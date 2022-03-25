@@ -92,14 +92,14 @@
 
 #| Q: What is the car of l where l is hotdog |#
 #| A: Nothing, b/c hotdog is not a list but an atom
-      (car 'hotdog)
-      => error car: contract violation
+      (car 'hotdog) ==> 
+      error car: contract violation
       expected: pair?
       given: 'hotdog |#
 
 #| Q: What is the car of l where l is () |#
 #| A: Nothing, b/c there is no first element in an empty list
-      (car '())
+      (car '()) ==>
       first: contract violation
       expected: (and/c list? (not/c empty?))
       given: '() |#
@@ -107,3 +107,41 @@
 #| ** The Law of Car ** 
 The primitive car is defined 
 only for non-empty lists. |#
+
+#| Q: What is the car of l where l is (((hotdogs)) (and) (pickle) relish) |#
+#| A: The car of (((hotdogs)) (and) (pickle) relish) is ((hotdogs))
+      This is the first expression in l
+      read: "The list of the list of hotdogs" |#
+(car '(((hotdogs)) (and) (pickle) relish)) ; ==> '((hotdogs))
+
+#| Q: What is (car l) where l is (((hotdogs)) (and) (pickle) relish) |#
+#| A: (car l) of (((hotdogs)) (and) (pickle) relish) is ((hotdogs)) like above
+      (car l) is just another way of saying "car of l"|#
+(car '(((hotdogs)) (and) (pickle) relish)) ; ==> '((hotdogs))
+
+#| Q: What is (car (car l)) where l is (((hotdogs)) (and)) |#
+#| A: (car (car l)) of (((hotdogs)) (and)) is (hotdogs) |#
+ (car (car '(((hotdogs)) (and)))) ; ==> '(hotdogs)
+
+#| Q: What is the cdr of l where l is (a b c) |#
+#| A: The cdr of (a b c) is (b c), b/c car of (a b c) is a |#
+(cdr '(a b c)) ; ==> '(b c)
+
+#| Q: What is the cdr of l where l is ((a b c) x y z) |#
+#| A: The cdr of ((a b c) x y z) is (x y z) |#
+(cdr '((a b c) x y z)) ; ==> '(x y z)
+
+#| Q: What is the cdr of l where l is (hamburger) |#
+#| A: The cdr of (hamburger) is () |#
+(cdr '(hamburger)) ; ==> '()
+
+#| Q: What is (cdr l) where l is ((x) t r) |#
+#| A: (cdr ((x) t r)) is (t r) |#
+(cdr '((x) t r)) ; ==> '(t r)
+
+#| Q: What is (cdr a) where a is hotdogs |#
+#| A: Nothing, b/c hotdogs is an atom and has no cdr
+      (cdr 'hotdogs) ==>
+      cdr: contract violation
+      expected: pair?
+      given: 'hotdogs|#
