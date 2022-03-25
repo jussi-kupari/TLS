@@ -1,5 +1,4 @@
 #lang racket
-(require test-engine/racket-tests)
 
 ;; atom? : Any -> Boolean
 ;; Produces #true if input is an atom
@@ -105,6 +104,6 @@
       expected: (and/c list? (not/c empty?))
       given: '() |#
 
-#| The Law of Car 
+#| ** The Law of Car ** 
 The primitive car is defined 
 only for non-empty lists. |#
