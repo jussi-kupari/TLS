@@ -6,6 +6,8 @@
   (λ (x) 
     (and (not (pair? x)) (not (null? x)))))
 
+#|                    Toys                    |#
+
 #| Q: Is it true that this is an atom?  atom |#
 #| A: Yes, because atom is a string of characters beginning with a letter |#
 (atom? 'atom) ; ==> #t
@@ -322,19 +324,78 @@
 
 #| Q: How many arguments does eq? take and what are they? |#
 #| A: Two arguments that must be non-numeric atoms |#
-; Note: eq? seems to work for numeric atoms in #lang racket
 
-#| Q: |#
-#| A: |#
+#| Q: Is (eq ? l1 l2) true or false where l1 is () and l2 is (strawberry) |#
+#| A: No answer, b/c eq? takes two atoms as arguments and () and (strawberry) are lists |#
+; Note: (eq? '() '(strawberry)) returns #f
+(eq? '() '(strawberry)) ; ==> #f
 
-#| Q: |#
-#| A: |#
+#| Q: Is (eq? n1 n2) true or false where n1 is 6 and n2 is 7 |#
+#| A: No answer, b/c eq? works with non-numerical atoms and these are numbers |#
+; Note: (eq? 6 7) returns #f, but (eq? 7 7) actually returns #t
+(eq? 6 7) ; ==> #f
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#|           *** The Law of Eq? ***
+      The primitive eq? takes two arguments.
+         Each must be a non-numeric atom. |#
+
+#| Q: Is (eq? (car l) a) true or false where l is (Mary had a little lamb chop) and a is Mary |#
+#| A: True, b/c (car (Mary had a little lamb chop)) is Mary and a is Mary|#
+(car '(Mary had a little lamb chop)) ; ==> 'Mary
+(eq? 'Mary 'Mary) ; ==> #t
+(eq? (car '(Mary had a little lamb chop)) 'Mary) ; ==> #t
+
+#| Q: Is (eq? (cdr l) a) true or false where l is (soured milk) and a is milk |#
+#| A: No answer, b/c (cdr (soured milk)) returns the list (milk) and eq? doesn't work with lists |#
+; Note: in reality this returns #f
+(eq? (cdr '(soured milk)) 'milk) ; ==> #f
+
+#| Q: Is (eq? (car l) (car (cdr l))) true or false where l is (beans beans we need jelly beans) |#
+#| A: True, b/c (car (beans beans we need jelly beans)) is beans,
+      (cdr (beans beans we need jelly beans)) is (beans we need jelly beans), and
+      (car (beans we need jelly beans)) is beans|#
+(eq? (car '(beans beans we need jelly beans)) (car (cdr '(beans beans we need jelly beans)))) ; ==> #t
+(car '(beans beans we need jelly beans)) ; ==> 'beans
+(cdr '(beans beans we need jelly beans)) ; ==> '(beans we need jelly beans)
+(car '(beans we need jelly beans)) ; ==> 'beans
+(eq? 'beans 'beans) ; ==> #t
+
+
+
+#| ==> Now go make yourself a peanut butter and jelly sandwich. <== |#
+
+
+
+#|        *** This space reserved for *** 
+                 JELLY STAINS! |#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
