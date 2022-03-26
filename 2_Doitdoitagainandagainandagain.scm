@@ -32,10 +32,10 @@
 #| Q: Write the function lat? using some, but not necessarily all, of the following functions: 
       car cdr cons null? atom? and eq? |#
 #| A: From the book:
-      You were not expected to be able to do this 
+      "You were not expected to be able to do this 
       yet, because you are still missing some 
       ingredients. Go on to the next question. 
-      Good luck.
+      Good luck."
 
       Below is my attempt, called list-of-atoms?, using some techniques not introduced yet. |#
 
