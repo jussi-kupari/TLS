@@ -6,11 +6,7 @@
   (λ (x) 
     (and (not (pair? x)) (not (null? x)))))
 
-
-
 #|                    Toys                    |#
-
-
 
 #| Q: Is it true that this is an atom?  atom |#
 #| A: Yes, because atom is a string of characters beginning with a letter |#
