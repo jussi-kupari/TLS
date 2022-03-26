@@ -345,6 +345,8 @@
       The primitive eq? takes two arguments.
          Each must be a non-numeric atom.            |#
 
+
+
 #| Q: Is (eq? (car l) a) true or false where l is (Mary had a little lamb chop) and a is Mary |#
 #| A: True, b/c (car (Mary had a little lamb chop)) is Mary and a is Mary|#
 (car '(Mary had a little lamb chop)) ; ==> 'Mary
