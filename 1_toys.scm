@@ -244,11 +244,85 @@
 (cons 'a '(c d)) ; ==> '(a c d)
 (cons 'a (cdr '((b) c d))) ; ==> '(a c d)
 
-#| Q: |#
-#| A: |#
+#| Q: Is it true that the list l is the null list where l is () |#
+#| A: Yes, () is an empty list and therefore null |#
+(null? '()) ; ==> #t
 
-#| Q: |#
-#| A: |#
+#| Q: What is (null? (quote ())) |#
+#| A: This is true, b/c (quote ()) defines an empty list |#
+(quote ()) ; ==> '()
+(null? '()) ; ==> #t
+(eq? '() (quote ())) ; ==> #t
+(null? (quote ())) ; ==> #t
+
+#| Q: Is (null? a) true or false where a is spaghetti |#
+#| A: No answer, b/c you can't ask null? from an atom |#
+; Note: actually this returns #f
+(null? 'spaghetti) ; ==> #f
+
+
+
+#|           *** The Law of Null? ***
+    The primitive null? is defined only for lists. |#
+
+
+
+#| Q: Is it true or false that s is an atom where s is Harry |#
+#| A: True, because Harry is a string of characters starting with a letter |#
+(atom? 'Harry) ; ==> #t
+
+#| Q: Is (atom? s) true or false where s is Harry |#
+#| A: True. See above. |#
+
+#| Q: Is (atom? s) true or false where s is (Harry had a heap of apples) |#
+#| A: False, b/c (Harry had a heap of apples) is a list |#
+(atom? '(Harry had a heap of apples)) ; ==> #f
+
+#| Q: How many arguments does atom? take and what are they? |#
+#| A: I takes one argument that should be a valid expression |#
+
+#| Q: Is (atom? (car l)) true or false where l is (Harry had a heap of apples) |#
+#| A: True, b/c (car (Harry had a heap of apples)) is Harry and Harry is an atom |#
+(atom? (car '(Harry had a heap of apples))) ; ==> #t
+
+#| Q: Is (atom? (cdr l)) true or false where l is (Harry had a heap of apples)|#
+#| A: False, b/c (cdr (Harry had a heap of apples)) is the list (had a heap of apples) |#
+(cdr '(Harry had a heap of apples)) ; ==> '(had a heap of apples)
+(atom? (cdr '(Harry had a heap of apples))) ; ==> #f
+
+#| Q: Is (atom? (cdr l)) true or false where l is (Harry) |#
+#| A: False, b/c (cdr (Harry))) is the null list '() and therefore not an atom |#
+(cdr '(Harry)) ; ==> '()
+(atom? (cdr '(Harry))) ; ==> #f
+
+#| Q: Is (atom? (car (cdr l))) true or false where l is (swing low sweet cherry oat) |#
+#| A: True, b/c (cdr (swing low sweet cherry oat)) is (low sweet cherry oat) and
+      (car (low sweet cherry oat)) is low, which is an atom |#
+(cdr '(swing low sweet cherry oat)) ; ==> '(low sweet cherry oat)
+(car '(low sweet cherry oat)) ; ==> 'low
+(atom? 'low) ; ==> #t
+
+#| Q: Is (atom? (car (cdr l))) true or false where l is (swing (low sweet) cherry oat) |#
+#| A: False, b/c (cdr (swing (low sweet) cherry oat)) is ((low sweet) cherry oat) and
+      (car ((low sweet) cherry oat)) is (low sweet), which is a list |#
+(cdr '(swing (low sweet) cherry oat)) ; ==> '((low sweet) cherry oat)
+(car '((low sweet) cherry oat)) ; ==> '(low sweet)
+(atom? '(low sweet)) ; ==> #f
+
+#| Q: True or false: a1 and a2 are the same atom where a1 is Harry and a2 is Harry|#
+#| A: True, b/c a1 is the atom Harry and a2 is the atom Harry |#
+
+#| Q: Is (eq?1 a1 a2) true or false where a1 is Harry and a2 is Harry |#
+#| A: True. See above |#
+(eq? 'Harry 'Harry) ; ==> #t
+
+#| Q: Is (eq? a1 a2) true or false where a1 is margarine and a2 is butter |#
+#| A: False, b/c margarine and butter are two different atoms |#
+(eq? 'margarine 'butter) ; ==> #f
+
+#| Q: How many arguments does eq? take and what are they? |#
+#| A: Two arguments that must be non-numeric atoms |#
+; Note: eq? seems to work for numeric atoms in #lang racket
 
 #| Q: |#
 #| A: |#
