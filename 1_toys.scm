@@ -110,6 +110,8 @@
          The primitive car is defined 
            only for non-empty lists. |#
 
+
+
 #| Q: What is the car of l where l is (((hotdogs)) (and) (pickle) relish) |#
 #| A: The car of (((hotdogs)) (and) (pickle) relish) is ((hotdogs))
       This is the first expression in l
@@ -161,6 +163,8 @@
         The primitive cdr is defined only for 
       non-empty lists. The cdr of any nonempty
           list is always another list. |#
+
+
 
 #| Q: What is (car (cdr l)) where l is ((b) (x y) ((c))) |#
 #| A: (car (cdr ((b) (x y) ((c))))) is (x y), b/c (cdr l) is ((x y) ((c))) |#
@@ -220,10 +224,13 @@
 (list? (cons '((a b c)) 'b)) ; ==> #f
 
 
+
 #|           *** The Law of Cons *** 
       The primitive cons takes two arguments. 
        The second argument to cons must be a 
            list. The result is a list. |#
+
+
 
 #| Q: What is (cons s (car l)) where s is a and l is ((b) c d). Why? |#
 #| A: (a b), b/c (car ((b) c d)) is (b) and (cons a (b)) is (a b) |#
