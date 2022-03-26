@@ -36,8 +36,8 @@
 
 #| Q: Is it true that this is a list? (atom turkey) or |#
 #| A: No, b/c these are two separate expressions: a list and an atom
-   (list? '(atom turkey) 'or)
-   ==> error (... the expected number of arguments does not match the given number) |#
+   (list? '(atom turkey) 'or) ==>
+   error (... the expected number of arguments does not match the given number) |#
 
 #| Q: Is it true that this is a list? ((atom turkey) or) |#
 #| A: Yes, this is a list containing a list and an atom |#
@@ -98,15 +98,17 @@
       given: 'hotdog |#
 
 #| Q: What is the car of l where l is () |#
-#| A: Nothing, b/c there is no first element in an empty list
+#| A: No answer, b/c there is no first element in an empty list
       (car '()) ==>
       first: contract violation
       expected: (and/c list? (not/c empty?))
       given: '() |#
 
-#| ** The Law of Car ** 
-The primitive car is defined 
-only for non-empty lists. |#
+
+
+#|            ** The Law of Car ** 
+         The primitive car is defined 
+           only for non-empty lists. |#
 
 #| Q: What is the car of l where l is (((hotdogs)) (and) (pickle) relish) |#
 #| A: The car of (((hotdogs)) (and) (pickle) relish) is ((hotdogs))
@@ -140,8 +142,118 @@ only for non-empty lists. |#
 (cdr '((x) t r)) ; ==> '(t r)
 
 #| Q: What is (cdr a) where a is hotdogs |#
-#| A: Nothing, b/c hotdogs is an atom and has no cdr
+#| A: No answer, b/c hotdogs is an atom and you can't ask and atom for a cdr
       (cdr 'hotdogs) ==>
       cdr: contract violation
       expected: pair?
       given: 'hotdogs|#
+
+#| Q: What is (cdr l) where l is () |#
+#| A: No answer, b/c only nonempty lists have one
+      (cdr '()) ==>
+      cdr: contract violation
+      expected: pair?
+      given: '() |#
+
+
+
+#|            *** The Law of Cdr *** 
+        The primitive cdr is defined only for 
+      non-empty lists. The cdr of any nonempty
+          list is always another list. |#
+
+#| Q: What is (car (cdr l)) where l is ((b) (x y) ((c))) |#
+#| A: (car (cdr ((b) (x y) ((c))))) is (x y), b/c (cdr l) is ((x y) ((c))) |#
+(car (cdr '((b) (x y) ((c))))) ; ==> '(x y)
+
+#| Q: What is (cdr (cdr l)) where l is ((b) (x y) ((c))) |#
+#| A: (cdr (cdr ((b) (x y) ((c))))) is (((c))), b/c (cdr l) is ((x y) ((c))) |#
+(cdr (cdr '((b) (x y) ((c))))) ; ==> '(((c)))  
+
+; (car l) returns the first expression of l as it is
+; (cdr l) returns l with the first expression removed 
+(car '((a) (b))) ; ==> '(a)
+(cdr '((a) (b))) ; ==> '((b))
+
+#| Q: What is (cdr (car l)) where l is (a (b (c)) d) |#
+#| A: No answer, b/c (car (a (b (c)) d)) is the atom 'a and you can't ask a cdr from an atom
+      (cdr (car '(a (b (c)) d))) ==>
+      cdr: contract violation
+      expected: pair?
+      given: 'a|#
+
+#| Q: What does car take as an argument? |#
+#| A: A non-empty list|#
+
+#| Q: What does cdr take as an argument? |#
+#| A: A non-empty list|#
+
+#| Q: What is the cons of the atom a and the list l where a is peanut and l is (butter and jelly) 
+      This can also be written "(cons a l)". Read: "cons the atom a onto the list l." |#
+#| A: (cons peanut (butter and jelly)) is (peanut butter and jelly), b/c cons adds the expression
+      as the first element to the beginning of a list |#
+(cons 'peanut '(butter and jelly)) ; ==> '(peanut butter and jelly)
+
+#| Q: What is the cons of s and l where s is (banana and) and l is (peanut butter and jelly) |#
+#| A: (cons (banana and) (peanut butter and jelly) is ((banana and) peanut butter and jelly) |#
+(cons '(banana and) '(peanut butter and jelly)) ;==> '((banana and) peanut butter and jelly)
+
+#| Q: What is (cons s l) where s is ((help) this) and l is (is very ((hard) to learn)) |#
+#| A: (((help) this) is very ((hard) to learn)), b/c cons just adds the expression at the
+      beginning of the list |#
+(cons '((help) this) '(is very ((hard) to learn))) ;==> '(((help) this) is very ((hard) to learn))
+
+#| Q: What does cons take as its arguments? |#
+#| A: It takes two arguments: an expression and a list |#
+
+#| Q: What is (cons s l) where s is (a b (c)) and l is () |#
+#| A: ((a b (c)))|#
+(cons '(a b (c)) '()) ; ==> '((a b (c)))
+
+#| Q: What is (cons s l) where s is a and l is () |#
+#| A: (a) |#
+(cons 'a '()) ; ==> '(a)
+
+#| Q: What is (cons s l) where s is ((a b c)) and l is b |#
+#| A: Not a list, b/c b is an atom and the second argument of cons must be a list |#
+(cons '((a b c)) 'b) ; ==> '(((a b c)) . b)
+(list? (cons '((a b c)) 'b)) ; ==> #f
+
+
+#|           *** The Law of Cons *** 
+      The primitive cons takes two arguments. 
+       The second argument to cons must be a 
+           list. The result is a list. |#
+
+#| Q: What is (cons s (car l)) where s is a and l is ((b) c d). Why? |#
+#| A: (a b), b/c (car ((b) c d)) is (b) and (cons a (b)) is (a b) |#
+(car '((b) c d)) ; ==> '(b)
+(cons 'a '(b)) ; == '(a b)
+(cons 'a (car '((b) c d))) ; ==> '(a b)
+
+#| Q: What is (cons s (cdr l)) where s is a and l is ((b) c d). Why? |#
+#| A: (a c d), b/c (cdr ((b) c d)) is (c d) and (cons a (c d)) is (a c d) |#
+(cdr '((b) c d)) ; ==> '(c d)
+(cons 'a '(c d)) ; ==> '(a c d)
+(cons 'a (cdr '((b) c d))) ; ==> '(a c d)
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
