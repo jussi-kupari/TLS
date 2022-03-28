@@ -293,7 +293,7 @@
 
 #| Q: Can you put in your own words how we determined the final value (bacon lettuce tomato) |#
 #| A: Rember checks each atom of a list against a given atom-of-interest one at a time. If the
-      list is null, it returns an empty list. If the list is not empty, it checks if if the first atom
+      list is null, it returns an empty list. If the list is not empty, it checks if the first atom
       is the same. If it is, it returns the list without the atom. If the atoms are not the same, it
       saves the first atom on the list to be consed with the result of running rember with the
       atom-of-interest and the rest of the list. Each round when the atoms are not the same it saves
@@ -308,6 +308,8 @@
        and consed the previous atoms back onto the rest of the lat."|#
 
 #| Q: Can you rewrite rember so that it reflects the above description? |#
+#| A: Yes |#
+
 ;; rember : Atom LAT -> LAT
 ;; Given atom and lat, removes the first occurrence of atom from lat, if it finds the atom
 (define rember
@@ -318,106 +320,211 @@
       (else
        (cons (car lat) (rember a (cdr lat)))))))
 
-#| A: |#
+#| Q: Do you think this is simpler? |#
+#| A: book: Functions like rember can always be simplified in this manner. |#
 
-#| Q: |#
-#| A: |#
+#| Q: So why don't we simplify right away? |#
+#| A: book: Because then a function's structure does not coincide with its argument's structure. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Let's see if the new rember is the same as the old one. What is the value of the application 
+      (rember a lat) where a is 'and and lat is (bacon lettuce and tomato) |#
+#| A: (bacon lettuce tomato) |#
 
-#| Q: |#
-#| A: |#
+#| Q: (null? lat) |#
+#| A: False |#
+(null? '(bacon lettuce and tomato)) ; ==> #f
 
-#| Q: |#
-#| A: |#
+#| Q: (eq? (car lat) a) |#
+#| A: False |#
+(eq? (car '(bacon lettuce and tomato)) 'and) ; ==> #f
 
-#| Q: |#
-#| A: |#
+#| Q: else |#
+#| A: True, so the value is (cons (car lat) (rember a (cdr lat))). |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the meaning of (cons (car lat) (rember a (cdr lat)))|#
 
-#| Q: |#
-#| A: |#
+#| A: Cons the first atom in lat to the value of (rember a (cdr lat)) when we find this value. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (null? lat) |#
+#| A: False |#
+(null? '(lettuce and tomato)) ; ==> #f
 
-#| Q: |#
-#| A: |#
+#| Q: (eq? (car lat) a) |#
+#| A: False |#
+(eq? (car '(lettuce and tomato)) 'and) ; ==> #f
 
-#| Q: |#
-#| A: |#
+#| Q: else |#
+#| A: True as always, so the value becomes (cons (car lat) (rember a (cdr lat))). |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the meaning of (cons (car lat) (rember a (cdr lat)))|#
+#| A: We have to find the value of running rember with the remaining list and
+      when we find this value, we must cons the first atom in the current list to this value. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (null? lat) |#
+#| A: False |#
+(null? '(and tomato)) ; ==> #f
 
-#| Q: |#
-#| A: |#
+#| Q: (eq? (car lat) a) |#
+#| A: True |#
+(eq? (car '(and tomato)) 'and) ; ==> #t
 
-#| Q: |#
-#| A: |#
+#| Q: What is the value of the line ((eq? (car lat) a) (cdr lat)) |#
+#| A: (cdr lat), which is (cdr (and tomato)), which is (tomato) |#
+(cdr '(and tomato)) ; ==> '(tomato)
 
-#| Q: |#
-#| A: |#
+#| Q: Now what? |#
+#| A: Now we can cons the previous atom, lettuce, to this result (tomato).
+      This becomes (lettuce tomato). |#
 
-#| Q: |#
-#| A: |#
+#| Q: Now what? |#
+#| A: Now we can cons the previous saved atom, bacon, to this result (lettuce tomato).
+      This becomes (bacon lettuce tomato). |#
 
-#| Q: |#
-#| A: |#
+#| Q: Now that we have completed rember try this example: (rember a lat) 
+      where a is sauce and lat is (soy sauce and tomato sauce) |#
+#| A: (soy and tomato sauce) |#
+(rember 'sauce '(soy sauce and tomato sauce)) ; ==> '(soy and tomato sauce)
 
-#| Q: |#
-#| A: |#
+#| Q: What is (firsts l)  where l is
+    ((apple peach pumpkin) 
+     (plum pear cherry) 
+     (grape raisin pea) 
+     (bean carrot eggplant)) |#
 
-#| Q: |#
-#| A: |#
+#| A: (apple plum grape bean) |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (firsts l) where l is
+     ((a b)
+      (c d)
+      (e f))|#
 
-#| Q: |#
-#| A: |#
+#| A: (a c e) |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (firsts l) where l is () |#
 
-#| Q: |#
-#| A: |#
+#| A: () |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (firsts l) where l is
+      ((five plums) 
+       (four) 
+       (eleven green oranges)) |#
 
-#| Q: |#
-#| A: |#
+#| A: (five four eleven) |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (firsts l) where l is
+      (((five plums) four) 
+       (eleven green oranges) 
+       ((no) more)) |#
 
-#| Q: |#
-#| A: |#
+#| A: ((five plums) eleven (no)) |#
 
-#| Q: |#
-#| A: |#
+#| Q: In your own words, what does (firsts l) do? |#
+#| A: It takes one argument, a list of non-empty lists, and returns a list composed of the first
+      expression of each sublist. If the list main is null, it returns a null list.
 
-#| Q: |#
-#| A: |#
+      Book:
+      "The function firsts takes one argument, a list, which is either a null list or contains 
+       only non-empty lists. It builds another list composed of the first S-expression of each 
+       internal list." |#
 
-#| Q: |#
-#| A: |#
+#| Q: See if you can write the function firsts. Remember the Commandments! |#
+#| A: Ok, I'll give it a shot! |#
 
-#| Q: |#
-#| A: |#
+;; firsts : List-of-lists -> List-of-expressions
+;; Given a list-of-lists, produces alist composed of the first expression of each list internal list.
+(define firsts
+  (λ (lol)
+    (cond
+      ((null? lol) '())
+      ((null? (car lol)) (firsts (cdr lol))) ; guarding agains having null-lists inside
+      (else
+       (cons (car (car lol)) (firsts (cdr lol)))))))
 
-#| Q: |#
-#| A: |#
+(firsts '((apple peach pumpkin) 
+          (plum pear cherry) 
+          (grape raisin pea) 
+          (bean carrot eggplant))) ; ==> '(apple plum grape bean)
 
-#| Q: |#
-#| A: |#
+(firsts ' ((a b)
+           (c d)
+           (e f))) ; ==> '(a c e)
+
+(firsts '()) ; ==> '()
+
+(firsts '((five plums) 
+          (four) 
+          (eleven green oranges))) ; ==> '(five four eleven)
+
+(firsts '(((five plums) four) 
+          (eleven green oranges) 
+          ((no) more))) ; ==> '((five plums) eleven (no))
+
+(firsts '(((five plums) four) 
+          () 
+          ((no) more))) ; ==> '((five plums) (no))
+
+#| a template from the authors that I didn't use:
+  (define firsts 
+    (λ (l) 
+      (cond 
+        ((null? l) ... ) 
+        (else (cons ... (firsts (cdr l))))))) |#
+
+#| Q: Why 
+     (define firsts 
+        (λ (l) 
+           ... )) |#
+#| A: book: Because we always state the function name, 
+      (lambda, and the argument(s) of the function . |#
+
+#| Q: Why (cond ...) |#
+#| A: Because we want to ask questions about the arguments to get the result. |#
+
+#| Q: Why (null? l ...) |#
+#| A: Always ask null? first. This is The First Commandment. |#
+
+#| Q: Why (else |#
+#| A: if the list is not null the it contains at least one non-null list.
+      else is the only other question needed. |#
+
+#| Q: Why (else |#
+#| A: Else is always the last question and always true. |#
+
+#| Q: Why (cons |#
+#| A: Because the value of firsts is a list and lists are build using conses.
+      The Second Commandment. |#
+
+#| Q: Why (firsts (cdr l)) |#
+#| A: Because we need also to look further into the list using recursion. |#
+
+#| Q: Why ))) |#
+#| A: We need the closing parentheses for define, λ, and cond|#
+
+#| Q: Keeping in mind the definition of (firsts l) what is a typical element of the value 
+      of (firsts l) where l is ((a b) (c d) (e f)) |#
+#| A: a, c, or e |#
+
+#| Q: What is another typical element? |#
+#| A: any of the ones above |#
+
+#| Q: Consider the function seconds. What would be a typical element of the value 
+      of (seconds l) where l is ((a b) (c d) (e f)) |#
+#| A: b, d, or f |#
+
+#| Q: How do we describe a typical element for (firsts l) |#
+#| A: First element of the first sublist or (car (car l)) |#
+
+#| Q: When we find a typical element of (firsts l) what do we do with it? |#
+#| A: Save it to be consed to the recursive result. |#
+
+
+
+#|          *** The Third Commandment *** 
+                 When building a list,
+          describe the first typical element,
+      and then cons it onto the natural recursion.    |#
+
+
 
 #| Q: |#
 #| A: |#
