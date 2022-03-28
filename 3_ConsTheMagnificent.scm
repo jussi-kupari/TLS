@@ -65,18 +65,18 @@
 #| A: I can't think of any. No. |#
 
 ; Now, let's write down what we have so far:
-(define rember
+(define rember-proto
   (λ (a lat)
     (cond
       ((null? lat) '())
       (else
        (cond
          ((eq? (car lat) a) (cdr lat))
-         (else (rember a (cdr lat))))))))
+         (else (rember-proto a (cdr lat))))))))
 
 #| Q: What is the value of (rember a lat) where a is bacon and lat is (bacon lettuce and tomato) |#
 #| A: (lettuce and tomato) |#
-(rember 'bacon '(bacon lettuce and tomato)) ; ==> '(lettuce and tomato)
+(rember-proto 'bacon '(bacon lettuce and tomato)) ; ==> '(lettuce and tomato)
 
 #| Q: Now, let's see if this function works. What is the first question? |#
 #| A: (null? lat) |#
@@ -147,7 +147,7 @@
 #| A: Of course |#
 
 #| Q: (eq? (car lat) a) |#
-#| A: True, and is the same as and) |#
+#| A: True, and is the same as and |#
 (car '(and tomato))  ; ==> 'and
 (eq? 'and 'and) ; ==> #t
 
@@ -168,87 +168,156 @@
 #|          *** The Second Commandment ***
                 Use cons to build lists.              |#
 
+; Let's see what happens when we use cons
 
+;; rember.v1 : Atom LAT -> LAT
+;; Given atom and lat, removes the first occurrence of atom from lat or if atom is not found returns lat
+(define rember.v1
+  (λ (a lat)
+    (cond
+      ((null? lat) '())
+      (else
+       (cond
+         ((eq? (car lat) a) (cdr lat))
+         (else
+          (cons (car lat) (rember.v1 a (cdr lat)))))))))
 
-#| Q: |#
-#| A: |#
+#| Q: What is the value of (rember a lat) where a is 'and and lat is (bacon lettuce and tomato) |#
+#| A: (bacon lettuce tomato) |#
+(rember.v1 'and '(bacon lettuce and tomato)) ; ==> '(bacon lettuce tomato)
 
-#| Q: |#
-#| A: |#
+#| Q: What is the first question? |#
+#| A: (null? lat) |#
+(null? '(bacon lettuce and tomato)) ; ==> #f
 
-#| Q: |#
-#| A: |#
+#| Q: What do we do now? |#
+#| A: Go to the next question |#
 
-#| Q: |#
-#| A: |#
+#| Q: else |#
+#| A: Yes, True |#
 
-#| Q: |#
-#| A: |#
+#| Q: (eq? (car lat) a) |#
+#| A: False. Go to next step. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the meaning of (cons (car lat) (rember a (cdr lat)))
+      where a is 'and and lat is (bacon lettuce and tomato) |#
+#| A: Append and at the beginning of the list that is formed from
+      recurring rember with a and (cdr lat) wehere a is 'and and (cdr lat) is (lettuce and tomato)
 
-#| Q: |#
-#| A: |#
+     from the book:
+     It says to cons the car of lat -bacon- onto the value of (rember a (cdr lat)). 
+     But since we don't know the value of (rember a (cdr lat)) yet, we must find it 
+     before we can cons (car lat) onto it. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the meaning of (rember a (cdr lat)) |#
+#| A: Remove the first occurrence of a - if found - from (cdr lat) where a is 'and and
+      (cdr lat) is (lettuce and tomato) |#
 
-#| Q: |#
-#| A: |#
+#| Q: (null? lat) |#
+#| A: False |#
+(null? '(lettuce and tomato)) ; ==> #f
 
-#| Q: |#
-#| A: |#
+#| Q: else |#
+#| A: Yes, yes. Go to the next question |#
 
-#| Q: |#
-#| A: |#
+#| Q: (eq? (car lat) a) |#
+#| A: False. onwards |#
+(eq? (car '(lettuce and tomato)) 'and) ; ==> #f
 
-#| Q: |#
-#| A: |#
+#| Q: What is the meaning of (cons (car lat) (rember a (cdr lat))) |#
+#| A: Cons the first atom of lat to the value of (rember a (cdr lat)), where
+      a is 'and and (cdr lat) is (and tomato). This means to append lettuce
+      at the beginning of a list that is the result of (rember and (and tomato)),
+      so we first have to find the value of (rember and (and tomato)) |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the meaning of (rember a (cdr lat)) |#
+#| A: This means running rember with 'and and (cdr lat) which is (and tomato) |#
 
-#| Q: |#
-#| A: |#
+#| Q: (null? lat) |#
+#| A: False |#
+(null? '(and tomato)) ; ==> #f
 
-#| Q: |#
-#| A: |#
+#| Q: else |#
+#| A: True as always. So onwards. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (eq? (car lat) a) |#
+#| A: True |#
+(eq? (car '(and tomato)) 'and) ; ==> #t
 
-#| Q: |#
-#| A: |#
+#| Q: What is the value of the line ((eq? (car lat) a) (cdr lat))|#
+#| A: (cdr lat), which is (tomato) |#
+(cdr '(and tomato)) ; ==> '(tomato)
 
-#| Q: |#
-#| A: |#
+#| Q: Are we finished? |#
+#| A: From the book:
+      Certainly not! We know what (rember a lat) is when lat is (and tomato), but we don't yet 
+      know what it is when lat is (lettuce and tomato) or (bacon lettuce and tomato). |#
 
-#| Q: |#
-#| A: |#
+#| Q: We now have a value for (rember a (cdr lat)) where a is and and (cdr lat) is (and tomato) 
+      This value is (tomato) What next? |#
 
-#| Q: |#
-#| A: |#
+#| A: From the book:
+      Recall that we wanted to cons lettuce onto the value of (rember a (cdr lat)) 
+      where a was 'and and (cdr lat) was (and tomato). Now that we have this value,
+      which is (tomato), we can cons lettuce onto it. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the result when we cons lettuce onto (tomato) |#
+#| A: (lettuce tomato) |#
 
-#| Q: |#
-#| A: |#
+#| Q: What does (lettuce tomato) represent |#
+#| A: It represents the value of (cons (car lat) (rember a (cdr lat))),
+      when lat is (lettuce and tomato) and (rember a (cdr lat)) is (tomato). |#
 
-#| Q: |#
-#| A: |#
+#| Q: Are we finished yet? |#
+#| A: Not quite. So far we know what (rember a lat) is when lat is (lettuce and tomato), 
+      but we don't yet know what it is when lat is (bacon lettuce and tomato). |#
 
-#| Q: |#
-#| A: |#
+#| Q: We now have a value for (rember a (cdr lat)) where a is 'and and 
+     (cdr lat) is (lettuce and tomato). This value is (lettuce tomato)
+     This is not the final value, so what must we do again? |#
 
-#| Q: |#
-#| A: |#
+#| A: Recall that, at one time, we wanted to cons bacon onto the value of (rember a (cdr lat)), 
+      where a was 'and and (cdr lat) was (lettuce and tomato). Now that we have this value, which is 
+      (lettuce tomato), we can cons bacon onto it. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the result when we cons bacon onto (lettuce tomato) |#
+#| A: (bacon lettuce tomato) |#
 
-#| Q: |#
+#| Q: What does (bacon lettuce tomato) represent? |#
+#| A: I represent the value of (cons (car lat) (rember a (cdr lat))),
+      lat is (bacon lettuce and tomato), (car lat) is bacon and
+      (rember a (cdr lat)) is (lettuce tomato) |#
+
+#| Q: Are we finished yet? |#
+#| A: Yes we have |#
+
+#| Q: Can you put in your own words how we determined the final value (bacon lettuce tomato) |#
+#| A: Rember checks each atom of a list against a given atom-of-interest one at a time. If the
+      list is null, it returns an empty list. If the list is not empty, it checks if if the first atom
+      is the same. If it is, it returns the list without the atom. If the atoms are not the same, it
+      saves the first atom on the list to be consed with the result of running rember with the
+      atom-of-interest and the rest of the list. Each round when the atoms are not the same it saves
+      the first atom to be consed to the result of running with the remaining list. When it reaches
+      the end - finds the atom or the end of the list - it conses the saved atoms to the
+      result.
+
+      from the book:
+      "The function rember checked each atom of the lat, one at a time, to see if it was the 
+       same as the atom and. If the car was not the same as the atom, we saved it to be 
+       consed to the final value later. When rember found the atom and, it dropped it, 
+       and consed the previous atoms back onto the rest of the lat."|#
+
+#| Q: Can you rewrite rember so that it reflects the above description? |#
+;; rember : Atom LAT -> LAT
+;; Given atom and lat, removes the first occurrence of atom from lat, if it finds the atom
+(define rember
+  (λ (a lat)
+    (cond
+      ((null? lat) '())
+      ((eq? (car lat) a) (cdr lat))
+      (else
+       (cons (car lat) (rember a (cdr lat)))))))
+
 #| A: |#
 
 #| Q: |#
