@@ -591,7 +591,7 @@
       1. cons a onto the value of 2 
       2. cons c onto the value of 3 
       3. cons e onto () 
-      Ill or 
+      III. or 
      cons a onto 
        the cons of c onto 
          the cons of e onto 
@@ -601,55 +601,123 @@ In any case, what is the value of (firsts l) |#
 #| A: (a c e) |#
 
 #| Q: With which of the three alternatives do you feel most comfortable? |#
-#| A: |#
+#| A: Maybe the first. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (insertR new old lat) where new is topping old is fudge
+      and lat is (ice cream with fudge for dessert) |#
+#| A: (ice cream with fudge topping for dessert). |#
 
-#| Q: |#
-#| A: |#
+#| Q: (insertR new old lat) where new is jalapeno old is and and lat is (tacos tamales and salsa) |#
+#| A: (tacos tamales and jalapeno salsa) |#
 
-#| Q: |#
-#| A: |#
+#| Q: (insertR new old lat) where new is e old is d and lat is (a b c d f g d h) |#
+#| A: (a b c d e f g d h) |#
 
-#| Q: |#
-#| A: |#
+#| Q: In your own words, what does (insertR new old lat) do?|#
+#| A: It takes three arguments: two atoms, new and old, and a list of atoms and
+      builds a new list where the new atom has been inserted after the old atom. |#
 
-#| Q: |#
-#| A: |#
+#| Q: See if you can write the first three lines of the function insertR |#
+#| A: I'm gonna try to write the whole function |#
 
-#| Q: |#
-#| A: |#
+;; insertR : Atom Atom LAT -> LAT
+;; Given two atoms and a list of atoms, inserts the first atom after the second atom in the list
+(define insertR.v1
+  (λ (new old lat)
+    (cond
+      ((null? lat) '())
+      ((eq? (car lat) old)
+       (cons old (cons new (cdr lat))))
+      (else
+       (cons (car lat) (insertR.v1 new old (cdr lat)))))))
 
-#| Q: |#
-#| A: |#
+(insertR.v1 'topping 'fudge '(ice cream with fudge for dessert)) ; ==> '(ice cream with fudge topping for dessert)
+(insertR.v1 'jalapeno 'and '(tacos tamales and salsa)) ; == > '(tacos tamales and jalapeno salsa)
+(insertR.v1 'e 'd '(a b c d f g d h)) ; ==> '(a b c d e f g d h)
 
-#| Q: |#
-#| A: |#
+;; here is the template of the first three lines from the book
+#|(define insertR 
+     (λ (new old lat) 
+       (cond ... ))) |#
 
-#| Q: |#
-#| A: |#
+#| Q: Which argument changes when we recur with insertR |#
+#| A: lat. We look at its first element and then recur with the rest.
+      Then we look at the first of the rest and recur with the rest of the rest ... |#
+  
+#| Q: How many questions can we ask about the lat? |#
+#| A: In general? Two. Lat is either empty/null or non-empty. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Now see if you can write the whole function insertR |#
+#| A: I already did that above. |#
 
-#| Q: |#
-#| A: |#
+;; Here is our first attempt. 
+(define insertR.v2 
+  (λ (new old lat) 
+    (cond 
+      ((null? lat) '()) 
+      (else 
+       (cond 
+         ((eq? (car lat) old) (cdr lat)) 
+         (else (cons (car lat) 
+                     (insertR.v2 new old 
+                                 (cdr lat))))))))) 
 
-#| Q: |#
-#| A: |#
+#| Q: What is the value of the application (insertR new old lat) that we just determined 
+      where new is topping old is fudge and lat is (ice cream with fudge for dessert) |#
+#| A: (ice cream with for dessert) |#
+(insertR.v2 'topping 'fudge '(ice cream with fudge for dessert)) ; ==> '(ice cream with for dessert)
 
-#| Q: |#
-#| A: |#
+#| Q: So far this is the same as rember. What do we do in insertR when (eq? (car lat) old) is true? |#
+#| A: We want to insert new on the right of old in the list. This is not what happens now |#
 
-#| Q: |#
-#| A: |#
+#| Q: How is this done? |#
+#| A: I know how it is done, but let's try consing new onto (cdr lat) |#
 
-#| Q: |#
-#| A: |#
+(define insertR.v3 
+  (λ (new old lat) 
+    (cond 
+      ((null? lat) '()) 
+      (else (cond 
+              ((eq? (car lat) old) 
+               (cons new (cdr lat))) 
+              (else (cons (car lat) 
+                          (insertR.v3 new old 
+                                      (cdr lat)))))))))
+#| Q: So what is (insertR new old lat) now where new is topping old is fudge
+      and lat is (ice cream with fudge for dessert) |#
+#| A: (ice cream with topping for dessert) |#
+(insertR.v3 'topping 'fudge '(ice cream with fudge for dessert)) ; ==> '(ice cream with topping for dessert)
 
-#| Q: |#
-#| A: |#
+#| Q: Is this the list we wanted? |#
+#| A: No. We have only replaced one atom for another. |#
+
+#| Q: What still needs to be done? |#
+#| A: We need to keep the old atom in addition to adding the new atom. |#
+
+#| Q: How can we include old before new |#
+#| A: Like this: (cons old (cons new (cdr lat))) |#
+
+#| Q: Now let's write the rest of the function insertR |#
+
+(define insertR.v4 
+  (λ (new old lat) 
+    (cond 
+      ((null? lat) '()) 
+      (else
+       (cond 
+         ((eq? (car lat) old) 
+          (cons old (cons new (cdr lat)))) 
+         (else
+          (cons (car lat) (insertR.v4 new old (cdr lat)))))))))
+
+#| When new is topping, old is fudge, and lat is (ice cream with fudge for dessert), the value of 
+   the application, (insertR new old lat), is (ice cream with fudge topping for dessert). 
+   If you got this right, have one. |#
+
+(insertR.v4 'topping 'fudge '(ice cream with fudge for dessert))
+; ==> '(ice cream with fudge topping for dessert)
+(insertR.v1 'topping 'fudge '(ice cream with fudge for dessert))
+; ==> '(ice cream with fudge topping for dessert)
 
 #| Q: |#
 #| A: |#
