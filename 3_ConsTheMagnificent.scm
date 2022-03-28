@@ -168,6 +168,8 @@
 #|          *** The Second Commandment ***
                 Use cons to build lists.              |#
 
+
+
 ; Let's see what happens when we use cons
 
 ;; rember.v1 : Atom LAT -> LAT
@@ -526,40 +528,79 @@
 
 
 
-#| Q: |#
-#| A: |#
+#| Q: With The Third Commandment, we can now fill in more of the function firsts 
+      What does the last line look like now? |#
+#| A: (else (cons (car (car l)) (firsts (cdr l))))
 
-#| Q: |#
-#| A: |#
+      build list -> (cons 
+      typical element -> (car (car l)
+      natural recursion -> (firsts (cdr l)) |#
 
-#| Q: |#
-#| A: |#
+#| Q: What does (firsts l) do
+  (define firsts 
+    (λ (l) 
+      (cond 
+        ((null? l) ... ) 
+        (else ( cons (car (car l)) 
+                     (firsts (cdr l)))))))
 
-#| Q: |#
-#| A: |#
+      where l is ((a b) (c d) (e f)) |#
 
-#| Q: |#
-#| A: |#
+#| A: It doesn't do anything yet, b/c it is missing the ((null? l) ... ) part that
+      returns the value when l is a null list. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (null? l) where l is ((a b) (c d) (e f)) |#
+#| A: False. Move to the next question. |#
+(null? '((a b) (c d) (e f))) ; ==> #f
 
-#| Q: |#
-#| A: |#
+#| Q: What is the meaning of (cons (car (car l)) (firsts (cdr l))) |#
+#| A: Save the first element of the first sublist, (car (car l)), to be
+      consed to the result of the natural recursion, (firsts (cdr l)). |#
 
-#| Q: |#
-#| A: |#
+#| Q: (null? l) where l is ((c d) (e f))|#
+#| A: False, move to the next line. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the meaning of (cons (car (car l)) (firsts (cdr l))) |#
+#| A: As before. Save (car (car l)) to be consed to the result of the natural recursion. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (null? l) where l is ((e f)) |#
+#| A: False, so we continue. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the meaning of (cons (car (car l)) (firsts (cdr l))) |#
+#| A: Again. Save (car (car l)) to be consed to the result of the natural recursion. |#
 
-#| Q: |#
+#| Q: (null? ())|#
+#| A: True |#
+
+#| Q: Now, what is the value of the line ((null? l) ... ) |#
+#| A: We are still missing the value when (null? l) is true |#
+
+#| Q: What do we need to cons atoms onto? |#
+#| A: A list. Remember The Law of Cons. |#
+
+#| Q: For the purpose of consing, what value can we give when (null? l) is true? |#
+#| A: An empty list, a null list. '() |#
+
+#| Q: With () as a value, we now have three cons 
+      steps to go back and pick up. We need to: 
+      I. either 
+      1. cons e onto () 
+      2. cons c onto the value of 1 
+      3. cons a onto the value of 2 
+      II. or 
+      1. cons a onto the value of 2 
+      2. cons c onto the value of 3 
+      3. cons e onto () 
+      Ill or 
+     cons a onto 
+       the cons of c onto 
+         the cons of e onto 
+           () 
+In any case, what is the value of (firsts l) |#
+
+#| A: (a c e) |#
+
+#| Q: With which of the three alternatives do you feel most comfortable? |#
 #| A: |#
 
 #| Q: |#
