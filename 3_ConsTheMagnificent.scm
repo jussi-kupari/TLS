@@ -621,7 +621,8 @@ In any case, what is the value of (firsts l) |#
 #| A: I'm gonna try to write the whole function |#
 
 ;; insertR : Atom Atom LAT -> LAT
-;; Given two atoms and a list of atoms, inserts the first atom after the second atom in the list
+;; Given two atoms and a list of atoms, inserts the first atom to the right of
+;; the first occurrence of the second atom in the list
 (define insertR.v1
   (λ (new old lat)
     (cond
@@ -683,6 +684,7 @@ In any case, what is the value of (firsts l) |#
               (else (cons (car lat) 
                           (insertR.v3 new old 
                                       (cdr lat)))))))))
+
 #| Q: So what is (insertR new old lat) now where new is topping old is fudge
       and lat is (ice cream with fudge for dessert) |#
 #| A: (ice cream with topping for dessert) |#
@@ -719,20 +721,153 @@ In any case, what is the value of (firsts l) |#
 (insertR.v1 'topping 'fudge '(ice cream with fudge for dessert))
 ; ==> '(ice cream with fudge topping for dessert)
 
-#| Q: |#
-#| A: |#
+#| Q: Now try insertL 
+      Hint: insertL inserts the atom new to the left of the first occurrence of the atom old in lat |#
+#| A: Ok, I will do it. |#
 
-#| Q: |#
-#| A: |#
+;; insertL : Atom Atom LAT -> LAT
+;; Given two atoms and a list of atoms, inserts the first atom to the left of
+;; the first occurrence of the second atom in the list
+(define insertL.v1
+  (λ (new old lat)
+    (cond
+      ((null? lat) '())
+      ((eq? (car lat) old)
+       (cons new (cons old (cdr lat))))
+      (else
+       (cons (car lat) (insertL.v1 new old (cdr lat)))))))
 
-#| Q: |#
-#| A: |#
+(insertL.v1 'topping 'fudge '(ice cream with fudge for dessert))
+; ==> '(ice cream with topping fudge for dessert)
 
-#| Q: |#
-#| A: |#
+#| Q: Did you think of a different way to do it?
 
-#| Q: |#
-#| A: |#
+      ((eq? (car lat) old) 
+        (cons new (cons old (cdr lat))))
+
+     could have been
+
+      ((eq? (car lat) old) 
+        (cons new lat))
+
+     since (cons old (cdr lat)) where old is eq? to 
+     (car lat) is the same as lat. |#
+
+#| A: I didn't think of that! Let's try it! |#
+
+(define insertL.v2
+  (λ (new old lat)
+    (cond
+      ((null? lat) '())
+      ((eq? (car lat) old)
+       (cons new lat))
+      (else
+       (cons (car lat) (insertL.v2 new old (cdr lat)))))))
+
+(insertL.v2 'topping 'fudge '(ice cream with fudge for dessert))
+; ==> '(ice cream with topping fudge for dessert)
+
+#| Q: Now try subst 
+      Hint: (subst new old lat) replaces the first occurrence of old in the lat with new 
+      For example, where new is topping old is fudge and lat is (ice cream with fudge for dessert) 
+      the value is (ice cream with topping for dessert). Now you have the idea. |#
+
+#| A: Ok. |#
+
+;; subst : Atom Atom LAT -> LAT
+;; Given two atoms and a list of atoms, substitutes the first occurrence
+;; of the second atom in the list with the first atom 
+(define subst
+  (λ (new old lat)
+    (cond
+      ((null? lat) '())
+      ((eq? (car lat) old)
+       (cons new (cdr lat)))
+      (else
+       (cons (car lat) (subst new old (cdr lat)))))))
+
+(subst 'topping 'fudge '(ice cream with fudge for dessert))
+; ==> '(ice cream with topping for dessert)
+
+#| Obviously, this is the same as one of our incorrect attempts at insertR.
+
+(define subst 
+    (λ (new old lat) 
+      (cond 
+        ((null? lat) '()) 
+        (else (cond 
+                ((eq? (car lat) old) 
+                 (cons new (cdr lat))) 
+                (else (cons (car lat) 
+                             (subst new old 
+                                     (cdr lat)))))))))  |#
+
+#| Q: Now try subst2 
+      Hint: (subst2 new o1 o2 lat) replaces either the first occurrence of o1 or 
+      the first occurrence of o2 by new 
+      For example, where new is vanilla o1 is chocolate o2 is banana and 
+      lat is (banana ice cream with chocolate topping) the value is
+      (vanilla ice cream with chocolate topping)
+
+      (subst2 'vanilla 'chocolate 'banana '(banana ice cream with chocolate topping))
+      ==> '(vanilla ice cream with chocolate topping) |#
+
+#| A: Ok. |#
+
+;; subst2.v1 : Atom Atom LAT -> LAT
+;; Given three atoms and a list of atoms, substitutes the first occurrence
+;; of either the second or third atom in the list with the first atom
+(define subst2.v1
+  (λ (new o1 o2 lat)
+    (cond
+      ((null? lat) '())
+      ((eq? (car lat) o1)
+       (cons new (cdr lat)))
+      ((eq? (car lat) o2)
+       (cons new (cdr lat)))
+      (else
+       (cons (car lat) (subst2.v1 new o1 o2 (cdr lat)))))))
+
+(subst2.v1 'vanilla 'chocolate 'banana '(banana ice cream with chocolate topping))
+; ==> '(vanilla ice cream with chocolate topping)
+
+#|
+
+define subst2 
+(λ (new o1 o2 lat) 
+  (cond 
+    ((null? lat) '()) 
+    (else (cond 
+            ((eq? (car lat) o1 ) 
+             (cons new (cdr lat))) 
+            ((eq? (car lat) o2) 
+             (cons new (cdr lat))) 
+            (else (cons (car lat) 
+                        (subst2 new o1 o2 
+                                (cdr lat))))))))) |#
+
+#| Q: Did you think of a better way? |#
+#| A: Replace the two eq? lines about the (car lat) by 
+      ((or (eq? (car lat) o1) (eq? (car lat) o2)) (cons new (cdr lat))).
+
+     Yes, sure |#
+
+;; subst2.v2 : Atom Atom LAT -> LAT
+;; Given three atoms and a list of atoms, substitutes the first occurrence
+;; of either the second or third atom in the list with the first atom
+(define subst2.v2
+  (λ (new o1 o2 lat)
+    (cond
+      ((null? lat) '())
+      ((or
+        (eq? (car lat) o1)
+        (eq? (car lat) o2))
+       (cons new (cdr lat)))
+      (else
+       (cons (car lat) (subst2.v2 new o1 o2 (cdr lat)))))))
+
+(subst2.v2 'vanilla 'chocolate 'banana '(banana ice cream with chocolate topping))
+; ==> '(vanilla ice cream with chocolate topping)
 
 #| Q: |#
 #| A: |#
