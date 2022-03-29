@@ -24,7 +24,7 @@
 #| A: toast is not a member of the list so the answer is (bacon lettuce and tomato) |#
 
 #| Q: (rember a lat) where a is cup and lat is (coffee cup tea cup and hick cup) |#
-#| A: (coffee tea cup and hick cup)|#
+#| A: (coffee tea cup and hick cup) |#
 
 #| Q: What does (rember a lat) do? |#
 #| A: It takes an atom and a list of atoms and removes the first occurrence
@@ -868,6 +868,12 @@ define subst2
 
 (subst2.v2 'vanilla 'chocolate 'banana '(banana ice cream with chocolate topping))
 ; ==> '(vanilla ice cream with chocolate topping)
+
+
+
+#|          If you got the last function, go and repeat the cake-consing.          |#
+
+
 
 #| Q: |#
 #| A: |#
