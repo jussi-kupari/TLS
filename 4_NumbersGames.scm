@@ -149,71 +149,113 @@
 #| Q: What is the natural way to build numbers from a list? |#
 #| A: Use + in place of cons: + builds numbers in the same way as cons builds lists. |#
 
-#| Q: |#
-#| A: |#
+#| Q: When building lists with cons the value of the terminal condition is ()
+      What should be the value of the terminal condition when building numbers with + |#
+#| A: 0. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the natural terminal condition for a list? |#
+#| A: (null? l) |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the natural terminal condition for a tup? |#
+#| A: (zero? tup) |#
 
-#| Q: |#
-#| A: |#
+#| Q: When we build a number from a list of numbers, what should the terminal condition 
+      line look like? |#
+#| A: ((null? tup) 0), so when the tuple is empty the value is zero.
+      Compare to ((null? l) ()) with lists. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the terminal condition line of addtup? |#
+#| A: ((null? tup) 0) |#
 
-#| Q: |#
-#| A: |#
+#| Q: How is a lat defined? |#
+#| A: It is either an empty list, or it contains an atom, (car lat),
+      and a rest, (cdr lat), that is also a lat. |#
 
-#| Q: |#
-#| A: |#
+#| Q: How is a tup defined? |#
+#| A: Like a list of numbers. It is either an empty list, or it contains a 
+      number and a rest that is also a tup. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is used in the natural recursion on a list?|#
+#| A: (cdr lat) |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is used in the natural recursion on a tup? |#
+#| A: (cdr tup) |#
 
-#| Q: |#
-#| A: |#
+#| Q: Why? |#
+#| A: Because a tup is just a list of numbers. The rest of a non-empty list is a list 
+      and the rest of a non-empty tup is a tup. |#
 
-#| Q: |#
-#| A: |#
+#| Q: How many questions do we need to ask about a list? |#
+#| A: Two. |#
 
-#| Q: |#
-#| A: |#
+#| Q: How many questions do we need to ask about a tup? |#
+#| A: Two, b/c it is a list of numbers; either it is empty or it is a 
+      number and a rest, which is again a tup.  |#
 
-#| Q: |#
-#| A: |#
+#| Q: How is a number defined? |#
+#| A: It is either zero or it is one added to a rest, 
+      where rest is again a number. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the natural terminal condition for numbers? |#
+#| A: (zero? n) |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the natural recursion on a number? |#
+#| A: (sub1 n) |#
 
-#| Q: |#
-#| A: |#
+#| Q: How many questions do we need to ask about a number? |#
+#| A: Two. (zero? n) and else. |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+ #|                *** The First Commandment *** 
+                         (first revision) 
+               When recurring on a list of atoms, lat,
+         ask two questions about it: (null? lat) and else. 
+      When recurring on a number, n, ask two questions about it:
+                       (zero ? n) and else.                            |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#| Q: What does cons do? |#
+#| A: It constructs lists. |#
+
+#| Q: What does addtup do? |#
+#| A: I sums up all the numbers in a tuple. |#
+
+#| Q: What is the terminal condition line of addtup? |#
+#| A: ((null? tup) 0) |#
+
+#| Q: What is the natural recursion for addtup? |#
+#| A: (addtup (cdr tup)) |#
+
+#| Q: What does addtup use to build a number? |#
+#| A: It uses +, b/c + builds numbers, too! |#
+
+#| Q: Fill in the dots in the following definition:
+(define addtup 
+    (λ (tup) 
+      (cond 
+        ((null? tup) 0) 
+        (else ... )))) |#
+
+#| A: Ok. |#
+
+;; addtup : Tuple -> Whole Number
+;; Given tuple, adds up all the numbers in the tuple
+(define addtup 
+    (λ (tup) 
+      (cond 
+        ((null? tup) 0) 
+        (else
+         (+ (car tup) (addtup (cdr tup)))))))
+
+(addtup '(5 5 5 5 5)) ; ==> 25
+
+#| Here is what we filled in: 
+   (+ (car tup) (addtup ( cdr tup))). 
+   Notice the similarity between this line, and 
+   the last line of the function rember: 
+   (cons (car lat) (rember a (cdr lat))). |#
 
 #| Q: |#
 #| A: |#
