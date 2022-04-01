@@ -257,32 +257,275 @@
    the last line of the function rember: 
    (cons (car lat) (rember a (cdr lat))). |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (* 5 3) |#
+#| A: 15. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (* 13 4) |#
+#| A: 52. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What does (* n m) do? |#
+#| A: Builds a number by adding up n m times |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the terminal condition line for *?|#
+#| A: ((zero? m) 0), b/c n * 0 = 0 |#
 
-#| Q: |#
-#| A: |#
+#| Q: Since (zero? m) is the terminal condition, m must eventually
+      be reduced to zero. What function is used to do this? |#
+#| A: sub1 |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#|                 *** The Fourth Commandment ***           
+                          (first revision) 
+          Always change at least one argument while recurring.
+            It must be changed to be closer to termination.
+   The changing argument must be tested in the termination condition:   
+            when using cdr, test termination with null? and 
+              when using sub1, test termination with zero?.                 |#
 
-#| Q: |#
-#| A: |#
+
+
+#| Q: What is another name for (* n (sub1 m)) in this case? |#
+#| A: The natural recursion for (* n m) |#
+
+#| Q: Try to write the function * [times] |#
+#| A: Ok. |#
+
+;; times : WN WN -> WN
+;; Given two whole numbers, adds up the first times the second
+(define times
+  (λ (n m)
+    (cond
+      ((zero? m) 0)
+      (else (+ n (times n (sub1 m)))))))
+
+(times 7 5) ; ==> 35
+
+#| Q: What is (times 12 3) |#
+#| A: (+ 12 (+ 12 (+ 12 0)), or 36, but let's follow through the function one 
+      time to see how we get this value. |#
+
+#| Q: (zero? m) |#
+#| A: False. |#
+
+#| Q: What is the meaning of (+ n (times n (sub1 m)))? |#
+#| A: It adds n (where n = 12) to the natural recursion. If times is correct then 
+      (times 12 (sub1 3)) should be 24. |#
+(times 12 (sub1 3)) ; ==> 24
+
+#| Q: What are the new arguments of (* n m) |#
+#| A: n is 12 and m is 2 |#
+
+#| Q: (zero? m) |#
+#| A: False. |#
+
+#| Q: What is the meaning of (+ n (times n (sub1 m)))? |#
+#| A: It adds n (where n = 12) to (* n (sub1 m)). |#
+(times 12 (sub1 2)) ; ==> 12
+
+#| Q: What are the new arguments of (* n m) |#
+#| A: n is 12 and m is 1 |#
+
+#| Q: (zero? m) |#
+#| A: False. |#
+
+#| Q: What is the meaning of (+ n (times n (sub1 m)))? |#
+#| A: It adds n (where n = 12) to (* n (sub1 m)). |#
+(times 12 (sub1 1)) ; ==> 0
+
+#| Q: What is the value of the line ((zero? m) 0)  |#
+#| A: 0, b/c (zero? m) is now true. |#
+
+#| Q: Are we finished yet? |#
+#| A: No. |#
+
+#| Q: Why not? |#
+#| A: We still have all the + calls to pick up. |#
+
+#| Q: What is the value of the original application? |#
+#| A: (+ 12 (+ 12 (+ 12 0)). Notice that n has been +ed m times. |#
+
+#| Q: Argue, using equations, that times is the conventional multiplication of nonnegative 
+      integers, where n is 12 and m is 3. |#
+
+#| A: (times 12 3) = 12 + (times 12 2)
+       = 12 + 12 + (times 12 1)
+       = 12 + 12 + 12 + (times 12 0)
+       = 12 + 12 + 12 + 0
+
+      Which is as we expected. This technique works for all recursive functions, not just 
+      those that use numbers. You can use this approach to write functions as well as to 
+      argue their correctness. |#
+
+#| Q: Again, why is 0 the value for the terminal condition line in times? |#
+#| A: Because 0 will not affect +. That is, n + O = n |#
+
+
+
+#|                          *** The Fifth Commandment *** 
+            When building a value with + , always use 0 for the value of the 
+          terminating line, for adding 0 does not change the value of an addition.
+       When building a value with *, always use 1 for the value of the terminating line,
+            for multiplying by 1 does not change the value of a multiplication.
+    When building a value with cons, always consider () for the value of the terminating line.        |#
+
+
+
+#| Q: What is (tup+ tup1 tup2) where tup1 is (3 6 9 11 4) and tup2 is (8 5 2 0 7) |#
+#| A: (11 11 11 11 11) |#
+
+#| Q: What is (tup+ tup1 tup2) where tup1 is (2 3) and tup2 is (4 6) |#
+#| A: (6 9) |#
+
+#| Q: What does (tup+ tup1 tup2) do? |#
+#| A: It takes two tuples of equal length as arguments and adds the first number from tup1 to the
+      first number of tup2 and so on, building a tup of the answers. |#
+
+#| Q: What is unusual about tup+ |#
+#| A: It looks at each element of two tups at the same time, or in other words, it recurs on 
+      two tups.  |#
+
+#| Q: If you recur on one tup how many questions do you have to ask? |#
+#| A: Two: (null tup) and else. |#
+
+#| Q: When recurring on two tups, how many questions need to be asked about the tups? |#
+#| A: Four questions:
+      Are both tups null? (and (null? tup1) (null? tup2))
+      Is the first tup null? (null? tup1)
+      Is the second tup null? (null? tup2)
+      else |#
+
+#| Q: Do you mean the questions 
+      (and (null'? tup1 ) (null'? tup2)) 
+      (null? tup1 ) 
+      (null? tup2) 
+      and else |#
+#| A: Yes, like I said above. |#
+
+#| Q: Can the first tup be () at the same time as the second is other than () |#
+#| A: If the tups must be of equal length the no. |#
+
+#| Q: Does this mean (and (null? tup1 ) (null? tup2)) and 
+      else are the only questions we need to ask? |#
+#| A: Yes, but we could also ask (null? tup1) or (null? tup2) as the first
+      question, because the tups are of equal length. |#
+
+#| Q: Write the function tup+ |#
+#| A: Will do. |#
+
+(define tup+
+  (λ (tup1 tup2)
+    (cond
+      ((and (null? tup1) (null? tup2))
+       '())
+      (else
+       (cons
+        (+ (car tup1) (car tup2))
+        (tup+ (cdr tup1) (cdr tup2)))))))
+
+(tup+ '(5 7 9) '(2 2 3)) ; ==> '(7 9 12)
+
+; book version is the same as mine
+
+#| Q: What are the arguments of +? |#
+#| A: (car tup1) (car tup2) |#
+
+#| Q: What are the arguments of cons? |#
+#| A: (+ (car tup1) (car tup2)) and (tup+ (cdr tup1) (cdr tup2)) |#
+
+#| Q: What is (tup+ tup1 tup2) where tup1 is (3 7) and tup2 is (4 6) |#
+#| A: (7 13), but let's see how it works |#
+(tup+ '(3 7) '(4 6)) ; ==> '(7 13)
+
+#| Q: (null? tup1 ) |#
+#| A: False. |#
+
+#| Q: (cons
+        (+ (car tup1 ) (car tup2))
+        (tup+ (cdr tup1 ) (cdr tup2))) |#
+#| A: (cons (+ 3 4 (tup+ (7) (6)),
+      so cons 7 to the natural recursion |#
+
+#| Q: Why does the natural recursion include the cdr of both arguments? |#
+#| A: Because the typical element of the final value uses the car of both tups,
+      so now we are ready to consider the rest of both tups. |#
+
+#| Q: (null? tup1) where tup1 is now (7) and tup2 is now (6) |#
+#| A: False. |#
+
+#| Q: (cons 
+        (+ (car tup1) (car tup2)) 
+        (tup+ (cdr tup1 ) (cdr tup2))) |#
+#| A: (cons (+ 7 6) (tup+ () ()), or cons 13 onto the natural recursion. |#
+
+#| Q: (null? tup1 ) |#
+#| A: True. |#
+
+#| Q: Then, what must be the value? |#
+#| A: (), because (null? tup2) must also be true. |#
+
+#| Q: What is the value of the application? |#
+#| A: (7 13). In other words, (cons (+ 3 4) (cons (+ 7 6) (cons ())
+      or (cons 7 (cons 13 (cons ()), or (7 13).
+      That is, the cons of 7 onto the cons of 13 onto (). |#
+
+#| Q: What problem arises when we want (tup+ tup1 tup2) where 
+      tup1 is (3 7) and tup2 is (4 6 8 1) |#
+#| A: No answer, since tup1 will become null before tup2. 
+      See The First Commandment: We did not ask all the necessary questions! 
+      But, we would like the final value to be (7 13 8 1). |#
+
+#| Q: Can we still write tup+ even if the tups are not the same length? |#
+#| A: Yes! |#
+
+#| Q: What new terminal condition line can we add to get the correct final value? |#
+#| A: Add ((null? tup1) tup2). |#
+
+#| Q: What is (tup+ tup1 tup2) where tup1 is (3 7 8 1) and tup2 is (4 6) |#
+#| A: No answer, since tup2 will become null before tup1. 
+      See The First Commandment: We did not ask all the necessary questions! |#
+
+#| Q: What do we need to include in our function? |#
+#| A: We need to ask two more questions: (null? tup1) and (null? tup2). |#
+
+#| Q: What does the second new line look like?|#
+#| A: ((null? tup2) tup1) |#
+
+#| Q: Here is a definition of tup+ that works for any two tups:
+      Can you simplify it? |#
+
+(define tup+.v2 
+    (λ (tup1 tup2) 
+      (cond 
+        ((and (null? tup1) (null? tup2)) 
+         '()) 
+        ((null? tup1) tup2) 
+        ((null? tup2) tup1) 
+        (else 
+         (cons (+ (car tup1) (car tup2)) 
+                (tup+.v2 
+                 (cdr tup1) (cdr tup2)))))))
+
+(tup+.v2 '(3 7 8 1) '(4 6)) ; ==> '(7 13 8 1)
+
+#| A: You can remove the ((and (null? tup1) (null? tup2)) '())
+      This is because if the tups are the same length you will be
+      consing a null tup at the and as is correct |#
+
+(define tup+.v3 
+    (λ (tup1 tup2) 
+      (cond 
+        ((null? tup1) tup2) 
+        ((null? tup2) tup1) 
+        (else 
+         (cons (+ (car tup1) (car tup2)) 
+                (tup+.v3 
+                 (cdr tup1) (cdr tup2))))))) 
+
+(tup+.v3 '(3 7 8 1) '(4 6)) ; ==> '(7 13 8 1)
+
+#| Q: Does the order of the two terminal conditions matter? |#
+#| A: No. |#
 
 #| Q: |#
 #| A: |#
