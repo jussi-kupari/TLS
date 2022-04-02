@@ -207,7 +207,7 @@
 
 
 
- #|                *** The First Commandment *** 
+#|                *** The First Commandment *** 
                          (first revision) 
                When recurring on a list of atoms, lat,
          ask two questions about it: (null? lat) and else. 
@@ -243,11 +243,11 @@
 ;; addtup : Tuple -> Whole Number
 ;; Given tuple, adds up all the numbers in the tuple
 (define addtup 
-    (λ (tup) 
-      (cond 
-        ((null? tup) 0) 
-        (else
-         (+ (car tup) (addtup (cdr tup)))))))
+  (λ (tup) 
+    (cond 
+      ((null? tup) 0) 
+      (else
+       (+ (car tup) (addtup (cdr tup)))))))
 
 (addtup '(5 5 5 5 5)) ; ==> 25
 
@@ -495,16 +495,16 @@
       Can you simplify it? |#
 
 (define tup+.v2 
-    (λ (tup1 tup2) 
-      (cond 
-        ((and (null? tup1) (null? tup2)) 
-         '()) 
-        ((null? tup1) tup2) 
-        ((null? tup2) tup1) 
-        (else 
-         (cons (+ (car tup1) (car tup2)) 
-                (tup+.v2 
-                 (cdr tup1) (cdr tup2)))))))
+  (λ (tup1 tup2) 
+    (cond 
+      ((and (null? tup1) (null? tup2)) 
+       '()) 
+      ((null? tup1) tup2) 
+      ((null? tup2) tup1) 
+      (else 
+       (cons (+ (car tup1) (car tup2)) 
+             (tup+.v2 
+              (cdr tup1) (cdr tup2)))))))
 
 (tup+.v2 '(3 7 8 1) '(4 6)) ; ==> '(7 13 8 1)
 
@@ -513,100 +513,472 @@
       consing a null tup at the and as is correct |#
 
 (define tup+.v3 
-    (λ (tup1 tup2) 
-      (cond 
-        ((null? tup1) tup2) 
-        ((null? tup2) tup1) 
-        (else 
-         (cons (+ (car tup1) (car tup2)) 
-                (tup+.v3 
-                 (cdr tup1) (cdr tup2))))))) 
+  (λ (tup1 tup2) 
+    (cond 
+      ((null? tup1) tup2) 
+      ((null? tup2) tup1) 
+      (else 
+       (cons (+ (car tup1) (car tup2)) 
+             (tup+.v3 
+              (cdr tup1) (cdr tup2))))))) 
 
 (tup+.v3 '(3 7 8 1) '(4 6)) ; ==> '(7 13 8 1)
 
 #| Q: Does the order of the two terminal conditions matter? |#
 #| A: No. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is else the last question? |#
+#| A: Yes, because either (null? tup1) or (null? tup2) is true if either one of them does 
+      not contain at least one number. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (bigger-than? 12 133) |#
+#| A: False. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (bigger-than? 120 11) |#
+#| A: True. |#
 
-#| Q: |#
-#| A: |#
+#| Q: On how many numbers do we have to recur? |#
+#| A: Two, n and m|#
 
-#| Q: |#
-#| A: |#
+#| Q: How do we recur? |#
+#| A: (sub1 n) (sub1 m) |#
 
-#| Q: |#
-#| A: |#
+#| Q: When do we recur? |#
+#| A: When we know neither number is equal to 0. |#
 
-#| Q: |#
-#| A: |#
+#| Q: How many questions do we have to ask about n and m? |#
+#| A: Three: (zero? m), (zero? n), and else |#
 
-#| Q: |#
-#| A: |#
+#| Q: Can you write the function  bigger-than? now using zero? and sub1 |#
+#| A: Sure. |#
 
-#| Q: |#
-#| A: |#
+(define bigger-than??
+  (λ (n m)
+    (cond
+      ((zero? m) #t)
+      ((zero? n) #f)
+      (else (bigger-than?? (sub1 n) (sub1 m))))))
 
-#| Q: |#
-#| A: |#
+(bigger-than?? 5 4) ; ==> #t
+(bigger-than?? 4 5) ; ==> #f
 
-#| Q: |#
-#| A: |#
+; Book version is the same as mine.
 
-#| Q: |#
-#| A: |#
+#| Q: Is the way we wrote (bigger-than?? n m) correct |#
+#| A: No, try it for the case where n and m are the same number. Let n and m be 3. |#
+(bigger-than?? 3 3) ; ==> #t
 
-#| Q: |#
-#| A: |#
+#| Q: (zero? 3) |#
+#| A: False, so move forwards to the next question. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (zero? 3) |#
+#| A: False, move to the next question. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the meaning of (bigger-than?? (sub1 n) (sub1 m)) |#
+#| A: Naturak recursion with both arguments reduced with one. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (zero? 2) |#
+#| A: False, so move forwards to the next question. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (zero? 2) |#
+#| A: False, move to the next question. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the meaning of (bigger-than?? (sub1 n) (sub1 m)) |#
+#| A: Natural recursion with both arguments reduced with one. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (zero? 1) |#
+#| A: False, so move forwards to the next question. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (zero? 1) |#
+#| A: False, move to the next question. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the meaning of (bigger-than?? (sub1 n) (sub1 m)) |#
+#| A: Natural recursion with both arguments reduced with one. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (zero? 0) |#
+#| A: True, so the value becomes #t |#
 
-#| Q: |#
-#| A: |#
+#| Q: IS this correct? |#
+#| A: No, b/c 3 is not bigger than 3. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Does the order of the two terminal conditions matter. |#
+#| A: Think about it. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Does the order of the two terminal conditions matter. |#
+#| A: Yes. Think first then try.
 
-#| Q: |#
-#| A: |#
+      If (zero? n) is first and is true, the value becomes #f, but
+      if (zero? m) is first and true, the value becomes #t |#
 
-#| Q: |#
-#| A: |#
+#| Q: How can we change the function bigger-than?? to take care of this subtle problem? |#
+#| A: Switch the zero? lines |#
 
-#| Q: |#
-#| A: |#
+(define bigger-than?
+  (λ (n m)
+    (cond
+      ((zero? n) #f)
+      ((zero? m) #t)
+      (else (bigger-than? (sub1 n) (sub1 m))))))
+
+(bigger-than? 3 3) ; ==> #f
+ 
+#| Q: What is (smaller-than? 4 6) |#
+#| A: True. |#
+
+#| Q: What is (smaller-than? 8 3) |#
+#| A: False. |#
+
+#| Q:  What is (smaller-than? 8 3) |#
+#| A: False. |#
+
+#| Q: Now try to write smaller-than? |#
+#| A: Ok. |#
+
+(define smaller-than? 
+  (λ (n m) 
+    (cond 
+      ((zero? m) #f) 
+      ((zero? n) #t ) 
+      (else (smaller-than? (sub1 n) (sub1 m)))))) 
+
+(smaller-than? 5 4) ; ==> #f
+(smaller-than? 4 5) ; ==> #t
+(smaller-than? 4 4) ; ==> #f
+
+; or, using bigger-than?
+(define smaller-than??
+  (λ (n m )
+    (bigger-than? m n)))
+
+(smaller-than?? 5 4) ; ==> #f
+(smaller-than?? 4 5) ; ==> #t
+(smaller-than?? 4 4) ; ==> #f
+
+#| Q: Here is the definition of same-num? |#
+
+(define same-num?
+  (λ (n m)
+    (cond
+      ((zero? m) (zero? n))
+      ((zero? n) #f)
+      (else
+       (same-num? (sub1 n) (sub1 m))))))
+
+#| A: Ok. |#
+
+
+#| Q: Rewrite same-size? using smaller-than? and bigger-than? |#
+#| A: Ok. |#
+
+(define same-num??
+  (λ (n m)
+    (cond
+      ((or (smaller-than? n m)
+           (bigger-than? n m)) #f)
+      (else #t))))
+
+;; Note: The book version doesn't use the or.
+
+#| Q: Does this mean we have two different 
+      functions for testing equality of atoms?|#
+#| A: Yes, they are same-num? for atoms that are numbers and eq? for the others. |#
+
+#| Q: (raise-to-power 1 1) |#
+#| A: 1. |#
+
+#| Q: (raise-to-power 2 3) |#
+#| A: 8. |#
+
+#| Q: (raise-to-power 5 3) |#
+#| A: 125. |#
+
+#| Q: Now write the function to-power
+      Hint: See the The First and Fifth Commandments. |#
+#| A: Ok. |#
+
+(define raise-to-power
+  (λ (n m)
+    (cond
+      ((zero? m) 1)
+      (else (times n (raise-to-power n (sub1 m)))))))
+
+(raise-to-power 1 1) ; ==> 1
+(raise-to-power 2 3) ; ==> 8
+(raise-to-power 5 3) ; ==> 125
+(raise-to-power 4 4) ; ==> 256
+
+#| Q: What is a good name for this function? 
+(define ??? 
+    (λ ( n m) 
+      (cond 
+        ((< n m) 0) 
+        (else (add1 (??? (- n m) m)))))) |#
+#| A: We have never seen this kind of definition 
+      before; the natural recursion also looks strange. |#
+
+#| Q: What does the first question check? |#
+#| A: It checks if the first argument is smaller than the second. |#
+
+#| Q: And what happens in the second line? |#
+#| A: We recur with a first argument from which 
+      we subtract the second argument. When the 
+      function returns, we add 1 to the result. |#
+
+#| Q: So what does the function do? |#
+#| A: It counts how many times the first argument fits into the second argument. |#
+
+#| Q: And what do we call this? |#
+#| A: Division. |#
+
+(define divide 
+  (λ (n m) 
+    (cond 
+      ((< n m) 0) 
+      (else (add1 (divide (- n m) m))))))
+
+(divide 10 5) ; ==> 2
+(divide 15 5) ; ==> 3
+(divide 36 5) ; ==> 7
+; Note: this is like the function quotient
+
+#| Q: What is (+ 15 4) |#
+#| A: It is 3. |#
+
+#| Q: How do we get there? |#
+#| A: (divide 15 4)
+      ==> (+ 1 (divide 11 4)
+      ==> (+ 1 (+  1 (divide 7 4))) 
+      ==> (+ 1 (+ 1 (+ 1 (divide 3 4)))) 
+      ==> (+ 1 (+ 1 (+ 1 0))) |#
+
+
+
+#|        Wouldn't a (ham and cheese on rye) be good right now? 
+                        Don't forget the mustard!                         |#
+
+
+
+#| Q: What is the value of (length lat) where lat is
+      (hotdogs with mustard sauerkraut and pickles)? |#
+#| A: 6. |#
+
+#| Q: What is (length lat) where lat is (ham and cheese on rye) |#
+#| A: 5. |#
+
+#| Q: Now try to write the function length. |#
+#| A: Ok. |#
+
+(define len
+  (λ (lat)
+    (cond
+      ((null? lat) 0)
+      (else (add1 (len (cdr lat)))))))
+
+(len '(1 2 3 4 5)) ; ==> 5
+(len '()) ; ==> 0
+
+#| Q: What is (pick n lat) where n is 4 and lat is
+      (lasagna spaghetti ravioli macaroni meatball) |#
+#| A: macaroni. |#
+
+#| Q: What is (pick 0 lat) where lat is (a) |#
+#| A: No answer. |#
+
+#| Q: Try to write the function pick. |#
+#| A: Ok. |#
+
+(define pick
+  (λ (n lat)
+    (cond
+      ((zero? (sub1 n)) (car lat))
+      (else (pick (sub1 n) (cdr lat))))))
+
+(pick 4 '(lasagna spaghetti ravioli macaroni meatball)) ; ==> 'macaroni
+
+; Book has the same solution
+
+#| Q: What is (rempick n lat) where n is 3 and lat is (hotdogs with hot mustard) |#
+#| A: (hotdogs with mustard) |#
+
+#| Q: Now try to write rempick. |#
+#| A: Ok. |#
+
+(define rempick
+  (λ (n lat)
+    (cond
+      ((zero? (sub1 n)) (cdr lat))
+      (else
+       (cons (car lat) (rempick (sub1 n) (cdr lat)))))))
+
+(rempick 3 '(hotdogs with hot mustard))
+
+#| Q: Is (number? a) true or false where a is tomato? |#
+#| A: False. |#
+
+#| Q: Is (number? 76) true or false? |#
+#| A: True. |#
+
+#| Q: Can you write number? which is true if its argument
+      is a numeric atom and false if it is anything else? |#  
+#| A: No: number?, like add1, sub1, zero?, car, cdr, cons,
+      null?, eq?, and atom?, is a primitive function. |#
+
+#| Q: Now using number? write the function no-nums which gives
+      as a final value a lat obtained by removing all the numbers
+      from the lat. For example, where lat is (5 pears 6 prunes 9 dates) 
+      the value of (no-nums lat) is (pears prunes dates) |#
+#| A: Ok. |#
+
+(define no-nums
+  (λ (lat)
+    (cond
+      ((null? lat) '())
+      ((number? (car lat))
+       (no-nums (cdr lat)))
+      (else
+       (cons (car lat) (no-nums (cdr lat)))))))
+
+(no-nums '(5 pears 6 prunes 9 dates)) ; ==> '(pears prunes dates)
+
+#| Book version is more verbose
+(define no-nums 
+    (λ (lat) 
+      (cond 
+        ((null? lat) '()) 
+        (else (cond 
+                ((number? (car lat)) 
+                 (no-nums (cdr lat))) 
+                (else (cons (car lat) 
+                            (no-nums 
+                             (cdr lat))))))))) |#
+
+#| Q: Now write all-nums which extracts a tup from a lat using all the numbers in the lat. |#
+#| A: Ok, I got this. |#
+
+(define all-nums
+  (λ (lat)
+    (cond
+      ((null? lat) '())
+      ((number? (car lat))
+       (cons (car lat) (all-nums (cdr lat))))
+      (else (all-nums (cdr lat))))))
+
+(all-nums '(5 pears 6 prunes 9 dates)) ; ==> '(5 6 9)
+
+#| Book version is again a more verbose version
+(define all-nums 
+    (λ ( lat) 
+      (cond 
+        ((null? lat) '()) 
+        (else 
+         (cond 
+           ((number? (car lat)) 
+            (cons (car lat) 
+                  (all-nums (cdr lat)))) 
+           (else (all-nums (cdr lat)))))) |#
+
+#| Q: Write the function eqan? which is true if its two arguments
+      (a1 and a2) are the same atom. Remember to use same-num? for numbers
+      and eq? for all other atoms. |#
+#| A: Ok. Let's try this. |#
+
+(define eqan?
+  (λ (a1 a2)
+    (cond
+      ((and (number? a1)
+            (number? a2)
+            (same-num? a1 a2)) #t)
+      ((or (number? a1)
+           (number? a2)) #f)
+      (else (eq? a1 a2)))))
+
+(eqan? 'a 1) ; ==> #f
+(eqan? 'a 'b) ; ==> #f
+(eqan? 5 4) ; ==> #f
+(eqan? 7 7) ; ==> #t
+(eqan? 'a 'a) ; ==> #t
+
+; Book solution is identical. 
+
+#| Q: Can we assume that all functions written using eq? can be
+      generalized by replacing eq? by eqan? |#
+#| A: Yes, all but eqan? itself. |#
+
+#| Q: Now write the function occur which counts the number of times
+      an atom a appears in a lat. |#
+#| A: Ok. |#
+
+(define occur
+  (λ (a lat)
+    (cond
+      ((null? lat) 0)
+      ((eqan? a (car lat))
+       (add1 (occur a (cdr lat))))
+      (else (occur a (cdr lat))))))
+
+(occur 'a '()) ; ==> 0
+(occur 'a '(a b c d e)) ; ==> 1
+(occur 'a '(a b c d a e)) ; ==> 2
+(occur 'a '(a b c a d a e a a d a)) ; ==> 6
+
+#| Book version is verbose as always and uses eq? instead of eqan?.
+(define occur 
+    (λ (a lat) 
+      (cond 
+        ((null? lat) 0) 
+        (else 
+         (cond 
+           ((eq? (car lat) a) 
+            (add1 (occur a (cdr lat)))) 
+           (else (occur a (cdr lat)))))))) |#
+
+#| Q: Write the function one? where (one? n) is #t if n is 1
+      and #f (i.e. , false) otherwise. |#
+#| A: Ok, will do. |#
+
+(define one?
+  (λ (n)
+    (zero? (sub1 n))))
+
+(one? 2) ; ==> #f
+(one? 0) ; ==> #f
+(one? 5466734) ; ==> #f
+(one? 1) ; ==> #t
+
+#| Book gives many verbose versions
+(define one? 
+    (λ (n) 
+      (cond 
+        ((zero ? n) #f) 
+        (else (zero ? (sub1 n))))))
+
+               OR
+
+(define one? 
+    (λ (n) 
+      (cond 
+        (else (same-num? n 1))))) |#
+
+#| Q: Guess how we can further simplify this function, making it a one-liner.
+      By removing the ( cond ... ) clause:
+ (define one? 
+    (λ (n) 
+      (same-num? n 1))) |#
+
+#| A: I already made a very similar one-liner version above using (zero? (sub1 n))! |#
+
+#| Q: Now rewrite the function rempick that removes the nth atom from a lat.
+      For example, where n is 3 and lat is (lemon meringue salty pie) the value
+      of (rem pick n lat) is (lemon meringue pie) Use the function one? in your answer. |#
+#| A: Ok, this is simple. |#
+
+(define rempick.v2
+  (λ (n lat)
+    (cond
+      ((one? n) (cdr lat))
+      (else
+       (cons (car lat) (rempick.v2 (sub1 n) (cdr lat)))))))
+
+(rempick.v2 3 '(lemon meringue salty pie)) ; ==> '(lemon meringue pie)
+
+#| Book version is identical to mine. |#
