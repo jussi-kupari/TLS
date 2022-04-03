@@ -299,38 +299,151 @@
 
 #| Book solution is identical to mine. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (insertL* new old l) where new is pecker old is chuck and l is
+((how much (wood))
+    could 
+    ((a (wood) chuck)) 
+    (((chuck))) 
+    (if (a) ((wood chuck))) 
+    could chuck wood) |#
+#| A:
+((how much (wood))
+    could 
+    ((a (wood) pecker chuck)) 
+    (((pecker chuck))) 
+    (if (a) ((wood pecker chuck))) 
+    could pecker chuck wood)|#
 
-#| Q: |#
-#| A: |#
+#| Q: Write insertL*
+(define insertL*
+  (λ (new old l)
+    (cond
+      ((...) ...)
+      ((...) ...)
+      ((...) ...)))) |#
 
-#| Q: |#
-#| A: |#
+#| A: Ok. |#
 
-#| Q: |#
-#| A: |#
+;; insertL* : Atom Atom List -> List
+;; Given two atoms and list, inserts the first atom on the left of each occurrence of the second atom.
+(define insertL*
+  (λ (new old l)
+    (cond
+      ((null? l) '())
+      ((atom? (car l))
+       (cond
+         ((eq? (car l) old)
+          (cons new
+                (cons old
+                      (insertL* new old (cdr l)))))
+         (else
+          (cons (car l)
+                (insertL* new old (cdr l))))))
+      (else
+       (cons (insertL* new old (car l))
+             (insertL* new old (cdr l)))))))
 
-#| Q: |#
-#| A: |#
+(insertL* 'pecker 'chuck
+          '((how much (wood))
+            could 
+            ((a (wood) chuck)) 
+            (((chuck))) 
+            (if (a) ((wood chuck))) 
+            could chuck wood))
+#| ==>
+'((how much (wood))
+  could
+  ((a (wood) pecker chuck))
+  (((pecker chuck)))
+  (if (a) ((wood pecker chuck)))
+  could
+  pecker
+  chuck
+  wood) |#
 
-#| Q: |#
-#| A: |#
+#| Book solution is identical to mine. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (member* a l) where a is chips and l is
+      ((potato) (chips ((with) fish) (chips))) |#
+#| A: True, b/c the atom chips appear in the list. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Write member*
 
-#| Q: |#
-#| A: |#
+(define member*
+  (λ (a l)
+    (cond
+      ((...) ...)
+      ((...) ...)
+      ((...) ...)))) |#
 
-#| Q: |#
-#| A: |#
+#| A: Alright. |#
 
-#| Q: |#
-#| A: |#
+;; my version uses a more awkward structure of cond -> predicate -> else
+;; that could be substituted with and or-structure like the book version does.
+
+;; member* : Atom List -> Boolean
+;; Given atom and list, produces true if atom is found in the list.
+(define member**
+  (λ (a l)
+    (cond
+      ((null? l) #f)
+      ((atom? (car l))
+       (cond
+         ((eq? (car l) a) #t)
+         (else (member** a (cdr l)))))
+      (else
+       (cond
+         ((member** a (car l)) #t)
+         (else (member** a (cdr l))))))))
+
+(member** 'chips '((potato) (chips ((with) fish) (chips)))) ; ==> #t
+(member** 'chips '((potato) (fries ((with) fish) (chips)))) ; ==> #t
+(member** 'chips '((potato) (fries ((with) fish) (fries)))) ; ==> #f
+
+;; book version uses or instead of my cond -> predicate -> else
+
+;; member* : Atom List -> Boolean
+;; Given atom and list, produces true if atom is found in the list.
+(define member* 
+    (λ (a l) 
+      (cond 
+        ((null? l) #f) 
+        ((atom? (car l)) 
+         (or (eq? (car l) a) 
+             (member* a (cdr l)))) 
+        (else (or (member* a (car l)) 
+                  (member* a (cdr l)))))))
+
+(member* 'chips '((potato) (chips ((with) fish) (chips)))) ; ==> #t
+(member* 'chips '((potato) (fries ((with) fish) (chips)))) ; ==> #t
+(member* 'chips '((potato) (fries ((with) fish) (fries)))) ; ==> #f
+
+#| Q: What is (member* a l) where a is chips and l is
+      ((potato) (chips ((with) fish) (chips))) |#
+
+#| A: True. |#
+
+#| Q: Which chips did it find? |#
+#| A: (chips ((with) fish) |#
+
+#| Q: What is (leftmost l) where l is
+      ((potato) (chips ((with) fish) (chips))) |#
+#| A: potato. |#
+
+#| Q: What is (leftmost l) where l is
+      (((hot) (tuna (and))) cheese) |#
+#| A: hot. |#
+
+#| Q: What is (leftmost l) where l is
+      (((() four)) 17 (seventeen)) |#
+#| A: No answer. |#
+
+#| Q: What is (leftmost '())|#
+#| A: No answer. |#
+
+#| Q: Can you describe what leftmost does? |#
+#| A: It finds the leftmost atom in a nonempty list of expressions
+      that does not contain an empty list. |#
 
 #| Q: |#
 #| A: |#
