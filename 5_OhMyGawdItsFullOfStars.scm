@@ -13,7 +13,16 @@
     (cond 
       ((null? l) #t) 
       ((atom? (car l)) (lat? (cdr l))) 
-      (else #f)))) 
+      (else #f))))
+
+;; plus : WN WN -> WN
+;; Given two whole numbers (nonnegative integers), produces their sum
+(define plus
+  (λ (n m)
+    (cond
+      ((zero? m) n)
+      (else
+       (add1 (plus n (sub1 m)))))))
 
 
 
@@ -44,16 +53,16 @@
 (define rember*
   (λ (a l)
     (cond
-      ((null? l) '()) ; empty list just returns empty
+      ((null? l) '())                        ; empty list just returns empty
       ((atom? (car l))
        (cond
          ((eq? (car l) a)
-          (rember* a (cdr l))) ; remove matching atom from list
+          (rember* a (cdr l)))               ; remove matching atom from list
          (else
           (cons (car l)
-                (rember* a (cdr l)))))) ; keep unmatching atom in list
-      (else (cons (rember* a (car l)) ; cons result of *rember on (car l) ... 
-                  (rember* a (cdr l))))))) ; ... on the result of *rember on (cdr l)
+                (rember* a (cdr l))))))      ; keep unmatching atom in list
+      (else (cons (rember* a (car l))        ; cons result of *rember on (car l) 
+                  (rember* a (cdr l)))))))   ; on the result of *rember on (cdr l)
 
 (rember* 'cup '((coffee) cup ((tea) cup) (and (hick)) cup))
 ; ==> ((coffee) ((tea)) (and (hick)))
@@ -100,21 +109,21 @@
 (define insertR*
   (λ (new old l)
     (cond
-      ((null? l) '()) ; empty list returns empty of course
-      ((atom? (car l)) ; if first element in an atom
+      ((null? l) '())                        ; empty list returns empty of course
+      ((atom? (car l))                       ; if first element in an atom
        (cond
-         ((eq? (car l) old) ; and matches with 'old
-          (cons old         ; cons 'old to the cons of 'new and natural recursion
+         ((eq? (car l) old)                  ; and matches with 'old
+          (cons old                          ; cons 'old to the cons of 'new and natural recursion
                 (cons new
                       (insertR* new old
                                 (cdr l)))))
-         (else (cons (car l) ; if no match just cons (car l) to natural recursion
+         (else (cons (car l)                 ; if no match just cons (car l) to natural recursion
                      (insertR* new old
                                (cdr l))))))
-      (else ; if (car l) is a list 
-       (cons (insertR* new old ; run insertR* on it 
+      (else                                  ; if (car l) is a list 
+       (cons (insertR* new old               ; run insertR* on it 
                        (car l))
-             (insertR* new old ; and cons in to the natural recursion with (cdr l)
+             (insertR* new old               ; and cons in to the natural recursion with (cdr l)
                        (cdr l)))))))
 
 (insertR* 'roast 'chuck
@@ -129,37 +138,164 @@
 #| Book version of insertR* is identical to mine. |#
 
 #| Q: How are insertR* and rember* similar? |#
-#| A: Each function asks three questions.  |#
+#| A: Each function asks three questions. |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#|                        *** The First Commandment *** 
+                                  (final version) 
+         When recurring on a list of atoms, lat, ask two questions about it:
+                               (null? lat) and else. 
+              When recurring on a number, n, ask two questions about it:
+                                (zero? n) and else. 
+       When recurring on a list of S-expressions, l, ask three question about it:
+                       (null? l), (atom? (car l)), and else.                               |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#| Q: How are insertR * and rember* similar? |#
+#| A: Each function recurs on the car of its argument when it finds out that the 
+      argument's car is a list. |#
 
-#| Q: |#
-#| A: |#
+#| Q: How are rember* and multirember different? |#
+#| A: The function multirember does not recur with the car. The function rember* recurs 
+      with the car as well as with the cdr. It recurs with the car when it finds out that 
+      the car is a list. |#
 
-#| Q: |#
-#| A: |#
+#| Q: How are insertR* and rember* similar? |#
+#| A: Both recur on the (car l) when it is a list and then recur with (cdr l). |#
 
-#| Q: |#
-#| A: |#
+#| Q: How are all *-functions similar? |#
+#| A: They all ask three quesions and, in addition to recurring on (cdr l),
+      they all recur on (car l) when it is a list. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Why? |#
+#| A: Because all *-functions work on lists that are either: 
+      - empty, 
+      - an atom consed onto a list, or 
+      - a list consed onto a list. |#
+
+
+
+#|                       *** The Fourth Commandment ***
+                                 (final version) 
+                Always change at least one argument while recurring. 
+               When recurring on a list-of-atoms, lat, use (cdr lat).
+                    When recurring on a number, n, use (sub1 n).
+      And when recurring on a list of S-expressions, l, use (car l) and (cdr l) if 
+                  neither (null? l) nor (atom? (car l)) are true.
+
+                   It must be changed to be closer to termination.
+        The changing argument must be tested in the termination condition:
+
+                    when using cdr, test termination with null?
+                 and when using sub1, test termination with zero?.                     |#
+
+
+
+#| Q: (occursomething a l) where a is banana and l is
+ '((banana)
+    (split ((((banana ice))) 
+            (cream (banana)) 
+            sherbet)) 
+    (banana) 
+    (bread) 
+    (banana brandy)) |#
+#| A: 5. |#
+
+#| Q: What is a better name for occursomething? |#
+#| A: occur* |#
+
+#| Q: Write occur*
+(define occur*
+  (λ (a l)
+    (cond
+      ((...) ...)
+      ((...) ...)
+      ((...) ...)))) |#
+
+#| A: Ok. |#
+
+;; occur* : Atom List -> WN
+;; Given atom and list, produces the sum of occurrences of atom in the list.
+(define occur*
+  (λ (a l)
+    (cond
+      ((null? l) 0)                                  ; if list is empty, zero occurrences
+      ((atom? (car l))                               ; if the first element is an atom, then
+       (cond
+         ((eq? (car l) a)                            ; if the same as 'a
+          (add1 (occur* a (cdr l))))                 ; add one and recur on (cdr l)
+         (else (occur* a (cdr l)))))                 ; otherwse just skip over (car l) and recur on (cdr l) 
+      (else                                          ; if (car l) is a list   
+       (plus (occur* a (car l))
+             (occur* a (cdr l)))))))                 ; add count of 'a in (car l) to recursion with (cdr l)
+
+
+(occur* 'banana '((banana)
+                  (split ((((banana ice))) 
+                          (cream (banana)) 
+                          sherbet)) 
+                  (banana) 
+                  (bread) 
+                  (banana brandy))) ; ==> 5
+
+#| Book solution is identical to mine. |#
+
+#| Q: (subst* new old l) where new is orange old is banana and l is
+ ((banana)
+   (split ((((banana ice))) 
+           (cream (banana)) 
+           sherbet)) 
+   (banana) 
+   (bread) 
+   (banana brandy)) |#
+
+#| A:
+((orange)
+   (split ((((orange ice))) 
+           (cream (orange)) 
+           sherbet)) 
+   (orange) 
+   (bread) 
+   (orange brandy)) |#
+
+#| Q: Write subst*
+(define subst*
+  (λ (new old l)
+    (cond
+      ((...) ...)
+      ((...) ...)
+      ((...) ...)))) |#
+
+#| A: Ok. |#
+
+(define subst*
+  (λ (new old l)
+    (cond
+      ((null? l) '())                             ; empty list returns empty
+      ((atom? (car l))                            ; if the first element is an atom
+       (cond
+         ((eq? (car l) old)                       ; and same as old
+          (cons new
+                (subst* new old (cdr l))))        ; cons new to the result of recurring with (cdr l)
+         (else (cons (car l)
+                     (subst* new old (cdr l)))))) ; o/w cons first element to the result of recurring with (cdr l)) 
+      (else                                       ; if first element is a list
+       (cons (subst* new old (car l))             ; substitute in that list and cons the resulting list
+             (subst* new old (cdr l)))))))        ; with the natural recursion with (cdr l)
+
+(subst* 'orange 'banana
+        '((banana)
+          (split ((((banana ice))) 
+                  (cream (banana)) 
+                  sherbet)) 
+          (banana) 
+          (bread) 
+          (banana brandy)))
+; ==> '((orange) (split ((((orange ice))) (cream (orange)) sherbet)) (orange) (bread) (orange brandy))
+
+#| Book solution is identical to mine. |#
 
 #| Q: |#
 #| A: |#
