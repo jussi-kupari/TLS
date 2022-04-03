@@ -100,21 +100,21 @@
 (define insertR*
   (λ (new old l)
     (cond
-      ((null? l) '())
-      ((atom? (car l))
+      ((null? l) '()) ; empty list returns empty of course
+      ((atom? (car l)) ; if first element in an atom
        (cond
-         ((eq? (car l) old)
-          (cons old
+         ((eq? (car l) old) ; and matches with 'old
+          (cons old         ; cons 'old to the cons of 'new and natural recursion
                 (cons new
                       (insertR* new old
                                 (cdr l)))))
-         (else (cons (car l)
+         (else (cons (car l) ; if no match just cons (car l) to natural recursion
                      (insertR* new old
                                (cdr l))))))
-      (else
-       (cons (insertR* new old
+      (else ; if (car l) is a list 
+       (cons (insertR* new old ; run insertR* on it 
                        (car l))
-             (insertR* new old
+             (insertR* new old ; and cons in to the natural recursion with (cdr l)
                        (cdr l)))))))
 
 (insertR* 'roast 'chuck
