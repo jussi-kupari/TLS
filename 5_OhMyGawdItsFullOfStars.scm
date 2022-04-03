@@ -270,6 +270,8 @@
 
 #| A: Ok. |#
 
+;; subst* : Atom Atom List -> List
+;; Given two atoms and list, substitutes each occurrece of first atom for the second atom in the list.
 (define subst*
   (λ (new old l)
     (cond
