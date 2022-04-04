@@ -24,6 +24,28 @@
       (else
        (add1 (plus n (sub1 m)))))))
 
+;; same-num? : WN WN -> Boolean
+;; Given two whole numbers, produces true if they are the same.
+(define same-num?
+  (λ (n m)
+    (cond
+      ((zero? m) (zero? n))
+      ((zero? n) #f)
+      (else
+       (same-num? (sub1 n) (sub1 m))))))
+
+;; eqan? : Atom Atom -> Boolean
+;; Given two atoms, produces true if they are the same atom.
+(define eqan?
+  (λ (a1 a2)
+    (cond
+      ((and (number? a1)
+            (number? a2)
+            (same-num? a1 a2)) #t)
+      ((or (number? a1)
+           (number? a2)) #f)
+      (else (eq? a1 a2)))))
+
 
 
 #|              *Oh My Gawd*: It's Full of Stars               |#
@@ -418,6 +440,8 @@
 (member* 'chips '((potato) (fries ((with) fish) (chips)))) ; ==> #t
 (member* 'chips '((potato) (fries ((with) fish) (fries)))) ; ==> #f
 
+#| Book version is the same. |#
+
 #| Q: What is (member* a l) where a is chips and l is
       ((potato) (chips ((with) fish) (chips))) |#
 
@@ -445,65 +469,168 @@
 #| A: It finds the leftmost atom in a nonempty list of expressions
       that does not contain an empty list. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is leftmost a *-function? |#
+#| A: It works on lists of S-expressions, but it only recurs on the car. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Does leftmost need to ask questions about all three possible cases? |#
+#| A: No, it only needs to ask two questions. We agreed that leftmost works on non-empty 
+      lists that don't contain empty lists. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Now see if you can write the function leftmost
 
-#| Q: |#
-#| A: |#
+(define leftmost
+  (λ (l)
+    (cond
+      ((...) ...)
+      ((...) ...)))) |#
 
-#| Q: |#
-#| A: |#
+#| A: Ok. |#
 
-#| Q: |#
-#| A: |#
+;; leftmost : List -> Atom
+;; Given list, produces the leftmost atom in a nonempty list that does not contain an empty list.
+(define leftmost
+  (λ (l)
+    (cond
+      ((null? l) "No answer.")      ; This is when an empty list is found instead of an atom
+      ((atom? (car l)) (car l))
+      (else (leftmost (car l))))))
 
-#| Q: |#
-#| A: |#
+(leftmost '(((hot) (tuna (and))) cheese)) ; ==> 'hot
+(leftmost '((potato) (chips ((with) fish) (chips)))) ; ==> 'potato
+(leftmost '(((() four)) 17 (seventeen))) ; ==> "No answer."
+(leftmost '()) ; ==> "No answer."
 
-#| Q: |#
-#| A: |#
+#| Book version does not guard for finding an empty list and produces an error in that case:
 
-#| Q: |#
-#| A: |#
+(define leftmost 
+    (λ (l) 
+      (cond 
+        ((atom? (car l)) (car l)) 
+        (else (leftmost (car l)))))) |#
 
-#| Q: |#
-#| A: |#
+#| Q: Do you remember what (or ... ) does? |#
+#| A: (or ...) asks questions one at a time until it finds one that is true.
+      Then (or ...) stops, making its value true. If it cannot find a true 
+      argument, the value of (or ...) is false. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (and (atom? (car l)) (eq? (car l) x)) where x is pizza and 
+      l is (mozzarella pizza) |#
+#| A: False. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Why is it false? |#
+#| A: Because (and ...) all of the expressions inside to evaluate to true,
+      but here the second evaluates to false (eq? mozzarella pizza) |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (and (atom? (car l)) (eq? (car l) x)) where x is pizza and 
+      l is ((mozzarella mushroom) pizza) |#
+#| A: False. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Why is it false? |#
+#| A: The first question already evaluates to false and therefore the whole
+      (and ...) evaluates to false. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Give an example for x and l where (and (atom? (car l)) (eq? (car l) x)) is true. |#
+#| A: x is mozzarella and l is (mozzarella (and ham) pizza) |#
+(and (atom? (car '(mozzarella (and ham) pizza)))
+     (eq? (car '(mozzarella (and ham) pizza)) 'mozzarella)) ; ==> #t
 
-#| Q: |#
-#| A: |#
+#| Q: Put in your own words what (and . . . ) does. |#
+#| A: (and ...) evaluates the expressions inside one at a time and produces
+      false if it comes across even a single expression evaluates to false.
+      If it finds no false, it evaluates to true. |#
 
-#| Q: |#
-#| A: |#
+#| Q: True or false: it is possible that one of the arguments of (and ...) and (or ...)
+      is not considered? 1 |#
+#| A: Yes, b/c (and ...) will stop and return false when encountering false and doesn't
+      care about the remaining expressions. Similarly, (or ...) will evaluate to true
+      and stop when finding the first true. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (eqlist ? l1 l2) where l1 is (strawberry ice cream) and l2 is (strawberry ice cream) |#
+#| A: True. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (eqlist? l1 l2) where l1 is (strawberry ice cream) and l2 is (strawberry cream ice) |#
+#| A: False. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (eqlist? l1 l2) where l1 is (banana ((split))) and l2 is ((banana) (split)) |#
+#| A: False. |#
+
+#| Q: (eqlist? l1 l2) where l1 is (beef ((sausage)) (and (soda))) and 
+      l2 is (beef ((salami)) (and (soda))) |#
+#| A: False. |#
+
+#| Q: (eqlist? l1 l2) where l1 is (beef ((sausage)) (and (soda))) and 
+      l2 is (beef ((sausage)) (and (soda))) |#
+#| A: True. |#
+
+#| Q: What is eqlist? |#
+#| A: A function that checks if two lists are equal. |#
+
+#| Q: How many questions will eqlist? have to ask about its arguments? |#
+#| A: Nine. |#
+
+#| Q: Can you explain why there are nine questions? |#
+#| A: Here are our words: 
+      "Each argument may be either 
+      - empty, 
+      - an atom consed onto a list, or 
+      - a list consed onto a list. 
+      For example, at the same time as the first argument may be the empty list, the 
+      second argument could be the empty list or have an atom or a list in the car position." |#
+
+#| Q: Write eqlist? using eqan? |#
+#| A: Ok. |#
+
+(define eqlist?
+  (λ (l1 l2)
+    (cond
+      ((and                                            ;if both lists empty lists are the same
+        (null? l1)
+        (null? l2)) #t)
+      ((and                                            ;if both first elements atoms
+        (atom? (car l1))
+        (atom? (car l2)))
+       (cond                                           ;then if
+         ((eqan? (car l1) (car l2))                    ;first elements equal 
+          (eqlist? (cdr l1) (cdr l2)))                 ;continue with comparing further
+         (else #f)))                                   ;else elements not equal and false
+      ((or                             
+        (and (atom? (car l1))
+             (not (atom? (car l2))))                   ;if one first element is atom and one list then false 
+        (and (not (atom? (car l1)))                    ;note the use of (not ...) 
+             (atom? (car l2)))) #f) 
+      (else                                            ;else first elements are both lists
+       (and
+        (eqlist? (car l1) (car l2))                    ;and if not equal then evaluate to false 
+        (eqlist? (cdr l1) (cdr l2)))))))               ;otherwise further in the list
+
+(eqlist? '(strawberry ice cream) '(strawberry ice cream)) ; ==> #t
+(eqlist? '(strawberry ice cream) '(strawberry cream ice)) ; ==> #f
+(eqlist? '(strawberry ice cream) '(strawberry cream ice)) ; ==> #f
+(eqlist? '(banana ((split))) '((banana) (split))) ; ==> #f
+(eqlist? '(beef ((sausage)) (and (soda))) '(beef ((salami)) (and (soda)))) ; ==> #f
+(eqlist? '(beef ((sausage)) (and (soda))) '(beef ((sausage)) (and (soda)))) ; ==> #t
+
+#| Book version is somewhat different from mine:
+(define eqlist?? 
+    (λ (l1 l2) 
+      (cond 
+        ((and (null? l1) (null? l2)) #t)         
+        ((and (null? l1) (atom? (car l2))) #f)    
+        ((null? l1) #f) 
+        ((and (atom? (car l1)) (null? l2)) #f) 
+        ((and (atom? (car l1)) 
+              (atom? (car l2))) 
+         (and (eqan? (car l1) (car l2)) 
+              (eqlist?? (cdr l1) (cdr l2)))) 
+        ((atom? (car l1)) #f) 
+        ((null? l2) #f) 
+        ((atom? (car l2)) #f) 
+        (else 
+         (and (eqlist?? (car l1) (car l2)) 
+              (eqlist?? (cdr l1) (cdr l2))))))) |#
+
+
+
 
 #| Q: |#
 #| A: |#
