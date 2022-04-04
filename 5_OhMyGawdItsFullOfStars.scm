@@ -427,14 +427,14 @@
 ;; member* : Atom List -> Boolean
 ;; Given atom and list, produces true if atom is found in the list.
 (define member* 
-    (λ (a l) 
-      (cond 
-        ((null? l) #f) 
-        ((atom? (car l)) 
-         (or (eq? (car l) a) 
-             (member* a (cdr l)))) 
-        (else (or (member* a (car l)) 
-                  (member* a (cdr l)))))))
+  (λ (a l) 
+    (cond 
+      ((null? l) #f) 
+      ((atom? (car l)) 
+       (or (eq? (car l) a) 
+           (member* a (cdr l)))) 
+      (else (or (member* a (car l)) 
+                (member* a (cdr l)))))))
 
 (member* 'chips '((potato) (chips ((with) fish) (chips)))) ; ==> #t
 (member* 'chips '((potato) (fries ((with) fish) (chips)))) ; ==> #t
@@ -580,99 +580,146 @@
 #| Q: Write eqlist? using eqan? |#
 #| A: Ok. |#
 
-(define eqlist?
+(define eqlist????
   (λ (l1 l2)
     (cond
-      ((and                                            ;if both lists empty lists are the same
-        (null? l1)
-        (null? l2)) #t)
-      ((and                                            ;if both first elements atoms
-        (atom? (car l1))
-        (atom? (car l2)))
-       (cond                                           ;then if
-         ((eqan? (car l1) (car l2))                    ;first elements equal 
-          (eqlist? (cdr l1) (cdr l2)))                 ;continue with comparing further
-         (else #f)))                                   ;else elements not equal and false
-      ((or                             
-        (and (atom? (car l1))
-             (not (atom? (car l2))))                   ;if one first element is atom and one list then false 
-        (and (not (atom? (car l1)))                    ;note the use of (not ...) 
-             (atom? (car l2)))) #f) 
-      (else                                            ;else first elements are both lists
-       (and
-        (eqlist? (car l1) (car l2))                    ;and if not equal then evaluate to false 
-        (eqlist? (cdr l1) (cdr l2)))))))               ;otherwise further in the list
+      ((and (null? l1) (null? l2)) #t)             ;if both list are null the they are the same
+      ((and (atom? (car l1)) (atom? (car l2)))     ;if both list start with an atom and
+       (cond                                         
+         ((eqan? (car l1) (car l2))                ;atoms are the same      
+          (eqlist???? (cdr l1) (cdr l2)))          ;look further in the lists      
+         (else #f)))                                   
+      ((or (atom? (car l1)) (atom? (car l2))) #f)  ;if an atom is still found as first then lists are not same 
+      (else                                        ;if the first elements are both lists   
+       (and                                        
+        (eqlist???? (car l1) (car l2))             ;check if first elementss are equal and if they are    
+        (eqlist???? (cdr l1) (cdr l2)))))))        ;look further in the lists 
 
-(eqlist? '(strawberry ice cream) '(strawberry ice cream)) ; ==> #t
-(eqlist? '(strawberry ice cream) '(strawberry cream ice)) ; ==> #f
-(eqlist? '(strawberry ice cream) '(strawberry cream ice)) ; ==> #f
-(eqlist? '(banana ((split))) '((banana) (split))) ; ==> #f
-(eqlist? '(beef ((sausage)) (and (soda))) '(beef ((salami)) (and (soda)))) ; ==> #f
-(eqlist? '(beef ((sausage)) (and (soda))) '(beef ((sausage)) (and (soda)))) ; ==> #t
+(eqlist???? '(strawberry ice cream) '(strawberry ice cream)) ; ==> #t
+(eqlist???? '(strawberry ice cream) '(strawberry cream ice)) ; ==> #f
+(eqlist???? '(strawberry ice cream) '(strawberry cream ice)) ; ==> #f
+(eqlist???? '(banana ((split))) '((banana) (split))) ; ==> #f
+(eqlist???? '(beef ((sausage)) (and (soda))) '(beef ((salami)) (and (soda)))) ; ==> #f
+(eqlist???? '(beef ((sausage)) (and (soda))) '(beef ((sausage)) (and (soda)))) ; ==> #t
 
 #| Book version is somewhat different from mine:
+   I will keep it as the default function here |#
+
+(define eqlist??? 
+  (λ (l1 l2) 
+    (cond 
+      ((and (null? l1) (null? l2)) #t)         
+      ((and (null? l1) (atom? (car l2))) #f)    
+      ((null? l1) #f) 
+      ((and (atom? (car l1)) (null? l2)) #f) 
+      ((and (atom? (car l1)) 
+            (atom? (car l2))) 
+       (and (eqan? (car l1) (car l2)) 
+            (eqlist??? (cdr l1) (cdr l2)))) 
+      ((atom? (car l1)) #f) 
+      ((null? l2) #f) 
+      ((atom? (car l2)) #f) 
+      (else 
+       (and (eqlist??? (car l1) (car l2)) 
+            (eqlist??? (cdr l1) (cdr l2)))))))
+
+
+#| Q: Is it okay to ask (atom? (car l2)) in the second question? |#
+#| A: Yes, because we know that the second list cannot be empty.
+      Otherwise the first question would have been true. |#
+
+#| Q: And why is the third question (null? l1)? |#
+#| A: At that point, we know that when the first argument is empty, the second argument is 
+      neither the empty list nor a list with an atom as the first element. If (null? l1) is true now, 
+      the second argument must be a list whose first element is also a list.|#
+
+#| Q: True or false: if the first argument is () eqlist? responds with #t in only one case. |#
+#| A: True. For (eqlist? '() l2) to be true, l2 must also be the empty list. |#
+
+#| Q: Does this mean that the questions (and (null? 11 ) (null? l2)) and 
+      (or (null? 11 ) (null? 12)) suffice to determine the answer in the first three cases? |#
+#| A: Yes. If the first question is true, eqlist ? responds with #t; otherwise, the answer is #f. |#
+
+#| Q: Rewrite eqlist? |#
+#| A: Well, copying from the book because my version was not the book version. |#
+
 (define eqlist?? 
-    (λ (l1 l2) 
+  (λ (l1 l2) 
+    (cond 
+      ((and (null? l1 )
+            (null? l2)) #t) 
+      ((or (null? l1 )
+           (null? l2)) #f) 
+      ((and (atom? (car l1)) 
+            (atom? (car l2))) 
+       (and (eqan? (car l1) (car l2)) 
+            (eqlist?? (cdr l1) (cdr l2)))) 
+      ((or (atom? (car l1 )) 
+           (atom? (car l2))) #f) 
+      (else 
+       (and (eqlist?? (car l1 ) (car l2)) 
+            (eqlist?? (cdr l1 ) (cdr l2)))))))
+
+#| Q: What is an S-expression? |#
+#| A: An S-expression is either an atom or a (possibly empty) list of S-expressions. |#
+
+#| Q: How many questions does equal? ask to determine whether two S-expressions are the same? |#
+#| A: Four. The first argument may be an atom or a list of S-expressions at the same time as 
+      the second argument may be an atom or a list of S-expressions. |#
+
+#| Q: Write equal? |#
+#| A: Ok. |#
+
+(define equal?
+  (λ (exp1 exp2)
+    (cond
+      ((and (atom? exp1) (atom? exp2))   ;if both are atoms and
+       (eqan? exp1 exp2))                ;if equal, then true
+      ((or (atom? exp1)                  ;if atom still found then 
+           (atom? exp2)) #f)              ;obviously one is not an atom 
+      (else (eqlist? exp1 exp2)))))      ;final alternative is that they are both lists, so compare   
+
+#| Book version doesn't use (or ...)
+
+(define equal? 
+    (λ (s1 s2) 
       (cond 
-        ((and (null? l1) (null? l2)) #t)         
-        ((and (null? l1) (atom? (car l2))) #f)    
-        ((null? l1) #f) 
-        ((and (atom? (car l1)) (null? l2)) #f) 
-        ((and (atom? (car l1)) 
-              (atom? (car l2))) 
-         (and (eqan? (car l1) (car l2)) 
-              (eqlist?? (cdr l1) (cdr l2)))) 
-        ((atom? (car l1)) #f) 
-        ((null? l2) #f) 
-        ((atom? (car l2)) #f) 
-        (else 
-         (and (eqlist?? (car l1) (car l2)) 
-              (eqlist?? (cdr l1) (cdr l2))))))) |#
+        ((and (atom? s1 ) (atom? s2)) 
+         (eqan? s1 s2)) 
+        ((atom? s1 ) #f) 
+        ((atom? s2) #f) 
+        (else (eqlist? s1 s2))))) |#
 
+#| Q: Why is the second question (atom? s1) |#
+#| A: If it is true, we know that the first argument is an atom and the second argument is a list.|#
 
+#| Q: And why is the third question (atom? s2) |#
+#| A: By the time we ask the third question we know that the first argument is not an atom. 
+      So all we need to know in order to distinguish between the two remaining cases is whether
+      or not the second argument is an atom. The first argument must be a list. |#
 
+#| Q: Can we summarize the second question and the third question as (or (atom? s1) (atom? s2)) |#
+#| A: Yes we can! I already did this in my version. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Simplify equal? |#
+#| A: See above. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Does equal? ask enough questions? |#
+#| A: Yes, all the four questions are covered. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Now, rewrite eqlist? using equal? |#
+#| A: Ok. |#
 
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
+(define eqlist? 
+  (λ (l1 l2) 
+    (cond 
+      ((and (null? l1)
+            (null? l2)) #t ) 
+      ((or (null? l1)
+           (null? l2)) #f) 
+      (else 
+       (and (equal? (car l1) (car l2)) 
+            (eqlist? (cdr l1 ) (cdr l2))))))) 
 
 #| Q: |#
 #| A: |#
