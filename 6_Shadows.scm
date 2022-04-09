@@ -34,13 +34,13 @@
 #| A: In ours: "For the purpose of this chapter, an arithmetic expression is either an atom 
       (including numbers), or two arithmetic expressions combined by plus, times, or raise-to-power." |#
 
-#| Q: What is (quote a)? or 'a |#
+#| Q: What is (quote a)? |#
 #| A: a. |#
 
-#| Q: What is (quote +)? or '+ |#
+#| Q: What is (quote +)? |#
 #| A: The atom +, not the operation + |#
 
-#| Q: What does (quote x) stand for? or 'x|#
+#| Q: What does (quote x) stand for? |#
 #| A: The atom x, not the operation x |#
 
 #| Q: Is (eq? (quote a) y) true or false where y is a? |#
