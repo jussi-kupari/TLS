@@ -49,8 +49,9 @@
 #| Q: Is (eq? x y) true or false where x is a and y is a? |#
 #| A: That's the same question again. And the answer is still true. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is (n + 3) an arithmetic expression? |#
+#| A: Not really, since there are parentheses around n + 3. Our definition of arithmetic 
+      expression does not mention parentheses. |#
 
 #| Q: |#
 #| A: |#
