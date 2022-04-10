@@ -683,29 +683,29 @@
       functions for testing equality of atoms?|#
 #| A: Yes, they are same-num? for atoms that are numbers and eq? for the others. |#
 
-#| Q: (raise-to-power 1 1) |#
+#| Q: (** 1 1) |#
 #| A: 1. |#
 
-#| Q: (raise-to-power 2 3) |#
+#| Q: (** 2 3) |#
 #| A: 8. |#
 
-#| Q: (raise-to-power 5 3) |#
+#| Q: (** 5 3) |#
 #| A: 125. |#
 
 #| Q: Now write the function to-power
       Hint: See the The First and Fifth Commandments. |#
 #| A: Ok. |#
 
-(define raise-to-power
+(define **
   (λ (n m)
     (cond
       ((zero? m) 1)
-      (else (times n (raise-to-power n (sub1 m)))))))
+      (else (times n (** n (sub1 m)))))))
 
-(raise-to-power 1 1) ; ==> 1
-(raise-to-power 2 3) ; ==> 8
-(raise-to-power 5 3) ; ==> 125
-(raise-to-power 4 4) ; ==> 256
+(** 1 1) ; ==> 1
+(** 2 3) ; ==> 8
+(** 5 3) ; ==> 125
+(** 4 4) ; ==> 256
 
 #| Q: What is a good name for this function? 
 (define ??? 
