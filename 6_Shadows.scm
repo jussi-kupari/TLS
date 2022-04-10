@@ -281,21 +281,7 @@
 #| Q: Now, let's attempt to write value. |#
 #| A: Ok. |#
 
-#|
-(define value
-  (λ (nexp)
-    (cond
-      ((atom? nexp) ...)
-      ((eq? (car (cdr nexp)) '+)
-       ...)                     
-      ((eq? (car (cdr nexp)) '*)
-       ...)
-      (else                        ;the operator can be only ** from here on
-       ))))
-|#
-
-
-#| Book doesn't use else:
+#| 
 (define value 
     (λ (nexp) 
       (cond 
@@ -305,6 +291,8 @@
         ((eq? (car (cdr nexp)) (quote x )) 
          ... ) 
         (else ... )))) |#
+
+#| Book version is identical. |#
 
 #| Q: What is the natural value of an arithmetic expression that is a number? |#
 #| A: The number itself. It is just that number. |#
@@ -350,17 +338,17 @@
 (value '(999 ** 2)) ; ==> 998001
 (value '(999 ** 0)) ; ==> 1
 
-#| Q: |#
-#| A: |#
+#| Q: Can you think of a different representation of arithmetic expressions? |#
+#| A: There are several of them. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Could (3 4 +) represent 3 + 4? |#
+#| A: Yes. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Could (+ 3 4)? |#
+#| A: Yes. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Or (plus 3 4) |#
+#| A: Yes. |#
 
 #| Q: |#
 #| A: |#
