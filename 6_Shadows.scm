@@ -350,11 +350,21 @@
 #| Q: Or (plus 3 4) |#
 #| A: Yes. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is (+ (* 3 6) (** 8 2)) a representation of an arithmetic expression? |#
+#| A: Yes. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Try to write the function value for a new 
+      kind of arithmetic expression that is either: 
+      - a number 
+      - a list of the atom + followed by 
+        two arithmetic expressions, 
+      - a list of the atom * followed by 
+        two arithmetic expressions, or 
+      - a list of the atom ** followed by 
+        two arithmetic expressions. |#
+
+#| A: Ok. |#
+
 
 #| Q: |#
 #| A: |#
