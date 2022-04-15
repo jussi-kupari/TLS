@@ -13,32 +13,33 @@
 
 
 #| Q: True or false: (lat? l) where l is (Jack Sprat could eat no chicken fat) |#
-#| A: True, b/c (Jack Sprat could eat no chicken fat) is a list of only atoms |#
+#| A: True, because each S-expression in l is an atom. |#
 
 #| Q: True or false: (lat ? l) where l is ((Jack) Sprat could eat no chicken fat) |#
-#| A: False, b/c the first element in ((Jack) Sprat could eat no chicken fat) is the list (Jack) |#
+#| A: False, since ( car l) is a list. |#
 
 #| Q: True or false: (lat? l) where l is (Jack (Sprat could) eat no chicken fat) |#
-#| A: False, b/c (Jack (Sprat could) eat no chicken fat) contains the list (Sprat could) |#
+#| A: False, since one of the S-expressions in l is a list. |#
 
 #| Q: True or false: (lat ? l) where l is () |#
-#| A: True, b/c l does not contain any number of lists |#
-; Note: It is not entirely obvious to me why an empty list is considered a list of atoms.
+#| A: True, because it does not contain a list. |#
+
+;Note: It is not entirely obvious to me why an empty list is considered a list of atoms.
 
 #| Q: True or false: a lat is a list of atoms. |#
-#| A: True |#
-; Note: An empty or null list is also a list of atoms
+#| A: True! Every lat is a list of atoms! |#
+;Note: An empty/null list is also a list of atoms,
 
-#| Q: Write the function lat? using some, but not necessarily all, of the following functions: 
-      car cdr cons null? atom? and eq? |#
+#| Q: Write the function lat? using some, but not necessarily all, of the
+     following functions: car cdr cons null? atom? and eq? |#
 #| A: From the book:
       "You were not expected to be able to do this 
       yet, because you are still missing some 
       ingredients. Go on to the next question. 
       Good luck."
 
-      Below are two of my attempts, called list-of-atoms? and
-      list-of-atoms2? (very similar), using some techniques not introduced yet. |#
+      Below are my attempts, called list-of-atoms? 1-2-3 (very similar),
+      using some techniques not introduced yet. |#
 
 ;; list-of-atoms? : List-of-Anything -> Boolean
 ;; Given list, produces true if it only contains atoms
@@ -49,11 +50,21 @@
               (list-of-atoms? (cdr l))
               #f))))
 
+; Using and instead of if with else
 (define (list-of-atoms2? l)
   (cond
     ((null? l) #t)
     (else (and (atom? (car l))
                (list-of-atoms2? (cdr l))))))
+
+; full λ style
+(define list-of-atoms3?
+  (λ (l)
+    (cond
+      ((null? l) #t)
+      (else
+       (and (atom? (car l))
+            (list-of-atoms3? (cdr l)))))))
 
 (list-of-atoms? '(Jack Sprat could eat no chicken fat)) ; ==> #t
 (list-of-atoms? '((Jack) Sprat could eat no chicken fat)) ; ==> #f
@@ -64,6 +75,11 @@
 (list-of-atoms2? '((Jack) Sprat could eat no chicken fat)) ; ==> #f
 (list-of-atoms2? '(Jack (Sprat could) eat no chicken fat)) ; ==> #f
 (list-of-atoms2? '()) ; ==> #t
+
+(list-of-atoms3? '(Jack Sprat could eat no chicken fat)) ; ==> #t
+(list-of-atoms3? '((Jack) Sprat could eat no chicken fat)) ; ==> #f
+(list-of-atoms3? '(Jack (Sprat could) eat no chicken fat)) ; ==> #f
+(list-of-atoms3? '()) ; ==> #t
 
 
 
@@ -81,7 +97,8 @@
       (else #f)))) 
 
 #| Q: What is the value of (lat ? l) where l is the argument (bacon and eggs) |#
-#| A: True, b/c the list (bacon and eggs) only contains atoms |#
+#| A: True. The application (lat ? l) where l is (bacon and eggs) 
+      has the value #t -true- because l is a lat. |#
 (lat? '(bacon and eggs)) ; ==> #t
 
 #| Q: How do we determine the answer #t for the application (lat ? l) |#
@@ -96,104 +113,100 @@
       My answer: First we check if the list is null, if yes, then #t.
       If the list is not null, we look at the first element. If that is
       an atom, then we proceed to repeat this process for the remaining part
-      of the list. If we get to the end of the list, that is, to an empty
-      list, we get #t. In any other case we get #f |#
+      of the list. If we get to the end of the list - that is - to an empty
+      list, we get #t. In any other case we get #f. |#
 
 #| Q: What is the first question asked by (lat? l) |#
-#| A: First question is: Is the list l null? (null? l) |#
+#| A: (null? l) 
+       Note: 
+      (cond ...) asks questions; 
+      (lambda ...) creates a function; and 
+      (define ...) gives it a name. |#
 
 #| Q: What is the meaning of the cond-line ((null? l) #t) where l is (bacon and eggs) |#
-#| A: This line sets up a conditional where we first ask if the list l is null. If the
-      (null? l) question returns #t then the whole function returns #t. If (null? l)
-      returns #f we continue to the next question. In this case (null? (bacon and eggs))
-      returns #f and we continue onwards. |#
+#| A: (null? l) asks if the argument l is the null list. If it is, the value of the application is 
+      true. If it is not, we ask the next question. In this case, l is not the null list,
+      so we ask the next question. |#
 (null? '(bacon and egss)) ;  ==> #f
 
 #| Q: What is the next question? |#
-#| A: The next question is: Is the first expression in l an atom? (atom? (car l)). |#
+#| A: (atom? (car l)). |#
 
 #| Q: What is the meaning of the line ((atom? (car l)) (lat? (cdr l))) where l is (bacon and eggs) |#
-#| A: This part first asks if the first expression of l is an atom. If this returns #t then
-      we proceed to repeat the lat? function using the remaining part of l (cdr l). If the first
-      expression is not an atom, we proceed to the next question. In this case (atom? (car l))
-      returns #t and we continue to (lat? (and eggs)) |#
+#| A: (atom? (car l)) asks if the first S-expression of the list l is an atom. If (car l) is an
+      atom, we want to know if the rest of l is also composed only of atoms. If (car l) is not
+      an atom, we ask the next question. In this case, (car l) is an atom, so the value of the 
+      function is the value of (lat ? (cdr l)). |#
 
 #| Q: What is the meaning of (lat? (cdr l)) |#
-#| A: This asks if the remaining part of l is a list of atoms |#
+#| A: (lat ? ( cdr l)) finds out if the rest of the list l is composed only of atoms,
+      by referring to the function with a new argument.  |#
 
 #| Q: Now what is the argument l for lat ? |#
-#| A: The argument is (cdr l) and therefore (and eggs) |#
+#| A: Now the argument l is (cdr l), which is (and eggs). |#
 (cdr '(bacon and eggs)) ; ==> '(and eggs)
 
 #| Q: What is the next question? |#
-#| A: If we reach the next part in the conditional, the function returns #f.
-      However; In the case of (lat? (bacon and eggs)) we start from the beginning
-      with (and eggs) so the next question is (null? l) |#
+#| A: (null? l) |#
 
 #| Q: What is the meaning of the line ((null? l) #t) where l is now (and eggs) |#
-#| A: This is the same as before. We first ask if the list l is null. If the
-      (null? l) question returns #t then the whole function returns #t. If (null? l)
-      returns #f we continue to the next question. In this case (null? (and eggs))
-      returns #f and we continue onwards. |#
+#| A: (null? l) asks if the argument l is the null list. If it is, the value of
+      the application is #t . If it is not, we ask the next question. In this case,
+      l is not the null list, so we ask the next question. |#
 (null? '(and eggs)) ; ==> #f
 
 #| Q: What is the next question? |#
 #| A: (atom? (car l)) |#
 
 #| Q: What is the meaning of the line ((atom? (car l)) (lat? (cdr l))) where l is (and eggs) |#
-#| A: This is the same as before. We ask if the first expression of l is an atom. If this returns #t then
-      we proceed to repeat the lat? function using the remaining part of l (cdr l). If the first
-      expression is not an atom, we proceed to the next question. In this case (atom? (car (and eggs)))
-      returns #t and we continue to (lat? (eggs)) |#
+#| A: (atom? ( car l)) asks if (car l) is an atom. If it is an atom, the value of the application
+      is (lat? (cdr l)). If not, we ask the next question. In this case, (car l) is an atom, so 
+      we want to find out if the rest of the list l is composed only of atoms. |#
 
 #| Q: What is the meaning of (lat? (cdr l)) |#
-#| A: This asks if the remaining part of the list is a list of atoms using the function lat?.
-      In this case, the remaining list is (eggs) |#
+#| A: (lat ? (cdr l)) finds out if the rest of l is composed only of atoms, by referring again 
+      to the function lat?, but this time, with the argument (cdr l), which is (eggs). |#
 
 #| Q: What is the next question? |#
 #| A: (null? l) |#
 
 #| Q: What is the meaning of the line ((null? l) #t where l is now (eggs) |#
-#| A: This is the same as before. We first ask if the list l is null. If the
-      (null? l) question returns #t then the whole function returns #t. If (null? l)
-      returns #f we continue to the next question. In this case (null? (eggs))
-      returns #f and we continue onwards. |#
+#| A: (null? l) asks if the argument l is the null list. If it is, the value of the application
+      is #t -true. If it is not, move to the next question. In this case, l is not null, so we
+      ask the next question. |#
 (null? '(eggs)) ; ==> #f
 
 #| Q: What is the next question? |#
-#| A: (atom? (car l))|#
+#| A: (atom? (car l)). |#
 
 #| Q: What is the meaning of the line ((atom? (car l)) (lat? (cdr l))) where l is now (eggs) |#
-#| A: This is the same as before. We ask if the first expression of l is an atom. If this returns #t then
-      we proceed to repeat the lat? function using the remaining part of l (cdr l). If the first
-      expression is not an atom, we proceed to the next question. In this case (atom? (car (eggs)))
-      returns #t and we continue to (lat? (cdr (eggs))) |#
+#| A: (atom? (car l)) asks if (car l) is an atom. If it is, the value of the application is 
+      (lat? (cdr l)). If (car l) is not an atom, ask the next question. In this case, (car l)
+      is an atom, so once again we look at (lat? (cdr l)). |#
 
-#| Q: What is the meaning of (lat ? (cdr l)) |#
-#| A: This asks if the remaining part of l is a list of atoms using the function lat?.
-      In this case, the remaining list is () |#
+#| Q: What is the meaning of (lat? (cdr l)) |#
+#| A: (lat? (cdr l)) finds out if the rest of the list l is composed only of atoms, by referring
+      to the function lat?, with l becoming the value of (cdr l). |#
 
-#| Q: Now, what is the argument for lat ? |#
+#| Q: Now, what is the argument for lat? |#
 #| A: () |#
 
-#| Q: What is the meaning of the line ((null ? l) #t) where l is now () |#
-#| A: This is the same as before. We first ask if the list l is null. If the
-      (null? l) question returns #t then the whole function returns #t. If (null? l)
-      returns #f we continue to the next question. In this case (null? ())
-      returns #t and the whole function returns #t. |#
+#| Q: What is the meaning of the line ((null? l) #t) where l is now () |#
+#| A: (null? l) asks if the argument l is the null list. If it is, the value of the application
+      is the value of #t . If not, we ask the next question. In this case, () is the null list.
+      So, the value of the application (lat? l) where l is (bacon and eggs), is #t -true. |#
 (null? '()) ; ==> #t
 
-#| Q: Do you remember the question about (lat ? l) |#
-#| A: No. Probably not. The application (lat? l) has the value #t if the list l is a
-      list of atoms where l is (bacon and eggs) |#
+#| Q: Do you remember the question about (lat? l) |#
+#| A: Probably not. The application (lat? l) has the value #t if the list l is a
+      list of atoms where l is (bacon and eggs). |#
 
 #| Q: Can you describe what the function lat? does in your own words? |#
 #| A: The function lat? tests if a list is a list of atoms by first testing if it
       is empty. If yes, then it returns #t. If it is not empty, it checks if the first
-      element is an atom. If this is true, then it repeats lat+ with the remaining list.
-      If the first element is not an atom, lat? return #f. If lat? reaches the end of the
-      list, which is a null list, it returns #t meaning that the list was indeed a list
-      of atoms
+      element is an atom. If this is true, then it repeats lat? with the remaining list.
+      If the first element is not an atom, lat? returns #f. If lat? reaches the end of the
+      list, which is a null list, it returns #t meaning the list was a list of atoms.
 
      From the book:
      "Here are our words: lat? looks at each S-expression in a list, in 
@@ -203,105 +216,113 @@
 
       To see how we could arrive at a value of #f, consider the next few questions." |#
 
-#| Q: What is the value of (lat? l) where l is now (bacon (and eggs))|#
-#| A: False, b/c l contains a list |#
+#| Q: What is the value of (lat? l) where l is now (bacon (and eggs)) |#
+#| A: #f, since the list l contains an S-expression that is a list. |#
 (lat? '(bacon (and eggs))) ; ==> #f
 
 #| Q: What is the first question? |#
-#| A: (null? l) |#
+#| A: (null? l). |#
 
 #| Q: What is the meaning of the line ((null? l) #t) where l is (bacon (and eggs)) |#
-#| A: This line asks if the list l is null list. If it is null, the application returns #t,
-      and if it is #f in continues to the next question. In this case (null? (bacon (and eggs)))
-      returns #f and the application continues onwards |#
+#| A: (null? l) asks if l is the null list. If it is, the value is #t . If l is not null,
+       move to the next question. In this case, it is not null, so we ask the next question. |#
 (null? '(bacon (and eggs))) ; ==> #f
 
 #| Q: What is the next question? |#
-#| A: (atom? (car l)) |#
+#| A: (atom? (car l)). |#
 
-#| Q: What is the meaning of the line ((atom? (car l)) (lat? (cdr l))) where l is (bacon (and eggs))|#
-#| A: This line first asks if the first expression in l is an atom. If this returns #t then the function
-      lat? is repeated with the remaining part of the list, otherwise we continues to the next question.
-      In this case (atom? (car l) returns #t and therefore lat? is repeated with (cdr l) to see if
-      the remaining list is also composed only of atoms |#
+#| Q: What is the meaning of the line ((atom? (car l)) (lat? (cdr l))) where l is (bacon (and eggs)) |#
+#| A: (atom? (car l)) asks if (car l) is an atom. If it is, the value is (lat? (cdr l)).
+      If it is not, we ask the next question. In this case, (car l) is an atom, so we want to
+      check if the rest of the list l is composed only of atoms. |#
 (atom? (car '(bacon (and eggs)))) ; ==> #t
 
 #| Q: What is the meaning of (lat? (cdr l)) |#
-#| A: (lat? (cdr l)) asks if the rest of the list l is a list of atoms |#
+#| A: (lat ? (cdr l)) checks to see if the rest of the list l is composed only of atoms,
+      by referring to lat ? with l replaced by (cdr l). |#
 
 #| Q: What is the meaning of the line ((null? l) #t) where l is now ((and eggs)) |#
-#| A: ((null? l) #t) first asks is l is a null list. It it is null, then the application results
-      in #t. If l in not a null list the application continues to the next question. In this case
-      (null? ((and eggs))) results in #f and we continue onwards |#
+#| A: (null? l) asks if l is the null list. If it is null, the value is #t . If it is
+      not null, we ask the next question. In this case, l is not null, so move to the next question. |#
 (null? '((and eggs))) ; ==> #f
 
 #| Q: What is the next question? |#
-#| A: (atom? (car l)) |#
+#| A: (atom? (car l)). |#
 
 #| Q: What is the meaning of the line ((atom? (car l)) (lat? (cdr l))) where l is now ((and eggs)) |#
-#| A: This line first checks if the first expression in l is an atom. If this returns true, the function
-      lat? is repeated with the remaining list (cdr l). If (atom? (car l)) returns #f, the application
-      continues to the conditional step. In this case, (atom? ((and eggs))) returns #f and we continue
-      to the next conditional step |#
+#| A: (atom? (car l)) asks if (car l) is an atom. If it is, the value is (lat ? (cdr l)).
+      If it is not, we move to the next question. In this case, (car l) is not an atom,
+      so we ask the next question. |#
 (atom? '((and eggs))) ; ==> #f
 
 #| Q: What is the next question? |#
-#| A: else |#
+#| A: else. |#
 
 #| Q: What is the meaning of the question else |#
-#| A: else asks if else is true. This is the final possible answer when all others have failed |#
+#| A: else asks if else is true. |#
 
 #| Q: Is else true? |#
-#| A: Yes, else is always true |#
+#| A: Yes, because the question else is always true! |#
 
 #| Q: else |#
-#| A: True |#
+#| A: Of course. |#
 
 #| Q: Why is else the last question? |#
-#| A: Because it is the only remaining one. No need to ask any more questions |#
+#| A: Because we do not need to ask any more questions. |#
 
 #| Q: Why do we not need to ask any more questions? |#
-#| A: Because we have depleted all possibilities: a null-list and a list with an atom at the start.
-      The only remaining possibility is that the first element is a list. Therefore else. |#
+#| A: Because a list can be empty, can have an atom in the first position, or can have a list 
+      in the first position. |#
 
-#| Q: What is the meaning of the line (else #f)|#
-#| A: This line asks if else returns #t and if it does, the application returns #f. else always
-      returns #t, so the application returns #f |#
+#| Q: What is the meaning of the line (else #f) |#
+#| A: else asks if else is true. If else is true -as it always is- then the answer is #f-false. |#
 
 #| Q: What is ))) |#
-#| A: These are closing parentheses of define, λ and cond |#
+#| A: These are the closing or matching parentheses of
+      (cond ... ,
+      (λ ... , and 
+      (define ... ,
+      which appear at the beginning of a function definition.  |#
 
-#| Q: Can you describe how we determined the value #f for (lat? l) where l is (bacon (and eggs))|#
-#| A: We first determined that l is not empty. Then we determined that the first expression is an atom.
-      We then repeated lat? with the rest of l and saw that it is not emtpy. Then we asked if the first
-      expression is an atom. We saw that it is (and eggs), which is a list not an atom; therefore,
-      the application resulted in #f |#
+#| Q: Can you describe how we determined the value #f for (lat? l) where l is (bacon (and eggs)) |#
+#| A: We first determined that l is not empty. Then we determined that the first expression is
+      an atom. We then repeated lat? with the rest of l and saw that it is not emtpy. Then we
+      asked if the first expression is an atom. We saw that it is (and eggs), which is a list
+      not an atom; therefore, the application resulted in #f.
+
+     Here is one way to say it: "(lat? l) looks at each item in its argument to see if it is an atom.
+     If it runs out of items before it finds a list, the value of (lat? l) is #t. If it finds a list,
+     as it did in the example (bacon (and eggs)), the value of (lat? l) is #f. " |#
 
 #| Q: Is (or (null? l1 ) (atom? l2)) true or false where l1 is () and l2 is (d e f g) |#
-#| A: True, b/c l1 is () (null? ()) is #t |#
+#| A: True, because (null? l1 ) is true where l1 is (). |#
 (or (null? '() ) (atom? '(d e f g))) ; ==> #t
 
 #| Q: Is (or (null? l1) (null? l2)) true or false where l1 is (a b c) and l2 is () |#
-#| A: True, b/c l2 is () (null? ()) is true |#
+#| A: True, because (null? l2) is true where l2 is (). |#
 (or (null? '(a b c)) (null? '())) ; ==> #t
 
 #| Q: Is (or (null? l1) (null? l2)) true or false where l1 is (a b c) and l2 is (atom) |#
-#| A: False, b/c both (null? l1) and (null? l2) return #f |#
+#| A: False, because neither (null? l1 ) nor (null? l2) is true where l1 is (a b c) and 
+      l2 is (atom). |#
 (null? '(a b c)) ; ==> #f
 (null? '(atom)) ; ==> #f
 (or (null? '(a b c)) (null? '(atom))) ; ==> #f
 
 #| Q: What does (or ... ) do? |#
-#| A: It evaluates the expressions inside one-by-one and returns #t if it finds a #t, else it returns #f |#
+#| A: (or ...) asks two questions, one at a time. If the first one is true it stops and answers true. 
+      Otherwise it asks the second question and answers with whatever the second question answers. |#
 
 #| Q: Is it true or false that a is a member of lat where a is tea and lat is (coffee tea or milk) |#
-#| A: True, b/c tea is an expression in the list (coffee tea or milk) |#
+#| A: True, because one of the atoms of the lat, (coffee tea or milk) is the same as the atom a-tea. |#
 
 #| Q: Is (member? a lat) true or false where a is poached and lat is (fried eggs and scrambled eggs) |#
-#| A: False, b/c poached is not an atom in the list (fried eggs and scrambled eggs) |#
+#| A: False, since a is not one of the atoms of the lat. |#
+
+#| This is the function member |#
 
 ;; member? : Atom LAT -> Boolean
-;; Given atom and lat, produces true if atom is found in the lat
+;; Given atom and lat, produces true if atom is found in lat
 (define member? 
   (λ (a lat) 
     (cond 
@@ -310,16 +331,16 @@
                 (member? a (cdr lat))))))) 
 
 #| Q: What is the value of (member? a lat) where a is meat and lat is (mashed potatoes and meat gravy) |#
-#| A: True, b/c the atom meat is found in the lat (mashed potatoes and meat gravy) |#
+#| A: #t, because the atom meat is one of the atoms of lat, (mashed potatoes and meat gravy). |#
 (member? 'meat '(mashed potatoes and meat gravy)) ; ==> #t
 
 #| Q: How do we determine the value #t for the above application? |#
-#| A: We first ask if the lat is null. If it is not null, we ask if either the first element
-      in the list is the one we look for (returning #t) or repeating the application from the beginning
-      with the remaining list returns #t |#
+#| A: The value is determined by asking the questions about (member? a lat). 
+      Hint: Write down the definition of the function member? and refer to it while you 
+      work on the next group of questions. |#
 
 #| Q: What is the first question asked by (member? a lat) |#
-#| A: (null? lat) |#
+#| A: (null? lat). This is also the first question asked by lat ?. |#
 
 
 
@@ -332,265 +353,256 @@
 
 
 #| Q: What is the meaning of the line ((null? lat) #f) where lat is (mashed potatoes and meat gravy) |#
-#| A: This line asks if the list l is null. If it is null, the application returns #f. If l is not
-      null, then the function proceeds to the next question. In this case (null? l) is #f and we
-      continue on to the next question |#
+#| A: (null? lat) asks if lat is the null list. If it is, the value is #f, since the atom meat was
+      not found in lat. If not, we ask the next question. In this case, it is not null, so we ask
+      the next question. |#
 (null? '(mashed potatoes and meat gravy)) ; ==> #f
 
 #| Q: What is the next question? |#
-#| A: else |#
+#| A: else. |#
 
 #| Q: Why is else the next question? |#
-#| A: All other needed questions are containded inside the following else question. |#
+#| A: Because we do not need to ask any more questions. |#
 
 #| Q: Is else really a question? |#
-#| A: Yes, apparently it is. It is a question that always returns true |#
+#| A: Yes, else is a question whose value is always true. |#
 
 #| Q: What is the meaning of the line
      (else (or (eq? (car lat) a) 
                (member? a (cdr lat)))) |#
-#| A: This line asks if the first expression in lat is the same as the atom we look for or
-      if the atom is a member of the remaining part of the list |#
+#| A: Now that we know that lat is not null?, we have to find out whether the car of lat is the 
+      same atom as a, or whether a is somewhere in the rest of lat. The answer 
+      (or (eq? (car lat) a) (member? a ( cdr lat))) does this. |#
 
 #| Q: True or false: 
        (or (eq? (car lat) a) 
-           (member? a  (cdr lat)))
+           (member? a (cdr lat)))
       where a is meat and lat is (mashed potatoes and meat gravy) |#
-#| A: True, b/c meat is an expression in the list (mashed potatoes and meat gravy) |#
+#| A: True, b/c meat is an expression in the list (mashed potatoes and meat gravy).
+      We will find out by looking at each question in turn. |#
 (or (eq? (car '(mashed potatoes and meat gravy)) 'meat) 
     (member? 'meat  (cdr '(mashed potatoes and meat gravy)))) ; ==> #t
 
 #| Q: Is (eq? (car lat) a) true or false where a is meat and lat is (mashed potatoes and meat gravy) |#
-#| A: False, b/c mashed is not the same as meat |#
+#| A: False, because meat is not eq? to mashed, the car of (mashed potatoes and meat gravy). |#
 (car '(mashed potatoes and meat gravy)) ; ==> 'mashed
 (eq? 'mashed 'meat) ; ==> #f
 (eq? (car '(mashed potatoes and meat gravy)) 'meat) ; ==> #f
 
 #| Q: What is the second question of (or ...) |#
-#| A: (member? a (cdr lat)), which asks if a is a member of the remaining part of lat |#
+#| A: (member? a (cdr lat)). This refers to the function with the 
+      argument lat replaced by (cdr lat). |#
 
 #| Q: Now what are the arguments of member? |#
-#| A: a and (cdr lat), which are meat and (potatoes and meat gravy) |#
+#| A: a is meat and lat is now (cdr lat), specifically (potatoes and meat gravy). |#
 
 #| Q: What is the next question |#
-#| A: (null? lat) * rememeber the first commandment * |#
+#| A: (null? lat). Rememeber the first commandment * |#
 
 #| Q: Is (null? lat) true or false where lat is (potatoes and meat gravy) |#
-#| A: False, b/c (potatoes and meat gravy) is not an null list |#
+#| A: #f-false. |#
 
 #| Q: What do we do now |#
-#| A: Ask the next question |#
+#| A: Ask the next question. |#
 
 #| Q: What is the next question |#
-#| A: else |#
+#| A: else. |#
 
-#| Q: What is the meaning of
-      (or (eq? (car lat) a) 
-          (member? a (cdr lat)))|#
-#| A: This is to find out if the first expression in the list is the atom we are looking for
-      or if the atom is an expression in the remaining part of the list |#
+#| Q: What is the meaning of (or (eq? (car lat) a) (member? a (cdr lat))) |#
+#| A: (or (eq? (car lat) a) (member? a (cdr lat))) finds out if a is eq? to the car of lat
+      or if a is a member of the cdr of lat by referring to the function. |#
 
 #| Q: Is a eq? to the car of lat |#
-#| A: False, b/c meat does not equal potatoes |#
+#| A: No, because a is meat and the car of lat is potatoes. |#
 
 #| Q: So what do we do next? |#
-#| A: We ask the next question, which is: is meat a member of (and meat gravy)?
-      (member? meat (and meat gravy)) |#
+#| A: We ask (member? a (cdr lat)). |#
+
+#| Q: Now, what are the arguments of member? |#
+#| A: a is meat, and lat is (and meat gravy) . |#
 
 #| Q: What is the next question? |#
 #| A: (null? lat) |#
 
 #| Q: What do we do now? |#
-#| A: (null? lat) returns #f, so we continue to the next question |#
+#| A: Ask the next question, since (null? lat) is false. |#
 
 #| Q: What is the next question? |#
-#| A: else |#
+#| A: else. |#
 
-#| Q: What is the value of
-      (or (eq? (car lat) a) 
-          (member? a (cdr lat))) |#
-#| A: because (eq? (car (and meat gravy)) meat) returns #f, the value becomes
-      the value of (member? meat (cdr (and meat gravy))) |#
+#| Q: What is the value of (or (eq? (car lat) a) (member? a (cdr lat))) |#
+#| A: The value of (member? a (cdr lat)). |#
 
 #| Q: Why? |#
-#| A: See above. B/c (eq? (car (and meat gravy)) meat) returns #f |#
+#| A: Because (eq? (car lat) a) is false. |#
 (eq? (car '(and meat gravy)) 'meat) ; ==> #f
 
 #| Q: What do we do now? |#
-#| A: Run member? with new arguments - Recur |#
+#| A: Recur - refer to the function with new arguments. |#
 
 #| Q: What are the new arguments? |#
-#| A: meat and (meat gravy) |#
+#| A: a is meat, and lat is (meat gravy). |#
 
 #| Q: What is the next question? |#
-#| A: (null? lat) |#
+#| A: (null? lat). |#
 
 #| Q: What do we do now? |#
-#| A: (null? (meat gravy)) returns #f, so we continue to the next question |#
+#| A: Since (null? lat) is false, ask the next question. |#
 
 #| Q: What is the next question? |#
-#| A: else |#
+#| A: else. |#
 
-#| Q: What is the value of 
-      (or (eq? (car lat) a) 
-          (member? a (cdr lat))) |#
-#| A: True, b/c (eq? (car (meat gravy) meat) returns #t |#
+#| Q: What is the value of (or (eq? (car lat) a) (member? a (cdr lat))) |#
+#| A: #t, because (car lat), which is meat, and a, which is meat, are the same atom. 
+      Therefore, (or ...) answers with #t. |#
  (car '(meat gravy)) ; ==> 'meat
  (eq? 'meat 'meat) ; ==> #t
 
 #| Q: What is the value of the application (member? a lat) where a is meat and lat is (meat gravy) |#
-#| A: True, because meat is a member of the list (meat gravy) |#
+#| A: #t, because we have found that meat is a member of (meat gravy). |#
 
 #| Q: What is the value of the application (member? a lat) where a is meat and lat is (and meat gravy) |#
-#| A: True, because meat is a member of the list (and meat gravy) |#
+#| A: #t, because meat is also a member of the lat (and meat gravy). |#
 
 #| Q: What is the value of the application (member? a lat) where a is meat and
       lat is (potates and meat gravy) |#
-#| A: True, because meat is a member of the list (potatoes and meat gravy) |#
+#| A: #t, because meat is also a member of the lat (potatoes and meat gravy). |#
 
 #| Q: What is the value of the application (member? a lat) where a is meat and
       lat is (mashed potates and meat gravy) |#
-#| A: True, because meat is a member of the list (mashed potatoes and meat gravy).
-      Note that this is our original lat. |#
+#| A: #t, because meat is also a member of the lat (mashed potatoes and meat gravy). 
+      Of course, this is our original lat. |#
 
 #| Q: Just to make sure you have it right, let's quickly run through it again.
       What is the value of the application (member? a lat) where a is meat and
       lat is (mashed potates and meat gravy) |#
-#| A: True |#
+#| A: #t. Hint: Write down the definition of the function member? and its arguments and 
+      refer to them as you go through the next group of questions. |#
 
 #| Q: (null? lat) |#
-#| A: False. Move to the next question. |#
+#| A: No. Move to the next line. |#
 
-#| Q: else|#
-#| A: True |#
+#| Q: else |#
+#| A: Yes. |#
 
-#| Q: (or (eq? (car lat) a) 
-          (member? a (cdr lat))) |#
-#| A: Let's see one expression at a time |#
+#| Q: (or (eq? (car lat) a) (member? a (cdr lat))) |#
+#| A: Perhaps. Let's see one expression at a time. |#
 
 #| Q: (eq? (car lat) a) |#
-#| A: False. Go to the next question. |#
+#| A: No. Ask the next question. |#
 
 #| Q: What next? |#
 #| A: Recur with a and (cdr lat) where a is meat and (cdr lat) is (potatoes and meat gravy). |#
 
 #| Q: (null? lat) |#
-#| A: False. Move to the next question. |#
+#| A: No. Move to the next line. |#
 
 #| Q: else |#
-#| A: True, but b/c (eq? (car lat) a) returns #f, we recur member? again with new arguments
-      where a is meat and (cdr lat) is (and meat gravy). |#
+#| A: Yes, but (eq? (car lat) a) is false. Recur with a and (cdr lat) where a is meat and (cdr lat) is (and meat gravy) . |#
 
 #| Q: (null? lat) |#
-#| A: False. Move to the next question. |#
+#| A: No. Move to the next line. |#
 
 #| Q: else |#
-#| A: True, but b/c (eq? (car lat) a) returns #f, we recur member? again with new arguments
-      where a is meat and (cdr lat) is (meat gravy). |#
+#| A: Yes, but (eq? (car lat) a) is false. Recur with a and (cdr lat) where a is meat and (cdr lat) is (meat gravy). |#
 
 #| Q: (null? lat) |#
-#| A: False. Move to the next question. |#
+#| A: No. Move to the next line. |#
 
 #| Q: (eq? (car lat) a) |#
-#| A: True |#
+#| A: Yes, the value is #t. |#
 (eq? (car '(meat gravy)) 'meat) ; ==> #t
 
-#| Q: (or (eq? (car lat) a) 
-          (member? a (cdr lat))) |#
-#| A: True |#
+#| Q: (or (eq? (car lat) a) (member? a (cdr lat))) |#
+#| A: #t.|#
 
 #| Q: What is the value of (member? a lat) where a is meat and lat is (meat gravy) |#
-#| A: True |#
+#| A: #t. |#
 
 #| Q: What is the value of (member? a lat) where a is meat and lat is (and meat gravy) |#
-#| A: True |#
+#| A: #t. |#
 
 #| Q: What is the value of (member? a lat) where a is meat and lat is (potatoes and meat gravy) |#
-#| A: True |#
+#| A: #t. |#
 
 #| Q: What is the value of (member? a lat) where a is meat and lat is (mashed potatoes and meat gravy) |#
-#| A: True |#
+#| A: #t. |#
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is (bagels and lox) |#
-#| A: False |#
+#| A: #f. |#
 (member? 'liver '(bagels and lox)) ; ==> #f
 
-#| Q: Let's work out why it is #f. What's the first question member? asks?|#
-#| A: (null? lat) |#
+#| Q: Let's work out why it is #f. What's the first question member? asks? |#
+#| A: (null? lat). |#
 
 #| Q: (null? lat) |#
-#| A: (null? (bagels and lox)) is #f, so we continue to the next question |#
+#| A: No. Move to the next line. |#
 (null? '(bagels and lox)) ; ==> #f
 
 #| Q: else |#
-#| A: True, but (eq? (car lat) a) is #f so we recur with (member? a (cdr lat))
-      where a is liver and lat in (cdr lat) is (and lox) |#
+#| A: Yes, but ( eq? ( car lat) a) is false. Recur with a and (cdr lat) where a is liver 
+      and (cdr lat) is (and lox). |#
 (eq? (car '(bagels and lox)) 'liver) ; ==> #f
 
 #| Q: (null? lat) |#
-#| A: (null? (and lox)) is #f, so we continue to the next question |#
+#| A: (No. Move to the next line. |#
 (null? '(and lox))  ; ==> #f
 
 #| Q: else |#
-#| A: True, but (eq? (car lat) a) is #f so we recur with (member? a (cdr lat))
-      where a is liver and lat in (cdr lat) is (lox) |#
+#| A: Yes, but (eq? (car lat) a) is false. Recur with a and (cdr lat) where a is liver 
+      and (cdr lat) is (lox). |#
 (eq? (car '(and lox)) 'liver) ; ==> #f
 
 #| Q: (null? lat) |#
-#| A: (null? (lox)) is #f, so we continue to the next question |#
+#| A: No. Move to the next line. |#
 (null? '(lox)) ; ==> #f
 
 #| Q: else |#
-#| A: True, but (eq? (car lat) a) is #f so we recur with (member? a (cdr lat))
-      where a is liver and lat in (cdr lat) is () |#
+#| A: Yes, but (eq? (car lat) a) is still false. Recur with a and (cdr lat) where a is liver 
+      and (cdr lat) is (). |#
 (eq? (car '(lox)) 'liver) ; ==> #f
 
 #| Q: (null? lat) |#
-#| A: (null? ()) is #t, so the application returns #f |#
+#| A: Yes. |#
 (null? '()) ; ==> #t
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is () |#
-#| A: False |#
+#| A: #f. |#
 (member? 'liver '()) ; ==> #f
 
-#| Q: What is the value of 
-      (or (eq? (car lat) a) 
-          (member? a (cdr lat))) 
+#| Q: What is the value of (or (eq? (car lat) a) (member? a (cdr lat))) 
       where a is liver and lat is (lox) |#
-#| A: False |#
+#| A: #f. |#
 (or (eq? (car '(lox)) 'liver)
     (member? 'liver (cdr '(lox)))) ; ==> #f
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is (lox) |#
-#| A: False |#
+#| A: #f. |#
 (member? 'liver '(lox)) ; ==> #f
 
-#| Q: What is the value of
-      (or (eq? (car lat) a) 
-          (member? a (cdr lat)))
+#| Q: What is the value of (or (eq? (car lat) a)  (member? a (cdr lat)))
       where a is liver and lat is (and lox) |#
-#| A: False |#
+#| A: #f. |#
 (or (eq? (car '(and lox)) 'liver)
     (member? 'liver (cdr '(and lox)))) ; ==> #f
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is (and lox) |#
-#| A: False |#
+#| A: #f. |#
 (member? 'liver '(and lox)) ; ==> #f
 
-#| Q: What is the value of
-      (or (eq? (car lat) a) 
-          (member? a (cdr lat)))
+#| Q: What is the value of (or (eq? (car lat) a) (member? a (cdr lat)))
       where a is liver and lat is (bagels and lox) |#
-#| A: False |#
+#| A: #f. |#
 (or (eq? (car '(bagels and lox)) 'liver)
     (member? 'liver (cdr '(bagels and lox)))) ; ==> #f
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is (bagels and lox) |#
-#| A: False |#
+#| A: #f. |#
 (member? 'liver '(bagels and lox)) ; ==> #f
 
 
 
+#|                          Do you believe all this? Then you may rest!                          |#
 
 
 
@@ -608,8 +620,9 @@
 
 
 
-#|                                   *** This space for doodling ***                                   |#
 
 
 
 
+
+#|                              *** This space for doodling ***                                 |#
