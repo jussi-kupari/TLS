@@ -763,7 +763,7 @@ In any case, what is the value of (firsts l) |#
 
 #| Q: Now try insertL 
       Hint: insertL inserts the atom new to the left of the first occurrence of the atom old in lat |#
-#| A: Ok, I will do it. |#
+#| A: This much is easy, right? |#
 
 ;; insertL : Atom Atom LAT -> LAT
 ;; Given two atoms and a list of atoms, inserts the first atom to the left of
@@ -780,9 +780,11 @@ In any case, what is the value of (firsts l) |#
 (insertL.v1 'topping 'fudge '(ice cream with fudge for dessert))
 ; ==> '(ice cream with topping fudge for dessert)
 
-#| Q: Did you think of a different way to do it?
+#| Q: Did you think of a different way to do it? |#
 
-      ((eq? (car lat) old) 
+#| A: For example,
+
+ ((eq? (car lat) old) 
         (cons new (cons old (cdr lat))))
 
      could have been
@@ -792,8 +794,6 @@ In any case, what is the value of (firsts l) |#
 
      since (cons old (cdr lat)) where old is eq? to 
      (car lat) is the same as lat. |#
-
-#| A: I didn't think of that! Let's try it! |#
 
 (define insertL.v2
   (λ (new old lat)
@@ -829,7 +829,7 @@ In any case, what is the value of (firsts l) |#
 (subst 'topping 'fudge '(ice cream with fudge for dessert))
 ; ==> '(ice cream with topping for dessert)
 
-#| Obviously, this is the same as one of our incorrect attempts at insertR.
+#| This is the same as one of our incorrect attempts at insertR.
 
 (define subst 
     (λ (new old lat) 
@@ -888,9 +888,7 @@ define subst2
 
 #| Q: Did you think of a better way? |#
 #| A: Replace the two eq? lines about the (car lat) by 
-      ((or (eq? (car lat) o1) (eq? (car lat) o2)) (cons new (cdr lat))).
-
-     Yes, sure |#
+      ((or (eq? (car lat) o1) (eq? (car lat) o2)) (cons new (cdr lat))). |#
 
 ;; subst2.v2 : Atom Atom LAT -> LAT
 ;; Given three atoms and a list of atoms, substitutes the first occurrence
@@ -916,35 +914,45 @@ define subst2
 
 
 #| Q: Do you recall what rember does? |#
-#| A: Rember takes as agruments an atom 'a and a list of atoms lat. It looks at each atom of the lat
-      to see if it is the same as the atom-of-interest. If it is not, rember saves the atom and proceeds.
-      When it finds the first occurrence of a, it stops and gives the value (cdr lat), or the rest of the
-      lat, so that the value returned is the original lat, with only that occurrence of a removed. |#
+#| A: The function rember looks at each atom of a lat to see if it is the same as
+      the atom a. If it is not, rember saves the atom and proceeds. When it finds
+      the first occurrence of a, it stops and gives the value ( cdr lat), or the 
+      rest of the lat, so that the value returned is the original lat, with only
+      that occurrence of a removed. |#
 
 #| Q: Write the function multirember which gives as its final value the lat
       with all occurrences of a removed.
 
       Hint: What do we want as the value when (eq? (car lat) a) is true? Consider the example 
-      where a is cup and lat is (coffee cup tea cup and hick cup). |#
+      where a is cup and lat is (coffee cup tea cup and hick cup).
+
+(define multirember
+  (λ (a lat)
+    (cond
+      ((...) (...))
+      (else
+       (cond
+         ((...) (...))
+         ((...) (...))))))) |#
 
 #| A: Ok. See below. |#
 
 ;; multirember : Atom LAT -> LAT
 ;; Given atom and lat, produces the lat with all occurrences of the atom removed.
-(define multirember
+(define multirember.v1
   (λ (a lat)
     (cond
       ((null? lat)
        '())
       ((eq? (car lat) a)
-       (multirember a (cdr lat)))
+       (multirember.v1 a (cdr lat)))
       (else
-       (cons (car lat) (multirember a (cdr lat)))))))
+       (cons (car lat) (multirember.v1 a (cdr lat)))))))
 
-(multirember 'cup '(coffee cup tea cup and hick cup)) ; ==> '(coffee tea and hick)
+(multirember.v1 'cup '(coffee cup tea cup and hick cup)) ; ==> '(coffee tea and hick)
 
-#|    After the first occurrence of a, we now recur with (multirember a (cdr lat)), in 
-      order to remove the other occurrences. |#
+#| After the first occurrence of a, we now recur with (multirember a (cdr lat)), in 
+   order to remove the other occurrences. |#
 
 #| Q: Can you see how multirember works? |#
 #| A: Possibly not, so we will go through the steps necessary to arrive at the value 
@@ -952,15 +960,26 @@ define subst2
 
 #| Note that my version is streamlined and without the extra else and cond,
    but I follow the book verbose version below. |#
+(define multirember 
+    (λ (a lat) 
+      (cond 
+        ((null? lat) (quote ())) 
+        (else 
+         (cond 
+           ((eq? (car lat) a) 
+            (multirember a (cdr lat))) 
+           (else (cons (car lat) 
+                       (multirember a 
+                                    (cdr lat)))))))))
 
 #| Q: (null? lat) |#
-#| A: False. Forward. |#
+#| A: No, so move to the next line. |#
 
 #| Q: else |#
-#| A: True as always |#
+#| A: Yes.|#
 
 #| Q: (eq? (car lat) a) |#
-#| A: False, so to the next question |#
+#| A: No, so move to the next line. |#
 
 #| Q: What is the meaning of (cons (car lat) (multirember a (cdr lat))) |#
 #| A: Save the first atom of lat 'coffee to be consed to the beginning of
@@ -971,23 +990,22 @@ define subst2
       Now determine (multirember a (cdr lat)). |#
 
 #| Q: (null? lat) |#
-#| A: False. Go to the next line. |#
+#| A: No, so move to the next line. |#
 
 #| Q: else |#
-#| A: True, as always |#
+#| A: Naturally. |#
 
 #| Q: (eq? (car lat) a) |#
-#| A: True, so we skip over (car lat) and continue to run of multirember with
-      the remaining list (multirember a (cdr lat)). |#
+#| A: Yes, so forget (car lat), and determine (multirember a (cdr lat)). |#
 
 #| Q: (null ? lat) |#
-#| A: False. Next line. |#
+#| A: No, so move to the next line. |#
 
 #| Q: else |#
-#| A: As true as always. |#
+#| A: Yes! |#
 
 #| Q: (eq? (car lat) a) |#
-#| A: False, so we continue to the next line. |#
+#| A: No, so move to the next line. |#
 
 #| Q: What is the meaning of (cons (car lat) (multirember a (cdr lat))) |#
 #| A: Save the first atom of lat 'tea to be consed to the beginning of
@@ -998,66 +1016,70 @@ define subst2
       Now determine (multirember a (cdr lat)). |#
 
 #| Q: (null? lat) |#
-#| A: False. Go to the next line. |#
+#| A: No, so move to the next line. |#
 
 #| Q: else |#
-#| A: True |#
+#| A: Okay, move on. |#
 
 #| Q: (eq? (car lat) a) |#
-#| A: True, so skip over (car lat) and determine (multirember a (cdr lat)). |#
+#| A: Yes, so forget (car lat), and determine (multirember a (cdr lat)). |#
 
 #| Q: (null ? lat) |#
-#| A: False. Next line. |#
+#| A: No, so move to the next line. |#
 
 #| Q: (eq? (car lat) a)  |#
-#| A: False, so move to the next line.  |#
+#| A: No, so move to the next line. |#
 
 #| Q: What is the meaning of (cons (car lat) (multirember a (cdr lat))) |#
-#| A: Save (car lat) - and - to be consed onto the value of (multirember a (cdr lat)) later. 
-      Now determine (multirember a (cdr lat)). |#
-
-#| Q: (null ? lat) |#
-#| A: False. Next line. |#
-
-#| Q: else |#
-#| A: As true as always. |#
-
-#| Q: (eq? (car lat) a) |#
-#| A: False, so we go forwards |#
-
-#| Q: What is the meaning of (cons (car lat) (multirember a (cdr lat))) |#
-#| A: Save the first atom of lat 'hick to be consed to the beginning of
-      the result from recurring multirember with the remaining list.
+#| A: Save (car lat) -and- to be consed onto the value of (multirember a (cdr lat)) later. 
       Now determine (multirember a (cdr lat)). |#
 
 #| Q: (null? lat) |#
-#| A: False. Go to the next line. |#
+#| A: No, so move to the next line. |#
 
 #| Q: (eq? (car lat) a) |#
-#| A: True, so skip over (car lat) and determine (multirember a (cdr lat)). |#
+#| A: No, so move to the next line. |#
+
+#| Q: What is the meaning of (cons (car lat) (multirember a (cdr lat))) |#
+#| A: Save (car lat) -hick- to be consed onto the value of
+      (multirember a (cdr lat)) later. Now determine (multirember a (cdr lat)). |#
 
 #| Q: (null? lat) |#
-#| A: True, the list is null and the value becomes '() |#
+#| A: No, so move to the next line. |#
+
+#| Q: (eq? (car lat) a) |#
+#| A: Yes, so forget (car lat), and determine (multirember a (cdr lat)). |#
+
+#| Q: (null? lat) |#
+#| A: Yes, so the value is (). |#
 
 #| Q: Are we finished? |#
-#| A: No. Now we have to pick up the saved conses. |#
+#| A: No, we still have several conses to pick up. |#
 
 #| Q: What do we do next? |#
-#| A: We cons the most recent (car lat) we have - hick - onto (). |#
+#| A: We cons the most recent (car lat) we have -hick- onto (). |#
 
 #| Q: What do we do next? |#
-#| A: We cons the next (car lat) - and - to (hick) |#
-
-#| Q: |#
-#| A: We cons the next (car lat) - tea - to (and hick). |#
+#| A: We cons and onto (hick). |#
 
 #| Q: What do we do next? |#
-#| A: We cons the next (car lat) - coffee - to (tea and hick). |#
+#| A: We cons tea onto (and hick). |#
+
+#| Q: What do we do next? |#
+#| A: We cons coffee onto (tea and hick). |#
 
 #| Q: Are we finished now? |#
 #| A: Yes. |#
 
-#| Q: Now write the function multiinsertR |#
+#| Q: Now write the function multiinsertR
+(define multiinsertR
+    (λ (new old lat)
+      (cond
+        ((...) (...))
+        (else
+         (cond
+           ((...) (...))
+           ((...) (...))))))) |#
 #| A: Ok. See below. |#
 
 ;; multiinsertR.v1 : Atom Atom LAT -> LAT 
@@ -1112,13 +1134,22 @@ define subst2
 
 ; (multiinsertL.v1 'fried 'fish '(chips and fish or fish and fried)) ==> out of memory!
 
-#| A: No. It is recurring on the original lat and not (cdr lat) |#
+#| A: Not quite. To find out why, go through (multiinsertL new old lat) 
+      where new is fried old is fish and lat is (chips and fish or fish and fried). |#
 
 #| Q. Was the terminal condition ever reached? |#
-#| A: No. It is recurring on the original lat and not (cdr lat) so we never get past
-      the first occurrence of old. |#
+#| A: No, because we never get past the first occurrence of old. |#
 
-#| Q: Now, try to write the function multiinsertL again: |#
+#| Q: Now, try to write the function multiinsertL again:
+(define multiinsertL
+    (λ (new old lat)
+      (cond
+        ((...) (...))
+        (else
+         (cond
+           ((...) (...))
+           ((...) (...))))))) |#
+
 #| A: Ok, here it is |#
 
 ;;  multiinsertL : Atom Atom LAT -> LAT 
@@ -1140,7 +1171,7 @@ define subst2
 (multiinsertL 'fried 'fish '(chips and fish or fish and fried))
 ; ==> '(chips and fried fish or fried fish and fried)
 
-;; A sleekier version without extra conds and elses
+;; A sleek version without extra conds and elses
 (define multiinsertL-sleek
   (λ (new old lat)
     (cond
