@@ -13,10 +13,10 @@
 
 
 #| Q: Is 14 an atom? |#
-#| A: Yes, all numbers are atoms. |#
+#| A: Yes, because all numbers are atoms. |#
 
 #| Q: Is (atom? n) true or false where n is 14 |#
-#| A: True, because 14 is a number and therefore an atom. |#
+#| A: True, because 14 is an atom. |#
 (atom? 14) ; ==> #t
 
 #| Q: Is -3 a number? |#
@@ -26,7 +26,8 @@
 #| A: Yes, but we consider only whole numbers. |#
 
 #| Q: Are -3 and 3.14159 numbers? |#
-#| A: Yes, but the only numbers we use are the nonnegative integers. |#
+#| A: Yes, but the only numbers we use are the 
+       nonnegative integers (i.e. , 0, 1, 2, 3, 4, ...). |#
 
 #| Q: What is (add1 n), where n is 67? |#
 #| A: 68. |#
@@ -40,10 +41,12 @@
 (sub1 5) ; ==> 4
 
 #| Q: What is (sub1 0) |#
-#| A: No answer. (in practice (sub1 0) returns -1 )|#
+#| A: No answer.
+      Note: in practice (sub1 0) returns -1. |#
 
 #| Q: Is (zero? 0) true or false? |#
 #| A: True. |#
+(zero? 0) ; ==> #t
 
 #| Q: Is (zero? 1492) true or false? |#
 #| A: False. |#
@@ -51,7 +54,7 @@
 
 #| Q: What is (+ 46 12) |#
 #| A: 58. |#
-(+ 46 12)
+(+ 46 12) ;  ==> 58
 
 #| Q: Try to write the function plus Hint: It uses zero? add1 and sub1 |#
 #| A: Ok. |#
@@ -64,6 +67,8 @@
       ((zero? m) n)
       (else
        (add1 (plus n (sub1 m)))))))
+
+; Wasn't that easy?
 
 (plus 5 5) ; ==> 10
 (plus 5 0) ; ==> 5
@@ -102,18 +107,18 @@
 (minus 5 5) ; ==> 0
 (minus 26 5) ; ==> 21
 
-; from the book
-(define --  
+; How about this:
+(define minuS  
   (λ (n m) 
     (cond 
       ((zero? m) n) 
-      (else (sub1 (-- n (sub1 m)))))))
+      (else (sub1 (minuS n (sub1 m)))))))
 
-(-- 6 5) ; ==> 1
-(-- 5 5) ; ==> 0
-(-- 26 5) ; ==> 21
+(minuS 6 5) ; ==> 1
+(minuS 5 5) ; ==> 0
+(minuS 26 5) ; ==> 21
 
-#| Q: Can you describe how (-- n m) works? |#
+#| Q: Can you describe how (minuS n m) works? |#
 #| A: It takes two numbers as arguments, and reduces the second until it hits zero.
       It subtracts one from the result as many times as it did to cause the second
       one to reach zero.
@@ -123,16 +128,16 @@
       second hits zero. |#
 
 #| Q: Is this a tup? (2 11 3 79 47 6) |#
-#| A: Yes, tup is short for tuple. |#
+#| A: Yes: tup is short for tuple. |#
 
 #| Q: Is this a tup? (8 55 5 555) |#
-#| A: Yes. It is also a list of numbers. |#
+#| A: Yes, of course, it is also a list of numbers. |#
 
 #| Q: Is this a tup? (1 2 8 apple 4 3) |#
-#| A: No. This is just a list of atoms. It has a non-number in it. |#
+#| A: No, it is just a list of atoms. |#
 
 #| Q: Is this a tup? (3 (7 4) 13 9) |#
-#| A: No. b/c it is not a list of numbers. (7 4) is not a number. |#
+#| A: No, because it is not a list of numbers. (7 4) is not a number. |#
 
 #| Q: Is this a tup? () |#
 #| A: Yes, it is a list of zero numbers. This special case is the empty tup. |#
@@ -147,63 +152,60 @@
 #| A: It builds a number by totaling all the numbers in its argument. |#
 
 #| Q: What is the natural way to build numbers from a list? |#
-#| A: Use + in place of cons: + builds numbers in the same way as cons builds lists. |#
+#| A: Use plus in place of cons: plus builds numbers in the same way as cons builds lists. |#
 
 #| Q: When building lists with cons the value of the terminal condition is ()
-      What should be the value of the terminal condition when building numbers with + |#
+      What should be the value of the terminal condition when building numbers with plus |#
 #| A: 0. |#
 
 #| Q: What is the natural terminal condition for a list? |#
-#| A: (null? l) |#
+#| A: (null? l). |#
 
 #| Q: What is the natural terminal condition for a tup? |#
-#| A: (zero? tup) |#
+#| A: (null? tup). |#
 
 #| Q: When we build a number from a list of numbers, what should the terminal condition 
       line look like? |#
-#| A: ((null? tup) 0), so when the tuple is empty the value is zero.
-      Compare to ((null? l) ()) with lists. |#
+#| A: ((null ? tup) 0), just as ((null? l) '()) 
+      is often the terminal condition line for lists. |#
 
 #| Q: What is the terminal condition line of addtup? |#
-#| A: ((null? tup) 0) |#
+#| A: ((null? tup) 0). |#
 
 #| Q: How is a lat defined? |#
 #| A: It is either an empty list, or it contains an atom, (car lat),
       and a rest, (cdr lat), that is also a lat. |#
 
 #| Q: How is a tup defined? |#
-#| A: Like a list of numbers. It is either an empty list, or it contains a 
-      number and a rest that is also a tup. |#
+#| A: It is either an empty list, or it contains a number and a rest that is also a tup. |#
 
 #| Q: What is used in the natural recursion on a list?|#
-#| A: (cdr lat) |#
+#| A: (cdr lat). |#
 
 #| Q: What is used in the natural recursion on a tup? |#
-#| A: (cdr tup) |#
+#| A: (cdr tup). |#
 
 #| Q: Why? |#
-#| A: Because a tup is just a list of numbers. The rest of a non-empty list is a list 
-      and the rest of a non-empty tup is a tup. |#
+#| A: Because the rest of a non-empty list is a list and the rest of a non-empty tup is a tup. |#
 
 #| Q: How many questions do we need to ask about a list? |#
 #| A: Two. |#
 
 #| Q: How many questions do we need to ask about a tup? |#
-#| A: Two, b/c it is a list of numbers; either it is empty or it is a 
-      number and a rest, which is again a tup.  |#
+#| A: Two, because it is either empty or it is a number and a rest, which is again a tup. |#
 
 #| Q: How is a number defined? |#
-#| A: It is either zero or it is one added to a rest, 
-      where rest is again a number. |#
+#| A: It is either zero or it is one added to a rest, where rest is again a number. |#
 
 #| Q: What is the natural terminal condition for numbers? |#
-#| A: (zero? n) |#
+#| A: (zero? n). |#
 
 #| Q: What is the natural recursion on a number? |#
-#| A: (sub1 n) |#
+#| A: (sub1 n). |#
 
 #| Q: How many questions do we need to ask about a number? |#
-#| A: Two. (zero? n) and else. |#
+#| A: Two.
+      Note: (zero? n) and else. |#
 
 
 
@@ -217,19 +219,19 @@
 
 
 #| Q: What does cons do? |#
-#| A: It constructs lists. |#
+#| A: It builds lists. |#
 
 #| Q: What does addtup do? |#
-#| A: I sums up all the numbers in a tuple. |#
+#| A: It builds a number by totaling all the numbers in a tup. |#
 
 #| Q: What is the terminal condition line of addtup? |#
-#| A: ((null? tup) 0) |#
+#| A: ((null? tup) 0). |#
 
 #| Q: What is the natural recursion for addtup? |#
-#| A: (addtup (cdr tup)) |#
+#| A: (addtup (cdr tup)). |#
 
 #| Q: What does addtup use to build a number? |#
-#| A: It uses +, b/c + builds numbers, too! |#
+#| A: It uses plus, beacause plus builds numbers, too! |#
 
 #| Q: Fill in the dots in the following definition:
 (define addtup 
@@ -247,31 +249,31 @@
     (cond 
       ((null? tup) 0) 
       (else
-       (+ (car tup) (addtup (cdr tup)))))))
+       (plus (car tup) (addtup (cdr tup)))))))
 
 (addtup '(5 5 5 5 5)) ; ==> 25
 
 #| Here is what we filled in: 
-   (+ (car tup) (addtup ( cdr tup))). 
+   (plus (car tup) (addtup (cdr tup))). 
    Notice the similarity between this line, and 
    the last line of the function rember: 
    (cons (car lat) (rember a (cdr lat))). |#
 
-#| Q: What is (* 5 3) |#
+#| Q: What is (x 5 3) |#
 #| A: 15. |#
 
-#| Q: What is (* 13 4) |#
+#| Q: What is (x 13 4) |#
 #| A: 52. |#
 
-#| Q: What does (* n m) do? |#
+#| Q: What does (x n m) do? |#
 #| A: Builds a number by adding up n m times |#
 
-#| Q: What is the terminal condition line for *?|#
-#| A: ((zero? m) 0), b/c n * 0 = 0 |#
+#| Q: What is the terminal condition line for x |#
+#| A: ((zero? m) 0), because n x 0 = 0 |#
 
 #| Q: Since (zero? m) is the terminal condition, m must eventually
       be reduced to zero. What function is used to do this? |#
-#| A: sub1 |#
+#| A: sub1. |#
 
 
 
@@ -285,189 +287,184 @@
 
 
 
-#| Q: What is another name for (* n (sub1 m)) in this case? |#
-#| A: The natural recursion for (* n m) |#
+#| Q: What is another name for (x n (sub1 m)) in this case? |#
+#| A: It's the natural recursion for x. |#
 
-#| Q: Try to write the function * [times] |#
+#| Q: Try to write the function x |#
 #| A: Ok. |#
 
-;; times : WN WN -> WN
+;; x : WN WN -> WN
 ;; Given two whole numbers, adds up the first times the second
-(define times
+(define x
   (λ (n m)
     (cond
       ((zero? m) 0)
-      (else (+ n (times n (sub1 m)))))))
+      (else (plus n (x n (sub1 m)))))))
 
-(times 7 5) ; ==> 35
+(x 7 5) ; ==> 35
 
-#| Q: What is (times 12 3) |#
-#| A: (+ 12 (+ 12 (+ 12 0)), or 36, but let's follow through the function one 
+#| Q: What is (x 12 3) |#
+#| A: (plus 12 (plus 12 (plus 12 0)), or 36, but let's follow through the function one 
       time to see how we get this value. |#
 
 #| Q: (zero? m) |#
-#| A: False. |#
+#| A: No. |#
 
-#| Q: What is the meaning of (+ n (times n (sub1 m)))? |#
-#| A: It adds n (where n = 12) to the natural recursion. If times is correct then 
-      (times 12 (sub1 3)) should be 24. |#
-(times 12 (sub1 3)) ; ==> 24
+#| Q: What is the meaning of (plus n (x n (sub1 m)))? |#
+#| A: It adds n (where n = 12) to the natural recursion. If x is correct then 
+      (x 12 (sub1 3)) should be 24. |#
+(x 12 (sub1 3)) ; ==> 24
 
-#| Q: What are the new arguments of (* n m) |#
-#| A: n is 12 and m is 2 |#
+#| Q: What are the new arguments of (x n m) |#
+#| A: n is 12, and m is 2. |#
 
 #| Q: (zero? m) |#
-#| A: False. |#
+#| A: No. |#
 
-#| Q: What is the meaning of (+ n (times n (sub1 m)))? |#
-#| A: It adds n (where n = 12) to (* n (sub1 m)). |#
-(times 12 (sub1 2)) ; ==> 12
+#| Q: What is the meaning of (plus n (x n (sub1 m)))? |#
+#| A: It adds n (where n = 12) to (x n (sub1 m)). |#
+(x 12 (sub1 2)) ; ==> 12
 
-#| Q: What are the new arguments of (* n m) |#
+#| Q: What are the new arguments of (x n m) |#
 #| A: n is 12 and m is 1 |#
 
 #| Q: (zero? m) |#
 #| A: False. |#
 
-#| Q: What is the meaning of (+ n (times n (sub1 m)))? |#
-#| A: It adds n (where n = 12) to (* n (sub1 m)). |#
-(times 12 (sub1 1)) ; ==> 0
+#| Q: What is the meaning of (plus n (times n (sub1 m)))? |#
+#| A: It adds n (where n = 12) to (x n (sub1 m)). |#
+(x 12 (sub1 1)) ; ==> 0
 
 #| Q: What is the value of the line ((zero? m) 0)  |#
-#| A: 0, b/c (zero? m) is now true. |#
+#| A: 0, because (zero? m) is now true. |#
 
 #| Q: Are we finished yet? |#
 #| A: No. |#
 
 #| Q: Why not? |#
-#| A: We still have all the + calls to pick up. |#
+#| A: We still have all the plus'es to pick up. |#
 
 #| Q: What is the value of the original application? |#
-#| A: (+ 12 (+ 12 (+ 12 0)). Notice that n has been +ed m times. |#
+#| A: Add 12 to 12 to 12 to 0 yielding 36. Notice that n has been plus'ed m times. |#
 
-#| Q: Argue, using equations, that times is the conventional multiplication of nonnegative 
+#| Q: Argue, using equations, that x is the conventional multiplication of nonnegative 
       integers, where n is 12 and m is 3. |#
 
-#| A: (times 12 3) = 12 + (times 12 2)
-       = 12 + 12 + (times 12 1)
-       = 12 + 12 + 12 + (times 12 0)
-       = 12 + 12 + 12 + 0
+#| A: (x 12 3) = 12 plus (x 12 2)
+       = 12 plus 12 plus (x 12 1)
+       = 12 plus 12 plus 12 plus (x 12 0)
+       = 12 plus 12 plus 12 plus 0
 
       Which is as we expected. This technique works for all recursive functions, not just 
       those that use numbers. You can use this approach to write functions as well as to 
       argue their correctness. |#
 
 #| Q: Again, why is 0 the value for the terminal condition line in times? |#
-#| A: Because 0 will not affect +. That is, n + O = n |#
+#| A: Because 0 will not affect plus. That is, n plus O = n |#
 
 
 
 #|                          *** The Fifth Commandment *** 
-            When building a value with + , always use 0 for the value of the 
+            When building a value with plus , always use 0 for the value of the 
           terminating line, for adding 0 does not change the value of an addition.
-       When building a value with *, always use 1 for the value of the terminating line,
+       When building a value with x, always use 1 for the value of the terminating line,
             for multiplying by 1 does not change the value of a multiplication.
     When building a value with cons, always consider () for the value of the terminating line.        |#
 
 
 
 #| Q: What is (tup+ tup1 tup2) where tup1 is (3 6 9 11 4) and tup2 is (8 5 2 0 7) |#
-#| A: (11 11 11 11 11) |#
+#| A: (11 11 11 11 11). |#
 
 #| Q: What is (tup+ tup1 tup2) where tup1 is (2 3) and tup2 is (4 6) |#
-#| A: (6 9) |#
+#| A: (6 9). |#
 
 #| Q: What does (tup+ tup1 tup2) do? |#
-#| A: It takes two tuples of equal length as arguments and adds the first number from tup1 to the
-      first number of tup2 and so on, building a tup of the answers. |#
+#| A: It adds the first number of tup1 to the first number of tup2, then it adds the second 
+      number of tup1 to the second number of tup2, and so on, building a tup of the answers,
+      for tups of the same length. |#
 
 #| Q: What is unusual about tup+ |#
-#| A: It looks at each element of two tups at the same time, or in other words, it recurs on 
-      two tups.  |#
+#| A: It looks at each element of two tups at the same time, or in other words,
+      it recurs on two tups. |#
 
 #| Q: If you recur on one tup how many questions do you have to ask? |#
-#| A: Two: (null tup) and else. |#
+#| A: Two, they are (null? tup) and else. |#
 
 #| Q: When recurring on two tups, how many questions need to be asked about the tups? |#
-#| A: Four questions:
-      Are both tups null? (and (null? tup1) (null? tup2))
-      Is the first tup null? (null? tup1)
-      Is the second tup null? (null? tup2)
-      else |#
+#| A: Four: if the first tup is empty or non-empty, and if the second tup is empty or non-empty. |#
 
 #| Q: Do you mean the questions 
       (and (null'? tup1 ) (null'? tup2)) 
       (null? tup1 ) 
       (null? tup2) 
       and else |#
-#| A: Yes, like I said above. |#
+#| A: Yes. |#
 
 #| Q: Can the first tup be () at the same time as the second is other than () |#
-#| A: If the tups must be of equal length the no. |#
+#| A: No, because the tups must have the same length. |#
 
 #| Q: Does this mean (and (null? tup1 ) (null? tup2)) and 
       else are the only questions we need to ask? |#
-#| A: Yes, but we could also ask (null? tup1) or (null? tup2) as the first
-      question, because the tups are of equal length. |#
+#| A: Yes, because (null? tup1) is true exactly when (null? tup2) is true.
+      Note: Why can't we just ask (null? tup1) and else? |#
 
 #| Q: Write the function tup+ |#
 #| A: Will do. |#
 
+;; tup+ : Tup Tup -> Tup
+;; Given two tups of equal length, produces a tup of their element-wise sums.
 (define tup+
   (λ (tup1 tup2)
     (cond
       ((and (null? tup1) (null? tup2))
        '())
       (else
-       (cons
-        (+ (car tup1) (car tup2))
+       (cons (plus (car tup1) (car tup2))
         (tup+ (cdr tup1) (cdr tup2)))))))
 
 (tup+ '(5 7 9) '(2 2 3)) ; ==> '(7 9 12)
 
-; book version is the same as mine
+; book solution is the same as mine
 
-#| Q: What are the arguments of +? |#
+#| Q: What are the arguments of plus in the last line? |#
 #| A: (car tup1) (car tup2) |#
 
-#| Q: What are the arguments of cons? |#
-#| A: (+ (car tup1) (car tup2)) and (tup+ (cdr tup1) (cdr tup2)) |#
+#| Q: What are the arguments of cons in the last line? |#
+#| A: (plus (car tup1) (car tup2)) and (tup+ (cdr tup1) (cdr tup2)). |#
 
 #| Q: What is (tup+ tup1 tup2) where tup1 is (3 7) and tup2 is (4 6) |#
-#| A: (7 13), but let's see how it works |#
+#| A: (7 13). But let's see how it works. |#
 (tup+ '(3 7) '(4 6)) ; ==> '(7 13)
 
 #| Q: (null? tup1 ) |#
-#| A: False. |#
+#| A: No. |#
 
 #| Q: (cons
-        (+ (car tup1 ) (car tup2))
+        (plus (car tup1 ) (car tup2))
         (tup+ (cdr tup1 ) (cdr tup2))) |#
-#| A: (cons (+ 3 4 (tup+ (7) (6)),
-      so cons 7 to the natural recursion |#
+#| A: cons 7 onto the natural recursion: (tup+ (cdr tup1) (cdr tup2)). |#
 
 #| Q: Why does the natural recursion include the cdr of both arguments? |#
 #| A: Because the typical element of the final value uses the car of both tups,
       so now we are ready to consider the rest of both tups. |#
 
 #| Q: (null? tup1) where tup1 is now (7) and tup2 is now (6) |#
-#| A: False. |#
+#| A: No. |#
 
 #| Q: (cons 
-        (+ (car tup1) (car tup2)) 
+        (plus (car tup1) (car tup2)) 
         (tup+ (cdr tup1 ) (cdr tup2))) |#
-#| A: (cons (+ 7 6) (tup+ () ()), or cons 13 onto the natural recursion. |#
+#| A: 13 onto the natural recursion. |#
 
 #| Q: (null? tup1 ) |#
-#| A: True. |#
+#| A: Yes. |#
 
 #| Q: Then, what must be the value? |#
-#| A: (), because (null? tup2) must also be true. |#
+#| A: (), because (null? tup2) must be true. |#
 
 #| Q: What is the value of the application? |#
-#| A: (7 13). In other words, (cons (+ 3 4) (cons (+ 7 6) (cons ())
-      or (cons 7 (cons 13 (cons ()), or (7 13).
-      That is, the cons of 7 onto the cons of 13 onto (). |#
+#| A: (7 13). That is, the cons of 7 onto the cons of 13 onto (). |#
 
 #| Q: What problem arises when we want (tup+ tup1 tup2) where 
       tup1 is (3 7) and tup2 is (4 6 8 1) |#
@@ -494,6 +491,8 @@
 #| Q: Here is a definition of tup+ that works for any two tups:
       Can you simplify it? |#
 
+;; tup+.v2 : Tup Tup -> Tup
+;; Given two tups of equal length, produces a tup of their element-wise sums.
 (define tup+.v2 
   (λ (tup1 tup2) 
     (cond 
@@ -502,7 +501,7 @@
       ((null? tup1) tup2) 
       ((null? tup2) tup1) 
       (else 
-       (cons (+ (car tup1) (car tup2)) 
+       (cons (plus (car tup1) (car tup2)) 
              (tup+.v2 
               (cdr tup1) (cdr tup2)))))))
 
@@ -512,6 +511,8 @@
       This is because if the tups are the same length you will be
       consing a null tup at the and as is correct |#
 
+;; tup+.v3 : Tup Tup -> Tup
+;; Given two tups of equal length, produces a tup of their element-wise sums.
 (define tup+.v3 
   (λ (tup1 tup2) 
     (cond 
@@ -531,75 +532,77 @@
 #| A: Yes, because either (null? tup1) or (null? tup2) is true if either one of them does 
       not contain at least one number. |#
 
-#| Q: What is (bigger-than? 12 133) |#
-#| A: False. |#
+#| Q: What is (>? 12 133) |#
+#| A: #f-false.|#
 
-#| Q: What is (bigger-than? 120 11) |#
-#| A: True. |#
+#| Q: What is (>? 120 11) |#
+#| A: #t-true. |#
 
 #| Q: On how many numbers do we have to recur? |#
-#| A: Two, n and m|#
+#| A: Two, n and m. |#
 
 #| Q: How do we recur? |#
-#| A: (sub1 n) (sub1 m) |#
+#| A: (sub1 n) (sub1 m). |#
 
 #| Q: When do we recur? |#
 #| A: When we know neither number is equal to 0. |#
 
 #| Q: How many questions do we have to ask about n and m? |#
-#| A: Three: (zero? m), (zero? n), and else |#
+#| A: Three: (zero? m), (zero? n), and else. |#
 
-#| Q: Can you write the function  bigger-than? now using zero? and sub1 |#
+#| Q: Can you write the function >?? now using zero? and sub1 |#
 #| A: Sure. |#
 
-(define bigger-than??
+;; >?? : WN WN -> Boolean
+;; Given two whole numbers, produces true if the first is greater than the second.
+(define >??
   (λ (n m)
     (cond
       ((zero? m) #t)
       ((zero? n) #f)
-      (else (bigger-than?? (sub1 n) (sub1 m))))))
+      (else (>?? (sub1 n) (sub1 m))))))
 
-(bigger-than?? 5 4) ; ==> #t
-(bigger-than?? 4 5) ; ==> #f
+(>?? 5 4) ; ==> #t
+(>?? 4 5) ; ==> #f
 
 ; Book version is the same as mine.
 
-#| Q: Is the way we wrote (bigger-than?? n m) correct |#
+#| Q: Is the way we wrote (>?? n m) correct? |#
 #| A: No, try it for the case where n and m are the same number. Let n and m be 3. |#
-(bigger-than?? 3 3) ; ==> #t
+(>?? 3 3) ; ==> #t
 
 #| Q: (zero? 3) |#
-#| A: False, so move forwards to the next question. |#
+#| A: No, so move forwards to the next question. |#
 
 #| Q: (zero? 3) |#
-#| A: False, move to the next question. |#
+#| A:  No, so move forwards to the next question. |#
 
-#| Q: What is the meaning of (bigger-than?? (sub1 n) (sub1 m)) |#
-#| A: Naturak recursion with both arguments reduced with one. |#
-
-#| Q: (zero? 2) |#
-#| A: False, so move forwards to the next question. |#
+#| Q: What is the meaning of (>?? (sub1 n) (sub1 m)) |#
+#| A: Recur, but with both arguments reduced by one. |#
 
 #| Q: (zero? 2) |#
-#| A: False, move to the next question. |#
+#| A: No, so move forwards to the next question. |#
 
-#| Q: What is the meaning of (bigger-than?? (sub1 n) (sub1 m)) |#
-#| A: Natural recursion with both arguments reduced with one. |#
+#| Q: (zero? 2) |#
+#| A: No, so move forwards to the next question. |#
+
+#| Q: What is the meaning of (>?? (sub1 n) (sub1 m)) |#
+#| A: Recur, but with both arguments reduced by one. |#
 
 #| Q: (zero? 1) |#
-#| A: False, so move forwards to the next question. |#
+#| A: No, so move forwards to the next question. |#
 
 #| Q: (zero? 1) |#
-#| A: False, move to the next question. |#
+#| A: No, so move forwards to the next question. |#
 
-#| Q: What is the meaning of (bigger-than?? (sub1 n) (sub1 m)) |#
+#| Q: What is the meaning of (>?? (sub1 n) (sub1 m)) |#
 #| A: Natural recursion with both arguments reduced with one. |#
 
 #| Q: (zero? 0) |#
-#| A: True, so the value becomes #t |#
+#| A: Yes, so the value of (>?? n m) becomes #t. |#
 
-#| Q: IS this correct? |#
-#| A: No, b/c 3 is not bigger than 3. |#
+#| Q: Is this correct? |#
+#| A: No, because 3 is not greater than 3. |#
 
 #| Q: Does the order of the two terminal conditions matter. |#
 #| A: Think about it. |#
@@ -610,78 +613,90 @@
       If (zero? n) is first and is true, the value becomes #f, but
       if (zero? m) is first and true, the value becomes #t |#
 
-#| Q: How can we change the function bigger-than?? to take care of this subtle problem? |#
-#| A: Switch the zero? lines |#
+#| Q: How can we change the function >?? to take care of this subtle problem? |#
+#| A: Switch the zero? lines: |#
 
-(define bigger-than?
+;; >? : WN WN -> Boolean
+;; Given two whole numbers, produces true if the first is greater than the second.
+(define >?
   (λ (n m)
     (cond
       ((zero? n) #f)
       ((zero? m) #t)
-      (else (bigger-than? (sub1 n) (sub1 m))))))
+      (else (>? (sub1 n) (sub1 m))))))
 
-(bigger-than? 3 3) ; ==> #f
+(>? 3 3) ; ==> #f
  
-#| Q: What is (smaller-than? 4 6) |#
-#| A: True. |#
+#| Q: What is (<? 4 6) |#
+#| A: #t. |#
 
-#| Q: What is (smaller-than? 8 3) |#
-#| A: False. |#
+#| Q: What is (<? 8 3) |#
+#| A: #f. |#
 
-#| Q:  What is (smaller-than? 8 3) |#
-#| A: False. |#
+#| Q:  What is (<? 6 6) |#
+#| A: #f. |#
 
-#| Q: Now try to write smaller-than? |#
+#| Q: Now try to write <? |#
 #| A: Ok. |#
 
-(define smaller-than? 
+;; <? : WN WN -> Boolean
+;; Given two whole numbers, produces true if the first is smaller than the second.
+(define <? 
   (λ (n m) 
     (cond 
       ((zero? m) #f) 
       ((zero? n) #t ) 
-      (else (smaller-than? (sub1 n) (sub1 m)))))) 
+      (else (<? (sub1 n) (sub1 m)))))) 
 
-(smaller-than? 5 4) ; ==> #f
-(smaller-than? 4 5) ; ==> #t
-(smaller-than? 4 4) ; ==> #f
+(<? 5 4) ; ==> #f
+(<? 4 5) ; ==> #t
+(<? 4 4) ; ==> #f
 
 ; or, using bigger-than?
-(define smaller-than??
+(define <??
   (λ (n m )
-    (bigger-than? m n)))
+    (>? m n)))
 
-(smaller-than?? 5 4) ; ==> #f
-(smaller-than?? 4 5) ; ==> #t
-(smaller-than?? 4 4) ; ==> #f
+(<?? 5 4) ; ==> #f
+(<?? 4 5) ; ==> #t
+(<?? 4 4) ; ==> #f
 
-#| Q: Here is the definition of same-num? |#
+#| Q: Here is the definition of =? |#
 
-(define same-num?
+;; =? : WN WN -> Boolean
+;; Given two whole numbers, produces true if the numbers are the same.
+(define =?
   (λ (n m)
     (cond
       ((zero? m) (zero? n))
       ((zero? n) #f)
       (else
-       (same-num? (sub1 n) (sub1 m))))))
+       (=? (sub1 n) (sub1 m))))))
 
-#| A: Ok. |#
+#| Q: Rewrite =? using <? and >? |#
 
-
-#| Q: Rewrite same-size? using smaller-than? and bigger-than? |#
-#| A: Ok. |#
-
-(define same-num??
+;; =?? : WN WN -> Boolean
+;; Given two whole numbers, produces true if the numbers are the same.
+(define =??
   (λ (n m)
     (cond
-      ((or (smaller-than? n m)
-           (bigger-than? n m)) #f)
+      ((or (<? n m)
+           (>? n m)) #f)
       (else #t))))
 
 ;; Note: The book version doesn't use the or.
+;; =??? : WN WN -> Boolean
+;; Given two whole numbers, produces true if the numbers are the same.
+(define =???
+  (λ (n m)
+    (cond
+      ((>? n m) #f)
+      ((<? n m) #f)
+      (else #t))))
 
 #| Q: Does this mean we have two different 
       functions for testing equality of atoms?|#
-#| A: Yes, they are same-num? for atoms that are numbers and eq? for the others. |#
+#| A: Yes, they are =? for atoms that are numbers and eq? for the others. |#
 
 #| Q: (** 1 1) |#
 #| A: 1. |#
@@ -692,15 +707,17 @@
 #| Q: (** 5 3) |#
 #| A: 125. |#
 
-#| Q: Now write the function to-power
+#| Q: Now write the function **
       Hint: See the The First and Fifth Commandments. |#
 #| A: Ok. |#
 
+;; ** : WN WN -> WN
+;; Given two whole numbers, raises the first to the power of the second-
 (define **
   (λ (n m)
     (cond
       ((zero? m) 1)
-      (else (times n (** n (sub1 m)))))))
+      (else (x n (** n (sub1 m)))))))
 
 (** 1 1) ; ==> 1
 (** 2 3) ; ==> 8
@@ -712,12 +729,13 @@
     (λ ( n m) 
       (cond 
         ((< n m) 0) 
-        (else (add1 (??? (- n m) m)))))) |#
+        (else (add1 (??? (minus n m) m)))))) |#
+
 #| A: We have never seen this kind of definition 
       before; the natural recursion also looks strange. |#
 
 #| Q: What does the first question check? |#
-#| A: It checks if the first argument is smaller than the second. |#
+#| A: It determines whether the first argument is less than the second one. |#
 
 #| Q: And what happens in the second line? |#
 #| A: We recur with a first argument from which 
@@ -725,35 +743,40 @@
       function returns, we add 1 to the result. |#
 
 #| Q: So what does the function do? |#
-#| A: It counts how many times the first argument fits into the second argument. |#
+#| A: It counts how many times the second argument fits into the first one. |#
 
 #| Q: And what do we call this? |#
 #| A: Division. |#
 
+;; divide : WN WN -> WN
+;; Given two whole numbers, produces the number of times the second fits into the first.
 (define divide 
   (λ (n m) 
     (cond 
       ((< n m) 0) 
-      (else (add1 (divide (- n m) m))))))
+      (else (add1 (divide (minus n m) m))))))
 
 (divide 10 5) ; ==> 2
 (divide 15 5) ; ==> 3
 (divide 36 5) ; ==> 7
-; Note: this is like the function quotient
+; Note: this is like the function quotient in Scheme.
 
-#| Q: What is (+ 15 4) |#
-#| A: It is 3. |#
+#| Q: What is (divide 15 4) |#
+#| A: Easy, it is 3. |#
 
 #| Q: How do we get there? |#
-#| A: (divide 15 4)
-      ==> (+ 1 (divide 11 4)
-      ==> (+ 1 (+  1 (divide 7 4))) 
-      ==> (+ 1 (+ 1 (+ 1 (divide 3 4)))) 
-      ==> (+ 1 (+ 1 (+ 1 0))) |#
+#| A: Easy, too:
+     (divide 15 4)
+      ==> (plus 1 (divide 11 4)
+      ==> (plus 1 (plus 1 (divide 7 4))) 
+      ==> (plus 1 (plus 1 (plus 1 (divide 3 4)))) 
+      ==> (plus 1 (plus 1 (plus 1 0))) |#
 
 
 
-#|        Wouldn't a (ham and cheese on rye) be good right now? 
+#|        Wouldn't a (ham and cheese on rye) be good right now?
+
+
                         Don't forget the mustard!                         |#
 
 
@@ -768,11 +791,15 @@
 #| Q: Now try to write the function length. |#
 #| A: Ok. |#
 
+;; len : LAT -> WN
+;; Given LAT, produces the length of the list
 (define len
   (λ (lat)
     (cond
       ((null? lat) 0)
       (else (add1 (len (cdr lat)))))))
+
+; Book has the same solution
 
 (len '(1 2 3 4 5)) ; ==> 5
 (len '()) ; ==> 0
@@ -787,6 +814,8 @@
 #| Q: Try to write the function pick. |#
 #| A: Ok. |#
 
+;; pick : LAT -> WN Atom
+;; Given whole number and LAT, produces the the atom at the position of the number.
 (define pick
   (λ (n lat)
     (cond
@@ -798,11 +827,13 @@
 ; Book has the same solution
 
 #| Q: What is (rempick n lat) where n is 3 and lat is (hotdogs with hot mustard) |#
-#| A: (hotdogs with mustard) |#
+#| A: (hotdogs with mustard). |#
 
 #| Q: Now try to write rempick. |#
 #| A: Ok. |#
 
+;; rempick : WN LAT -> LAT
+;; Given whole number and LAT, produces the LAT without the atom at the position of the number.
 (define rempick
   (λ (n lat)
     (cond
@@ -810,7 +841,9 @@
       (else
        (cons (car lat) (rempick (sub1 n) (cdr lat)))))))
 
-(rempick 3 '(hotdogs with hot mustard))
+; Book has the same solution
+
+(rempick 3 '(hotdogs with hot mustard)) ; ==> '(hotdogs with mustard)
 
 #| Q: Is (number? a) true or false where a is tomato? |#
 #| A: False. |#
@@ -829,6 +862,8 @@
       the value of (no-nums lat) is (pears prunes dates) |#
 #| A: Ok. |#
 
+;; no-nums : LAT -> LAT
+;; Given LAT, produces a new LAT by removing all the numbers from the given LAT.
 (define no-nums
   (λ (lat)
     (cond
@@ -855,6 +890,8 @@
 #| Q: Now write all-nums which extracts a tup from a lat using all the numbers in the lat. |#
 #| A: Ok, I got this. |#
 
+;; all-nums : LAT -> LAT
+;; Given LAT, produces a new LAT by extracting all the numbers from the LAT.
 (define all-nums
   (λ (lat)
     (cond
@@ -882,12 +919,14 @@
       and eq? for all other atoms. |#
 #| A: Ok. Let's try this. |#
 
+;; egan? : Atom Atom  -> Boolean
+;; Given two atoms, produces true if they are the same.
 (define eqan?
   (λ (a1 a2)
     (cond
       ((and (number? a1)
             (number? a2)
-            (same-num? a1 a2)) #t)
+            (=? a1 a2)) #t)
       ((or (number? a1)
            (number? a2)) #f)
       (else (eq? a1 a2)))))
@@ -902,12 +941,14 @@
 
 #| Q: Can we assume that all functions written using eq? can be
       generalized by replacing eq? by eqan? |#
-#| A: Yes, all but eqan? itself. |#
+#| A: Yes, except, of course, for eqan? itself. |#
 
 #| Q: Now write the function occur which counts the number of times
       an atom a appears in a lat. |#
 #| A: Ok. |#
 
+;; occur : Atom LAT -> WN
+;; Given atom and LAT, produces the number of times the atom appears in the list.
 (define occur
   (λ (a lat)
     (cond
@@ -936,42 +977,56 @@
       and #f (i.e. , false) otherwise. |#
 #| A: Ok, will do. |#
 
+;; one? : WN -> Boolean
+;; Given a whole number, produces true if it is one.
 (define one?
   (λ (n)
     (zero? (sub1 n))))
+
+;OR
+(define one?.v2
+  (λ (n)
+    (=? n 1)))
 
 (one? 2) ; ==> #f
 (one? 0) ; ==> #f
 (one? 5466734) ; ==> #f
 (one? 1) ; ==> #t
 
+(one?.v2 2) ; ==> #f
+(one?.v2 0) ; ==> #f
+(one?.v2 5466734) ; ==> #f
+(one?.v2 1) ; ==> #t
+
 #| Book gives many verbose versions
 (define one? 
     (λ (n) 
-      (cond 
-        ((zero ? n) #f) 
-        (else (zero ? (sub1 n))))))
+      (cond                               
+        ((zero? n) #f) 
+        (else (zero? (sub1 n))))))
 
                OR
 
 (define one? 
     (λ (n) 
       (cond 
-        (else (same-num? n 1))))) |#
+        (else (=? n 1))))) |#
 
 #| Q: Guess how we can further simplify this function, making it a one-liner.
-      By removing the ( cond ... ) clause:
+      By removing the (cond ...) clause:
  (define one? 
     (λ (n) 
-      (same-num? n 1))) |#
+      (=? n 1))) |#
 
-#| A: I already made a very similar one-liner version above using (zero? (sub1 n))! |#
+#| Note: I already made the same version above. |#
 
 #| Q: Now rewrite the function rempick that removes the nth atom from a lat.
       For example, where n is 3 and lat is (lemon meringue salty pie) the value
       of (rem pick n lat) is (lemon meringue pie) Use the function one? in your answer. |#
 #| A: Ok, this is simple. |#
 
+;; rempick.v2 : WN LAT -> LAT
+;; Given whole number and LAT, produces the LAT without the atom at the position of the number. 
 (define rempick.v2
   (λ (n lat)
     (cond
