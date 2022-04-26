@@ -24,15 +24,15 @@
       (else
        (add1 (plus n (sub1 m)))))))
 
-;; same-num? : WN WN -> Boolean
+;; =? : WN WN -> Boolean
 ;; Given two whole numbers, produces true if they are the same.
-(define same-num?
+(define =?
   (λ (n m)
     (cond
       ((zero? m) (zero? n))
       ((zero? n) #f)
       (else
-       (same-num? (sub1 n) (sub1 m))))))
+       (=? (sub1 n) (sub1 m))))))
 
 ;; eqan? : Atom Atom -> Boolean
 ;; Given two atoms, produces true if they are the same atom.
@@ -41,7 +41,7 @@
     (cond
       ((and (number? a1)
             (number? a2)
-            (same-num? a1 a2)) #t)
+            (=? a1 a2)) #t)
       ((or (number? a1)
            (number? a2)) #f)
       (else (eq? a1 a2)))))
@@ -83,11 +83,11 @@
          (else
           (cons (car l)
                 (rember* a (cdr l))))))      ; keep unmatching atom in list
-      (else (cons (rember* a (car l))        ; cons result of *rember on (car l) 
-                  (rember* a (cdr l)))))))   ; on the result of *rember on (cdr l)
+      (else (cons (rember* a (car l))        ; cons result of (rember* a (car l)) 
+                  (rember* a (cdr l)))))))   ; on the result of (rember* a (cdr l))
 
 (rember* 'cup '((coffee) cup ((tea) cup) (and (hick)) cup))
-; ==> ((coffee) ((tea)) (and (hick)))
+; ==> '((coffee) ((tea)) (and (hick)))
 (rember* 'sauce '(((tomato sauce)) ((bean) sauce) (and ((flying)) sauce)))
 ;==> '(((tomato)) ((bean)) (and ((flying))))
 
@@ -97,16 +97,16 @@
    works. Notice that now we are recurring down the car of the list, instead of just the 
    cdr of the list. |#
 
-#| Q: (lat ? l) where l is (((tomato sauce)) ((bean) sauce) (and ((flying)) sauce)) |#
-#| A: False. |#
+#| Q: (lat? l) where l is (((tomato sauce)) ((bean) sauce) (and ((flying)) sauce)) |#
+#| A: #f. |#
 (lat? '(((tomato sauce)) ((bean) sauce) (and ((flying)) sauce))) ; ==> #f
 
 #| Q: Is (car l) an atom where l is (((tomato sauce)) ((bean) sauce) (and ((flying)) sauce)) |#
-#| A: No it is not. |#
+#| A: No. |#
 (atom? (car '(((tomato sauce)) ((bean) sauce) (and ((flying)) sauce)))) ; ==> #f
 
-#| Q: What is (insertR* new old l) where new is roast old is chuck and 
-      l is ((how much (wood)) could ((a (wood) chuck)) (((chuck))) (if (a) ((wood chuck))) could chuck wood) |#
+#| Q: What is (insertR* new old l) where new is roast old is chuck and l is
+      ((how much (wood)) could ((a (wood) chuck)) (((chuck))) (if (a) ((wood chuck))) could chuck wood) |#
 #| A:
 '((how much (wood))
   could
@@ -117,6 +117,7 @@
 
 #| Q: Now write the function insertR* which inserts the atom new to the right of old 
       regardless of where old occurs.
+
 (define insertR*
   (λ (new old l)
     (cond
@@ -127,15 +128,15 @@
 #| A: Ok. |#
 
 ;; insertR* : Atom Atom List -> List
-;; Given two atoms and a list, inserts the first atom on the right of any occurrecne of the second atom
+;; Given two atoms and a list, inserts the first atom to the right of the second atom
 (define insertR*
   (λ (new old l)
     (cond
       ((null? l) '())                        ; empty list returns empty of course
       ((atom? (car l))                       ; if first element in an atom
        (cond
-         ((eq? (car l) old)                  ; and matches with 'old
-          (cons old                          ; cons 'old to the cons of 'new and natural recursion
+         ((eq? (car l) old)                  ; and matches with old
+          (cons old                          ; cons old to the cons of new and natural recursion
                 (cons new
                       (insertR* new old
                                 (cdr l)))))
@@ -185,11 +186,11 @@
       the car is a list. |#
 
 #| Q: How are insertR* and rember* similar? |#
-#| A: Both recur on the (car l) when it is a list and then recur with (cdr l). |#
+#| A: They both recur with the car, whenever the car is a list, as well as with the cdr. |#
 
 #| Q: How are all *-functions similar? |#
-#| A: They all ask three quesions and, in addition to recurring on (cdr l),
-      they all recur on (car l) when it is a list. |#
+#| A: They all ask three questions and recur with the car as well as with the cdr, whenever the 
+      car is a list. |#
 
 #| Q: Why? |#
 #| A: Because all *-functions work on lists that are either: 
@@ -226,9 +227,10 @@
 #| A: 5. |#
 
 #| Q: What is a better name for occursomething? |#
-#| A: occur* |#
+#| A: occur*. |#
 
 #| Q: Write occur*
+
 (define occur*
   (λ (a l)
     (cond
@@ -239,19 +241,19 @@
 #| A: Ok. |#
 
 ;; occur* : Atom List -> WN
-;; Given atom and list, produces the sum of occurrences of atom in the list.
+;; Given atom and list, produces the sum of atom's occurrences in the list.
 (define occur*
   (λ (a l)
     (cond
       ((null? l) 0)                                  ; if list is empty, zero occurrences
       ((atom? (car l))                               ; if the first element is an atom, then
        (cond
-         ((eq? (car l) a)                            ; if the same as 'a
+         ((eq? (car l) a)                            ; if same as atom
           (add1 (occur* a (cdr l))))                 ; add one and recur on (cdr l)
-         (else (occur* a (cdr l)))))                 ; otherwse just skip over (car l) and recur on (cdr l) 
+         (else (occur* a (cdr l)))))                 ; otherwse skip over (car l) and recur on (cdr l) 
       (else                                          ; if (car l) is a list   
        (plus (occur* a (car l))
-             (occur* a (cdr l)))))))                 ; add count of 'a in (car l) to recursion with (cdr l)
+             (occur* a (cdr l)))))))                 ; add count of aotm in (car l) to recursion with (cdr l)
 
 
 (occur* 'banana '((banana)
@@ -283,6 +285,7 @@
    (orange brandy)) |#
 
 #| Q: Write subst*
+
 (define subst*
   (λ (new old l)
     (cond
@@ -293,7 +296,7 @@
 #| A: Ok. |#
 
 ;; subst* : Atom Atom List -> List
-;; Given two atoms and list, substitutes each occurrece of first atom for the second atom in the list.
+;; Given two atoms and list, substitutes each first atom for the second atom in the list.
 (define subst*
   (λ (new old l)
     (cond
@@ -302,12 +305,12 @@
        (cond
          ((eq? (car l) old)                       ; and same as old
           (cons new
-                (subst* new old (cdr l))))        ; cons new to the result of recurring with (cdr l)
+                (subst* new old (cdr l))))        ; cons new to result of recurring with (cdr l)
          (else (cons (car l)
-                     (subst* new old (cdr l)))))) ; o/w cons first element to the result of recurring with (cdr l)) 
+                     (subst* new old (cdr l)))))) ; else cons first element to result of recurring with (cdr l)) 
       (else                                       ; if first element is a list
-       (cons (subst* new old (car l))             ; substitute in that list and cons the resulting list
-             (subst* new old (cdr l)))))))        ; with the natural recursion with (cdr l)
+       (cons (subst* new old (car l))             ; subst* in that list and cons resulting list
+             (subst* new old (cdr l)))))))        ; to the natural recursion with (cdr l)
 
 (subst* 'orange 'banana
         '((banana)
@@ -337,6 +340,7 @@
     could pecker chuck wood)|#
 
 #| Q: Write insertL*
+
 (define insertL*
   (λ (new old l)
     (cond
@@ -347,7 +351,7 @@
 #| A: Ok. |#
 
 ;; insertL* : Atom Atom List -> List
-;; Given two atoms and list, inserts the first atom on the left of each occurrence of the second atom.
+;; Given two atoms and list, inserts the first atom on the left of each second atom.
 (define insertL*
   (λ (new old l)
     (cond
@@ -387,7 +391,7 @@
 
 #| Q: (member* a l) where a is chips and l is
       ((potato) (chips ((with) fish) (chips))) |#
-#| A: True, b/c the atom chips appear in the list. |#
+#| A: #t, because the atom chips appears in the list l. |#
 
 #| Q: Write member*
 
@@ -444,11 +448,10 @@
 
 #| Q: What is (member* a l) where a is chips and l is
       ((potato) (chips ((with) fish) (chips))) |#
-
-#| A: True. |#
+#| A: #t. |#
 
 #| Q: Which chips did it find? |#
-#| A: (chips ((with) fish) |#
+#| A: ((potato) (>>chips<< ((with) fish) (chips))). |#
 
 #| Q: What is (leftmost l) where l is
       ((potato) (chips ((with) fish) (chips))) |#
@@ -466,8 +469,9 @@
 #| A: No answer. |#
 
 #| Q: Can you describe what leftmost does? |#
-#| A: It finds the leftmost atom in a nonempty list of expressions
-      that does not contain an empty list. |#
+#| A: Here is our description: 
+      "The function leftmost finds the leftmost atom in a non-empty list of S-expressions 
+      that does not contain the empty list."|#
 
 #| Q: Is leftmost a *-function? |#
 #| A: It works on lists of S-expressions, but it only recurs on the car. |#
@@ -508,59 +512,69 @@
         ((atom? (car l)) (car l)) 
         (else (leftmost (car l)))))) |#
 
-#| Q: Do you remember what (or ... ) does? |#
+#| Q: Do you remember what (or ...) does? |#
 #| A: (or ...) asks questions one at a time until it finds one that is true.
       Then (or ...) stops, making its value true. If it cannot find a true 
       argument, the value of (or ...) is false. |#
 
 #| Q: What is (and (atom? (car l)) (eq? (car l) x)) where x is pizza and 
       l is (mozzarella pizza) |#
-#| A: False. |#
+#| A: #f. |#
 
 #| Q: Why is it false? |#
-#| A: Because (and ...) needs all of the expressions inside to evaluate to true,
-      but here the second evaluates to false |#
+#| A: Since (and ...) asks (atom? (car l)), which is true, it then asks (eq? (car l) x),
+      which is false; hence it is #f. |#
 
 #| Q: What is (and (atom? (car l)) (eq? (car l) x)) where x is pizza and 
       l is ((mozzarella mushroom) pizza) |#
-#| A: False. |#
+#| A: #f. |#
 
 #| Q: Why is it false? |#
-#| A: The first question already evaluates to false and therefore the whole
-      (and ...) evaluates to false. |#
+#| A: Since (and ... ) asks (atom? (car l)), and (car l) is not an atom; so it is #f. |#
 
 #| Q: Give an example for x and l where (and (atom? (car l)) (eq? (car l) x)) is true. |#
-#| A: x is mozzarella and l is (mozzarella (and ham) pizza) |#
-(and (atom? (car '(mozzarella (and ham) pizza)))
-     (eq? (car '(mozzarella (and ham) pizza)) 'mozzarella)) ; ==> #t
+#| A: Here's one: x is pizza and l is (pizza (tastes good)). |#
+(and (atom? (car '(pizza (tastes good))))
+     (eq? (car '(pizza (tastes good))) 'pizza)) ; ==> #t
 
 #| Q: Put in your own words what (and ... ) does. |#
 #| A: (and ...) evaluates the expressions inside one at a time and stops to produce
       false if it comes across even a single expression that evaluates to false.
-      If it finds no false, it evaluates to true. |#
+      If it finds no false, it evaluates to true.
+
+      We put it in our words: 
+      "(and ... ) asks questions one at a time until it finds one whose value is false.
+      Then (and ... ) stops with false. If none of the expressions are false, (and ... ) is true." |#
 
 #| Q: True or false: it is possible that one of the arguments of (and ...) and (or ...)
-      is not considered? 1 |#
-#| A: Yes, b/c (and ...) will stop and return false when encountering false and doesn't
-      care about the remaining expressions. Similarly, (or ...) will evaluate to true
-      and stop when finding the first true. |#
+      is not considered? |#
+#| A: True, because (and ...) stops if the first argument has the value #f, and (or ...) 
+      stops if the first argument has the value #t . |#
 
-#| Q: (eqlist ? l1 l2) where l1 is (strawberry ice cream) and l2 is (strawberry ice cream) |#
-#| A: True. |#
+#|    Note: (cond ...) also has the property of not considering all of 
+      its arguments. Because of this property, however, neither (and ...) nor (or ...)
+      can be defined as functions in terms of (cond ...), though both (and ...) and (or ...)
+      can be expressed as abbreviations of (cond ...)-expressions: 
+         (and a b) = (cond (a b) (else #f)) 
+      and 
+         (or a b) = (cond (a #t) (else b)) |#
+
+#| Q: (eqlist? l1 l2) where l1 is (strawberry ice cream) and l2 is (strawberry ice cream) |#
+#| A: #t. |#
 
 #| Q: (eqlist? l1 l2) where l1 is (strawberry ice cream) and l2 is (strawberry cream ice) |#
-#| A: False. |#
+#| A: #f. |#
 
 #| Q: (eqlist? l1 l2) where l1 is (banana ((split))) and l2 is ((banana) (split)) |#
-#| A: False. |#
+#| A: #f. |#
 
 #| Q: (eqlist? l1 l2) where l1 is (beef ((sausage)) (and (soda))) and 
       l2 is (beef ((salami)) (and (soda))) |#
-#| A: False. |#
+#| A: #f, but almost #t. |#
 
 #| Q: (eqlist? l1 l2) where l1 is (beef ((sausage)) (and (soda))) and 
       l2 is (beef ((sausage)) (and (soda))) |#
-#| A: True. |#
+#| A: #t. That's better. |#
 
 #| Q: What is eqlist? |#
 #| A: A function that determines if two lists are equal. |#
@@ -580,17 +594,19 @@
 #| Q: Write eqlist? using eqan? |#
 #| A: Ok. |#
 
+;; eqlist???? : List List -> Boolean
+;; Given two lists, produces true if they are identical.
 (define eqlist????
   (λ (l1 l2)
     (cond
-      ((and (null? l1) (null? l2)) #t)             ;if both lists are null the they are the same
-      ((and (atom? (car l1)) (atom? (car l2)))     ;if both lists start with an atom and
+      ((and (null? l1) (null? l2)) #t)             ;both lists are null and therefore the same
+      ((and (atom? (car l1)) (atom? (car l2)))     ;both lists start with an atom and
        (cond                                         
          ((eqan? (car l1) (car l2))                ;atoms are the same      
-          (eqlist???? (cdr l1) (cdr l2)))          ;look further in the lists. Otherwise return false      
+          (eqlist???? (cdr l1) (cdr l2)))          ;look further in the lists. Else return false      
          (else #f)))                                   
-      ((or (atom? (car l1)) (atom? (car l2))) #f)  ;if an atom is still found as first then lists are not same 
-      (else                                        ;if the first elements are both lists   
+      ((or (atom? (car l1)) (atom? (car l2))) #f)  ;atom still found as first then lists are not same 
+      (else                                        ;first elements are both lists   
        (and                                        
         (eqlist???? (car l1) (car l2))             ;check if first elements are equal and if they are    
         (eqlist???? (cdr l1) (cdr l2)))))))        ;look further in the lists 
@@ -605,22 +621,24 @@
 #| Book version is somewhat different from mine:
    I will keep it as the default function here |#
 
+;; eqlist??? : List List -> Boolean
+;; Given two lists, produces true if they are identical.
 (define eqlist??? 
   (λ (l1 l2) 
     (cond 
       ((and (null? l1) (null? l2)) #t)         ;both list empty means they are the same
       ((and (null? l1) (atom? (car l2))) #f)   ;first list empty and second starts with atom means different 
-      ((null? l1) #f)                          ;first still is empty means they are idfferent
-      ((and (atom? (car l1)) (null? l2)) #f)   ;first start with atom and second empty means different
+      ((null? l1) #f)                          ;first still empty means they are different
+      ((and (atom? (car l1)) (null? l2)) #f)   ;first starts with atom and second empty means different
       ((and (atom? (car l1)) (atom? (car l2))) 
        (and (eqan? (car l1) (car l2)) 
-            (eqlist??? (cdr l1) (cdr l2))))    ;lists start with equal atoms, so look further in the lists
-      ((atom? (car l1)) #f)                    ;first still starts with an atoms so they are different     
+            (eqlist??? (cdr l1) (cdr l2))))    ;lists start with equal atoms. Look further in the lists
+      ((atom? (car l1)) #f)                    ;first still starts with atom so they are different     
       ((null? l2) #f)                          ;second is empty means they are different   
-      ((atom? (car l2)) #f)                    ;seond starts with atom means they are different 
+      ((atom? (car l2)) #f)                    ;second starts with atom means they are different 
       (else                                    ;if we get here then 
        (and (eqlist??? (car l1) (car l2))      ;check if the first element lists 
-            (eqlist??? (cdr l1) (cdr l2))))))) ;and the remaining list are equal
+            (eqlist??? (cdr l1) (cdr l2))))))) ;and the remaining lists are equal
 
 
 #| Q: Is it okay to ask (atom? (car l2)) in the second question? |#
@@ -640,8 +658,10 @@
 #| A: Yes. If the first question is true, eqlist? responds with #t; otherwise, the answer is #f. |#
 
 #| Q: Rewrite eqlist? |#
-#| A: Yes, sir. |#
+#| A: Yes. |#
 
+;; eqlist?? : List List -> Boolean
+;; Given two lists, produces true if they are identical.
 (define eqlist?? 
   (λ (l1 l2) 
     (cond 
@@ -666,6 +686,8 @@
 #| Q: Write equal? |#
 #| A: Ok. |#
 
+;; equal : Sexp Sexp -> Boolean
+;; Given two S-expressions, produces true if they are identical.
 (define equal?
   (λ (s1 s2)
     (cond
@@ -687,7 +709,7 @@
         (else (eqlist? s1 s2))))) |#
 
 #| Q: Why is the second question (atom? s1) |#
-#| A: If it is true, we know that the first argument is an atom and the second argument is a list.|#
+#| A: If it is true, we know that the first argument is an atom and the second argument is a list. |#
 
 #| Q: And why is the third question (atom? s2) |#
 #| A: By the time we ask the third question we know that the first argument is not an atom. 
@@ -695,10 +717,10 @@
       or not the second argument is an atom. The first argument must be a list. |#
 
 #| Q: Can we summarize the second question and the third question as (or (atom? s1) (atom? s2)) |#
-#| A: Yes we can! I already did this in my version. |#
+#| A: Yes we can! |#
 
 #| Q: Simplify equal? |#
-#| A: See above. |#
+#| A: See my version above. |#
 
 #| Q: Does equal? ask enough questions? |#
 #| A: Yes, all the four questions are covered. |#
@@ -706,6 +728,8 @@
 #| Q: Now, rewrite eqlist? using equal? |#
 #| A: Ok. |#
 
+;; eqlist? : List List -> Boolean
+;; Given two lists, produces true if they are identical.
 (define eqlist? 
   (λ (l1 l2) 
     (cond 
@@ -717,9 +741,12 @@
        (and (equal? (car l1) (car l2)) 
             (eqlist? (cdr l1) (cdr l2)))))))
 
+#| Book solution is identical. |#
+
 
 
 #|               *** The Sixth Commandment ***
+
          Simplify only after the function is correct.       |#
 
 
@@ -745,9 +772,12 @@
                   (rember s 
                           (cdr l))))))))) |#
 
-#| A: Obviously! equal? works for both atoms and lists, so
-      we can remove the redundant part that first asks ((atom? (car l)) |#
+#| A: Obviously!
+      Note: equal? works for both atoms and lists, so
+      we can remove the redundant part that first asks ((atom? (car l)). |#
 
+;; rember : Sexp List -> List
+;; Given S-expression and list, produces a list with occurrences of S-expression removed.
 (define rember 
   (λ (s l) 
     (cond 
@@ -774,8 +804,10 @@
 #| A: Yes. The inner (cond ...) asks question the outer (cond ...) could ask! |#
 
 #| Q: Do it! |#
-#| A: Ok! |#
+#| A: Ok. |#
 
+;; rember.v2 : Sexp List -> List
+;; Given S-expression and list, produces a list with occurrences of S-expression removed.
 (define rember.v2
   (λ (s l)
     (cond
@@ -784,6 +816,8 @@
        (cdr l))
       (else
        (cons (car l) (rember.v2 s (cdr l)))))))
+
+#| Book solution is identical to mine. |#
 
 #| Q: Does this new definition look simpler? |#
 #| A: Yes, it does! |#
@@ -798,7 +832,7 @@
 #| Q: When functions are correct and well-designed, we can think about them easily. |#
 #| A: And that saved us this time from getting it wrong. |#
 
-#| Q: Can all functions that use eq? and = be generalized by replacing eq? and = by the 
+#| Q: Can all functions that use eq? and =? be generalized by replacing eq? and =? by the 
       function equal? |#
 #| A: Not quite; this won't work for eqan?, but will work for all others.
       In fact, disregarding the trivial example of eqan?, that is exactly what 
