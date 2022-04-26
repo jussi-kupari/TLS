@@ -695,7 +695,9 @@
        (eqan? s1 s2))                   ;if equal, then true
       ((or (atom? s1)                   ;if atom still found then 
            (atom? s2)) #f)              ;obviously one is not an atom 
-      (else (eqlist? s1 s2)))))         ;final alternative is that they are both lists, so compare   
+      (else (eqlist? s1 s2)))))         ;final alternative is that they are both lists, so compare
+
+; Note that this function calls eqlist? that itself is below rewritten to call equal? !!
 
 #| Book version doesn't use (or ...)
 
@@ -738,7 +740,7 @@
       ((or (null? l1)
            (null? l2)) #f) 
       (else 
-       (and (equal? (car l1) (car l2)) 
+       (and (equal? (car l1) (car l2))    ; We call equal? here that itself uses eqlist? !!
             (eqlist? (cdr l1) (cdr l2)))))))
 
 #| Book solution is identical. |#
