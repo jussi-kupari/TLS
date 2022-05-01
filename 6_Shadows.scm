@@ -1,66 +1,13 @@
 #lang racket
 
-;; atom? : Any -> Boolean
-;; Produces #true if input is an atom
-(define atom? 
-  (λ (x) 
-    (and (not (pair? x)) (not (null? x)))))
-
-;; lat? : List-of-Anything -> Boolean
-;; Given list, produces true if it only contains atoms
-(define lat? 
-  (λ (l) 
-    (cond 
-      ((null? l) #t) 
-      ((atom? (car l)) (lat? (cdr l))) 
-      (else #f))))
-
-;; plus : WN WN -> WN
-;; Given two whole numbers (nonnegative integers), produces their sum
-(define plus
-  (λ (n m)
-    (cond
-      ((zero? m) n)
-      (else
-       (add1 (plus n (sub1 m)))))))
-
-;; =? : WN WN -> Boolean
-;; Given two whole numbers, produces true if they are the same.
-(define =?
-  (λ (n m)
-    (cond
-      ((zero? m) (zero? n))
-      ((zero? n) #f)
-      (else
-       (=? (sub1 n) (sub1 m))))))
-
-;; eqan? : Atom Atom -> Boolean
-;; Given two atoms, produces true if they are the same atom.
-(define eqan?
-  (λ (a1 a2)
-    (cond
-      ((and (number? a1)
-            (number? a2)
-            (=? a1 a2)) #t)
-      ((or (number? a1)
-           (number? a2)) #f)
-      (else (eq? a1 a2)))))
-
-;; x : WN WN -> WN
-;; Given two whole numbers, adds up the first times the second
-(define x
-  (λ (n m)
-    (cond
-      ((zero? m) 0)
-      (else (+ n (x n (sub1 m)))))))
-
-;; ** : WN WN -> WN
-;; Given two whole numbers, raises the first to the power of the second
-(define **
-  (λ (n m)
-    (cond
-      ((zero? m) 1)
-      (else (x n (** n (sub1 m)))))))
+;; Require
+(require
+  "Atom.scm"
+  "1_Toys.scm"
+  "2_Doitdoitagainandagainandagain.scm"
+  "3_ConsTheMagnificent.scm"
+  "4_NumbersGames.scm"
+  "5_OhMyGawdItsFullOfStars.scm")
 
 
 
@@ -343,7 +290,7 @@
        (plus (value (car nexp))
              (value (car (cdr (cdr nexp))))))                     
       ((eq? (car (cdr nexp)) '*)
-       (x (value (car nexp))
+       (* (value (car nexp))
           (value (car (cdr (cdr nexp))))))
       (else                                    
        (** (value (car nexp))

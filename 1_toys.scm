@@ -1,13 +1,8 @@
 #lang racket
 
-
-
-;; atom? : Any -> Boolean
-;; Produces #true if input is an atom
-(define atom? 
-  (λ (x) 
-    (and (not (pair? x)) (not (null? x)))))
-
+;; Require
+(require
+  "Atom.scm")
 
 
 #|                    Toys                    |#
@@ -137,7 +132,7 @@
 
 #| Q: What is (car (car l)) where l is (((hotdogs)) (and)) |#
 #| A: (hotdogs). |#
- (car (car '(((hotdogs)) (and)))) ; ==> '(hotdogs)
+(car (car '(((hotdogs)) (and)))) ; ==> '(hotdogs)
 
 #| Q: What is the cdr of l where l is (a b c) |#
 #| A: (b c), because (b c) is the list l without (car l). |#

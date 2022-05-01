@@ -1,28 +1,14 @@
 #lang racket
 
-;; atom? : Any -> Boolean
-;; Produces #true if input is an atom
-(define atom? 
-  (λ (x) 
-    (and (not (pair? x)) (not (null? x)))))
-
-;; lat? : List-of-Anything -> Boolean
-;; Given list, produces true if it only contains atoms
-(define lat? 
-  (λ (l) 
-    (cond 
-      ((null? l) #t) 
-      ((atom? (car l)) (lat? (cdr l))) 
-      (else #f))))
-
-;; member? : Atom LAT -> Boolean
-;; Given atom and lat, produces true if atom is found in lat
-(define member? 
-  (λ (a lat) 
-    (cond 
-      ((null? lat) #f) 
-      (else (or (eq? (car lat) a) 
-                (member? a (cdr lat))))))) 
+;; Require
+(require
+  "Atom.scm"
+  "1_Toys.scm"
+  "2_Doitdoitagainandagainandagain.scm"
+  "3_ConsTheMagnificent.scm"
+  "4_NumbersGames.scm"
+  "5_OhMyGawdItsFullOfStars.scm"
+  "6_Shadows.scm")
 
 
 
@@ -53,9 +39,9 @@
          ((member? (car lat) (cdr lat)) #f)
          (else (set.v1? (cdr lat))))))))
 
-#|Note: I didn't remember we had created member? and started to implement
+#| Note: I didn't remember we had created member? and started to implement
         it from the beginning. I also used -if- with member?, but then reverted to cond,
-        so this is now identical to the book solution; However, it has a superfluous cond. |#
+        so this is now identical to the book solution. |#
 
 (set.v1? '()) ; ==> #t
 (set.v1? '(apple peaches apple plum)) ; ==> #F

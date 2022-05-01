@@ -1,12 +1,14 @@
 #lang racket
 
-;; atom? : Any -> Boolean
-;; Produces #true if input is an atom
-(define atom? 
-  (λ (x) 
-    (and (not (pair? x)) (not (null? x)))))
+;; Require
+(require
+  "Atom.scm"
+  "1_Toys.scm"
+  "2_Doitdoitagainandagainandagain.scm"
+  "3_ConsTheMagnificent.scm")
 
-
+;; Provide
+(provide plus =? eqan? **)
 
 #|               Numbers Games               |#
 
@@ -421,7 +423,7 @@
        '())
       (else
        (cons (plus (car tup1) (car tup2))
-        (tup+ (cdr tup1) (cdr tup2)))))))
+             (tup+ (cdr tup1) (cdr tup2)))))))
 
 (tup+ '(5 7 9) '(2 2 3)) ; ==> '(7 9 12)
 
@@ -717,7 +719,7 @@
   (λ (n m)
     (cond
       ((zero? m) 1)
-      (else (x n (** n (sub1 m)))))))
+      (else (* n (** n (sub1 m)))))))
 
 (** 1 1) ; ==> 1
 (** 2 3) ; ==> 8
