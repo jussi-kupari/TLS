@@ -1,13 +1,13 @@
 #lang racket
 
+(provide (all-defined-out))
+
 (require "Atom.scm"
          "1_Toys.scm"
          "2_Doitdoitagainandagainandagain.scm"
          "3_ConsTheMagnificent.scm"
          "4_NumbersGames.scm")
 
-
-(provide )
 
 
 #|              *Oh My Gawd*: It's Full of Stars               |#
