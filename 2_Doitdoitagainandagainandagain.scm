@@ -1,10 +1,11 @@
 #lang racket
 
+(provide (all-defined-out))
+
 (require "Atom.scm"
          "1_Toys.scm")
 
-(provide lat?
-         member?)
+
 
 #|     Do It, Do it Again, and Again, and Again...     |#
 

@@ -1,14 +1,13 @@
 #lang racket
 
+(provide (all-defined-out))
+
 (require "Atom.scm"
          "1_Toys.scm"
          "2_Doitdoitagainandagainandagain.scm"
          "3_ConsTheMagnificent.scm")
 
-(provide plus
-         =?
-         eqan?
-         **)
+
 
 #|               Numbers Games               |#
 

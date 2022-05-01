@@ -1,8 +1,11 @@
 #lang racket
 
+(provide (all-defined-out))
+
 (require "Atom.scm"
          "1_Toys.scm"
          "2_Doitdoitagainandagainandagain.scm")
+
 
 
 #|               Cons the Magnificent               |#
