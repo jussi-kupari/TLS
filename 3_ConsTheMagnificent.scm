@@ -1,10 +1,8 @@
 #lang racket
 
-;; Require
-(require
-  "Atom.scm"
-  "1_Toys.scm"
-  "2_Doitdoitagainandagainandagain.scm")
+(require "Atom.scm"
+         "1_Toys.scm"
+         "2_Doitdoitagainandagainandagain.scm")
 
 
 #|               Cons the Magnificent               |#
@@ -960,16 +958,16 @@ define subst2
 #| Note that my version is streamlined and without the extra else and cond,
    but I follow the book verbose version below. |#
 (define multirember 
-    (λ (a lat) 
-      (cond 
-        ((null? lat) (quote ())) 
-        (else 
-         (cond 
-           ((eq? (car lat) a) 
-            (multirember a (cdr lat))) 
-           (else (cons (car lat) 
-                       (multirember a 
-                                    (cdr lat)))))))))
+  (λ (a lat) 
+    (cond 
+      ((null? lat) (quote ())) 
+      (else 
+       (cond 
+         ((eq? (car lat) a) 
+          (multirember a (cdr lat))) 
+         (else (cons (car lat) 
+                     (multirember a 
+                                  (cdr lat)))))))))
 
 #| Q: (null? lat) |#
 #| A: No, so move to the next line. |#

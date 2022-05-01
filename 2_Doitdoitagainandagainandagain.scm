@@ -1,12 +1,10 @@
 #lang racket
 
-;; Require
-(require
-  "Atom.scm"
-  "1_Toys.scm")
+(require "Atom.scm"
+         "1_Toys.scm")
 
-;; Provide
-(provide lat? member?)
+(provide lat?
+         member?)
 
 #|     Do It, Do it Again, and Again, and Again...     |#
 
@@ -455,8 +453,8 @@
 #| Q: What is the value of (or (eq? (car lat) a) (member? a (cdr lat))) |#
 #| A: #t, because (car lat), which is meat, and a, which is meat, are the same atom. 
       Therefore, (or ...) answers with #t. |#
- (car '(meat gravy)) ; ==> 'meat
- (eq? 'meat 'meat) ; ==> #t
+(car '(meat gravy)) ; ==> 'meat
+(eq? 'meat 'meat) ; ==> #t
 
 #| Q: What is the value of the application (member? a lat) where a is meat and lat is (meat gravy) |#
 #| A: #t, because we have found that meat is a member of (meat gravy). |#

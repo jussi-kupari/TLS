@@ -1,8 +1,6 @@
 #lang racket
 
-;; Require
-(require
-  "Atom.scm")
+(require "Atom.scm")
 
 
 #|                    Toys                    |#

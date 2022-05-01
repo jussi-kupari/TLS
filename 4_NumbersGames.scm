@@ -1,14 +1,14 @@
 #lang racket
 
-;; Require
-(require
-  "Atom.scm"
-  "1_Toys.scm"
-  "2_Doitdoitagainandagainandagain.scm"
-  "3_ConsTheMagnificent.scm")
+(require "Atom.scm"
+         "1_Toys.scm"
+         "2_Doitdoitagainandagainandagain.scm"
+         "3_ConsTheMagnificent.scm")
 
-;; Provide
-(provide plus =? eqan? **)
+(provide plus
+         =?
+         eqan?
+         **)
 
 #|               Numbers Games               |#
 

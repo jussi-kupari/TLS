@@ -1,14 +1,12 @@
 #lang racket
 
-;; Require
-(require
-  "Atom.scm"
-  "1_Toys.scm"
-  "2_Doitdoitagainandagainandagain.scm"
-  "3_ConsTheMagnificent.scm"
-  "4_NumbersGames.scm"
-  "5_OhMyGawdItsFullOfStars.scm"
-  "6_Shadows.scm")
+(require "Atom.scm"
+         "1_Toys.scm"
+         "2_Doitdoitagainandagainandagain.scm"
+         "3_ConsTheMagnificent.scm"
+         "4_NumbersGames.scm"
+         "5_OhMyGawdItsFullOfStars.scm"
+         "6_Shadows.scm")
 
 
 
