@@ -214,10 +214,6 @@
 
 ;; eqset? : Set Set -> Boolean
 ;; Given two sets, produces true if they are the same.
-
-
-;; eqset? : Set Set -> Boolean
-;; Given two sets, produces true if they are the same.
 (define eqset.v1?
   (λ (set1 set2)
     (cond
@@ -228,7 +224,7 @@
 
 (eqset.v1? '(6 large chickens with wings) '(6 chickens with large wings)) ; ==> #t
 
-; Book just uses subset? that I already forgot to use...
+; Book just uses subset? and i forgot to use it...
 
 (define eqset.v2?
   (λ (set1 set2)
@@ -283,26 +279,125 @@
 (intersect? '(stewed tomatoes and macaroni) '(macaroni and cheese)) ; ==> #t
 (intersect? '(stewed tomatoes but no chicken) '(macaroni and cheese)) ; ==> #f
 
-#| Q: |#
-#| A: |#
+;First book version
 
-#| Q: |#
-#| A: |#
+(define intersect.v2? 
+  (λ (set1 set2) 
+    (cond 
+      ((null? set1) #f ) 
+      (else 
+       (cond 
+         ((member? (car set1) set2) #t ) 
+         (else (intersect.v2? 
+                (cdr set1 ) set2))))))) 
 
-#| Q: |#
-#| A: |#
+(intersect.v2? '(stewed tomatoes and macaroni) '(macaroni and cheese)) ; ==> #t
+(intersect.v2? '(stewed tomatoes but no chicken) '(macaroni and cheese)) ; ==> #f
 
-#| Q: |#
-#| A: |#
+#| Q: Write the shorter version. |#
+#| A: Ok. |#
 
-#| Q: |#
-#| A: |#
+(define intersect.v3? 
+  (λ (set1 set2) 
+    (cond 
+      ((null? set1) #f ) 
+      ((member? (car set1) set2) #t ) 
+      (else (intersect.v3? (cdr set1) set2)))))
 
-#| Q: |#
-#| A: |#
+(intersect.v3? '(stewed tomatoes and macaroni) '(macaroni and cheese)) ; ==> #t
+(intersect.v3? '(stewed tomatoes but no chicken) '(macaroni and cheese)) ; ==> #f
 
-#| Q: |#
-#| A: |#
+#| Q: Try writing intersect? with (or ...) |#
+#| A: My own version was written with (or ...)|#
+
+#| Q: What is (intersect set1 set2) where set1 is (stewed tomatoes and macaroni)
+      and set2 is (macaroni and cheese) |#
+#| A: (and macaroni). |#
+
+#| Q: Now you can write the short version of intersect |#
+#| A: Ok. |#
+
+;; intersect : Set1 Set2 -> Boolean
+;; Given two sets, produces the intersect of the two sets.
+(define intersect 
+  (λ (set1 set2) 
+    (cond 
+      ((null? set1 ) '()) 
+      ((member? (car set1 ) set2) 
+       (cons (car set1) 
+             (intersect (cdr set1) set2))) 
+      (else (intersect (cdr set1) set2)))))
+
+(intersect '(stewed tomatoes and macaroni) '(macaroni and cheese)) ; ==> '(and macaroni)
+
+; Book solution is identical to mine.
+
+#| Q: What is (union set1 set2) where set1 is (stewed tomatoes and macaroni casserole) 
+      and set2 is (macaroni and cheese) |#
+#| A: (stewed tomatoes casserole macaroni and cheese) |#
+
+#| Q: Write union |#
+#| A: Ok. |#
+
+;; union : Set Set -> Set
+;; Given two sets, produces their union.
+(define union.v1
+  (λ (set1 set2)
+    (cond
+      ((null? set1) set2)
+      ((member? (car set1) set2)
+       (cons (car set1)           ; this would be easier the other way around
+             (union.v1 (cdr set1) (rember (car set1) set2))))
+      (else (cons (car set1)
+                  (union.v1 (cdr set1) set2))))))
+
+(union.v1 '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
+; ==> '(stewed tomatoes and macaroni casserole cheese)
+
+; Book solution is below. I'm tired and thought the other way around overcomplicating my solution...
+
+(define union
+  (lambda (set1 set2) 
+    (cond 
+      ((null? set1) set2) 
+      ((member? (car set1) set2) 
+       (union (cdr set1) set2)) 
+      (else (cons (car set1) 
+                  (union (cdr set1) set2)))))) 
+
+(union '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
+; ==> '(stewed tomatoes and macaroni casserole cheese)
+
+#| Q: What is this function? |#
+
+#|
+(define xxx 
+  (λ (set1 set2) 
+    (cond 
+      ((null? set1) '()) 
+      ((member? (car set1) set2) 
+       (xxx (cdr set1) set2)) 
+      (else (cons (car set1) 
+                  (xxx (cdr set1) set2)))))) |#
+
+#| A: Note: Looks like it keeps the atoms that are unique for set1, set-diff.
+      In our words: 
+      "It is a function that returns all the atoms in set1 that are not in set2." 
+      That is, xxx is the (set) difference function. |#
+
+;; set-diff : Set Set -> Set
+;; Given two sets, produces the set of atoms that is unique to the first set
+(define set-diff 
+  (λ (set1 set2) 
+    (cond 
+      ((null? set1) '()) 
+      ((member? (car set1) set2) 
+       (set-diff (cdr set1) set2)) 
+      (else (cons (car set1) 
+                  (set-diff (cdr set1) set2))))))
+
+(set-diff '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
+; ==> '(stewed tomatoes casserole)
 
 #| Q: |#
 #| A: |#
