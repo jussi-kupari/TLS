@@ -317,15 +317,15 @@
 #| Q: Can you rewrite rember so that it reflects the above description? |#
 #| A: Yes, we can simplify it. |#
 
-;; rember : Atom LAT -> LAT
+;; Rember : Atom LAT -> LAT
 ;; Given atom and lat, removes the first occurrence of the atom, if it finds it in the lat.
-(define rember
+(define Rember
   (λ (a lat)
     (cond
       ((null? lat) '())
       ((eq? (car lat) a) (cdr lat))
       (else
-       (cons (car lat) (rember a (cdr lat)))))))
+       (cons (car lat) (Rember a (cdr lat)))))))
 
 #| Q: Do you think this is simpler? |#
 #| A: Functions like rember can always be simplified in this manner. |#
@@ -339,7 +339,7 @@
       Hint: Write down the function rember and 
       its arguments and refer to them as you go 
       through the next sequence of questions. |#
-(rember 'and '(bacon lettuce tomato)); ==> '(bacon lettuce tomato)
+(Rember 'and '(bacon lettuce tomato)); ==> '(bacon lettuce tomato)
 
 #| Q: (null? lat) |#
 #| A: No. |#
@@ -395,7 +395,7 @@
 #| Q: Now that we have completed rember try this example: (rember a lat) 
       where a is sauce and lat is (soy sauce and tomato sauce) |#
 #| A: ( rember a lat) is (soy and tomato sauce). |#
-(rember 'sauce '(soy sauce and tomato sauce)) ; ==> '(soy and tomato sauce)
+(Rember 'sauce '(soy sauce and tomato sauce)) ; ==> '(soy and tomato sauce)
 
 #| Q: What is (firsts l)  where l is
     ((apple peach pumpkin) 
