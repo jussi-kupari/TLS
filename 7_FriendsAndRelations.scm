@@ -427,54 +427,129 @@
        (intersect (car l-set)
                   (intersectall (cdr l-set)))))))
 
-#| Note: I wanted to do this recursively with intersection but it
+#| Note: I wanted to do this recursively with intersect but it
          took me some time to realize that the terminal line has to be
          (null? (cdr l-set) (car l-set)).
 
          The book solution is of course the same. |#
 
 (intersectall '((a b c) (c a d e) (e f g h a b))) ; ==> '(a)
+
 (intersectall '((6 pears and) 
                 (3 peaches and 6 peppers) 
                 (8 pears and 6 plums) 
                 (and 6 prunes with some apples))) ; ==> '(6 and)
 
 
-#| Q: |#
-#| A: |#
+#| Q: Is this a pair? (pear pear) |#
+#| A: Yes, because it is a list with only two atoms. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is this a pair? (3 7) |#
+#| A: Yes. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is this a pair? ((2) (pair)) |#
+#| A: Yes, because it is a list with only two S-expressions. |#
 
-#| Q: |#
-#| A: |#
+#| Q: (a-pair? l) where l is (full (house)) |#
+#| A: #t, because it is a list with only two S-expressions.|#
 
-#| Q: |#
-#| A: |#
+#| Q: Define a-pair? |#
+#| A: Ok. |#
 
-#| Q: |#
-#| A: |#
+;; a-pair.v1? : List -> Boolean
+;; Given list, produces true if it contains exactly two S-expressions
+(define a-pair.v1?
+  (λ (l)
+    (null? (cdr (cdr l)))))
 
-#| Q: |#
-#| A: |#
+(a-pair.v1? '(pear pear))    ; ==> #t
+(a-pair.v1? '(3 7))          ; ==> #t
+(a-pair.v1? '((2) (pair)))   ; ==> #t
+(a-pair.v1? '(full (house))) ; ==> #t
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+; Book offers a more verbose solution
 
-#| Q: |#
-#| A: |#
+(define a-pair? 
+  (λ (x) 
+    (cond 
+      ((atom? x) #f) 
+      ((null? x) #f) 
+      ((null? (cdr x)) #f) 
+      ((null? (cdr (cdr x))) #t ) 
+      (else #f)))) 
 
-#| Q: |#
-#| A: |#
+(a-pair? '(pear pear))    ; ==> #t
+(a-pair? '(3 7))          ; ==> #t
+(a-pair? '((2) (pair)))   ; ==> #t
+(a-pair? '(full (house))) ; ==> #t
 
-#| Q: |#
-#| A: |#
+#| Q: How can you refer to the first S-expression of a pair? |#
+#| A: By taking the car of the pair. |#
+
+#| Q: How can you refer to the second S-expression of a pair? |#
+#| A: By taking the car of the cdr of the pair. |#
+
+#| Q: How can you build a pair with two atoms? |#
+#| A: You cons the first one onto the cons of the second one onto ().
+      That is, (cons x1 (cons x2 '())). |#
+
+#| Q: How can you build a pair with two S-expressions? |#
+#| A: You cons the first one onto the cons of the 
+      second one onto (). That is, (cons x1 (cons x2 '())). |#
+
+#| Q: Did you notice the differences between the last two answers? |#
+#| A: No, there aren't any. |#
+
+(define first.v1 
+  (λ (p) 
+    (cond 
+      (else (car p)))))
+
+(define second.v1 
+  (λ (p) 
+    (cond 
+      (else (car (cdr p))))))
+
+(define build.v1 
+  (λ (sl s2) 
+    (cond 
+      (else (cons sl 
+                  (cons s2 '()))))))
+
+#| Q: What possible uses do these three functions have? |#
+#| A: They are used to make representations of pairs and to get
+      parts of representations of pairs. See chapter 6. 
+      They will be used to improve readability, as you will soon see. 
+      Redefine first, second, and build as one-liners. |#
+
+;; first : Pair -> Sexp
+;; Given pair, produces the first element
+(define first
+  (λ (p) 
+    (car p)))
+
+;; second : Pair -> Sexp
+;; Given pair, produces, the second element
+(define second 
+  (λ (p) 
+    (car (cdr p))))
+
+;; build : Sexp Sexp -> Pair
+;; Given two S-expressions, produces a pair
+(define build
+  (λ (sl s2) 
+    (cons sl 
+          (cons s2 '()))))
+
+#| Q: Can you write third as a one-liner? |#
+#| A: Yes. |#
+
+;; third : List -> Sexp
+;; Given list, produces the third S-expression in it.
+(define third
+  (λ (l)
+    (car (cdr (cdr l)))))
 
 #| Q: |#
 #| A: |#
