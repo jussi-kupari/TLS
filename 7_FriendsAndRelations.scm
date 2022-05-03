@@ -456,19 +456,25 @@
 #| Q: Define a-pair? |#
 #| A: Ok. |#
 
-;; a-pair.v1? : List -> Boolean
-;; Given list, produces true if it contains exactly two S-expressions
+;; a-pair.v1? : Sexp -> Boolean
+;; Given S-expression, produces true if it is a list of exactly two S-expressions.
 (define a-pair.v1?
-  (λ (l)
-    (null? (cdr (cdr l)))))
+  (λ (sexp)
+    (cond
+      ((atom? sexp) #f)
+      ((null? (cdr sexp)) #f)
+      ((null? (cdr (cdr sexp))) #t)
+      (else #f))))
 
+(a-pair.v1? 'pear)           ; ==> #f
+(a-pair.v1? '(pear))         ; ==> #f
 (a-pair.v1? '(pear pear))    ; ==> #t
 (a-pair.v1? '(3 7))          ; ==> #t
 (a-pair.v1? '((2) (pair)))   ; ==> #t
 (a-pair.v1? '(full (house))) ; ==> #t
 
 
-; Book offers a more verbose solution
+; Book solution below. I ended with the same after thinking I had come up with something better...
 
 (define a-pair? 
   (λ (x) 
@@ -476,9 +482,11 @@
       ((atom? x) #f) 
       ((null? x) #f) 
       ((null? (cdr x)) #f) 
-      ((null? (cdr (cdr x))) #t ) 
+      ((null? (cdr (cdr x))) #t) 
       (else #f)))) 
 
+(a-pair? 'pear)           ; ==> #f
+(a-pair? '(pear))         ; ==> #f
 (a-pair? '(pear pear))    ; ==> #t
 (a-pair? '(3 7))          ; ==> #t
 (a-pair? '((2) (pair)))   ; ==> #t
