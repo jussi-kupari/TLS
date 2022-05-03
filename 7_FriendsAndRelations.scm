@@ -399,14 +399,46 @@
 (set-diff '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
 ; ==> '(stewed tomatoes casserole)
 
-#| Q: |#
-#| A: |#
+#| Q: What is (intersect all l-set) where l-set is
+      ((a b c) (c a d e) (e f g h a b)) |#
 
-#| Q: |#
-#| A: |#
+#| A: (a). |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (intersect all l-set) where l-set is
+      ((6 pears and) 
+       (3 peaches and 6 peppers) 
+       (8 pears and 6 plums) 
+       (and 6 prunes with some apples)) |#
+
+#| A: (6 and).|#
+
+#| Q: Now, using whatever help functions you need, write intersectall
+      assuming that the list of sets is non-empty. |#
+
+#| A: Ok. |#
+
+;; intersectall : L-Set -> Set
+;; Given l-set, produces the intersection of atoms in the sets
+(define intersectall
+  (λ (l-set)
+    (cond
+      ((null? (cdr l-set)) (car l-set))
+      (else
+       (intersect (car l-set)
+                  (intersectall (cdr l-set)))))))
+
+#| Note: I wanted to do this recursively with intersection but it
+         took me some time to realize that the terminal line has to be
+         (null? (cdr l-set) (car l-set)).
+
+         The book solution is of course the same. |#
+
+(intersectall '((a b c) (c a d e) (e f g h a b))) ; ==> '(a)
+(intersectall '((6 pears and) 
+                (3 peaches and 6 peppers) 
+                (8 pears and 6 plums) 
+                (and 6 prunes with some apples))) ; ==> '(6 and)
+
 
 #| Q: |#
 #| A: |#
