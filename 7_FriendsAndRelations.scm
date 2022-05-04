@@ -628,7 +628,6 @@
 
 ; Book solution is identical.
 
-
 #| Q: Would the following also be correct: |#
 (define revrel.v2 
   (lambda (rel) 
@@ -654,7 +653,6 @@
 (define revpair 
   (λ (pair) 
     (build (second pair) (first pair)))) 
-
 
 #| A: See my solution below. |#
 
@@ -708,7 +706,7 @@
 (seconds '((8 3) (4 8) (7 6) (6 2) (3 4))) ; ==> '(3 8 6 2 4)
 
 ;; fullfun? : Fun -> Boolean
-;; Given fun, produces true if the secons elements in fun create a set.
+;; Given fun, produces true if the second elements in fun create a set.
 (define fullfun?
   (λ (fun)
     (set? (seconds fun))))
@@ -716,7 +714,7 @@
 (fullfun? '((8 3) (4 8) (7 6) (6 2) (3 4))) ; ==> #t
 
 #| Q: Can you define seconds |#
-#| A: It is just like firsts. |#
+#| A: It is just like firsts. Note: I defined it above. |#
 
 #| Q: What is another name for fullfun? |#
 #| A: one-to-one?. |#
@@ -730,158 +728,41 @@
 
 ; Note: Didn't remember we had revrel
 
-#| Q: |#
-#| A: |#
+#| Q: Is ((chocolate chip) (doughy cookie)) a one-to-one function? |#
+#| A: Yes, and you deserve one now! |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#|                    Go and get one!
 
-#| Q: |#
-#| A: |#
+               OR BETTER YET, MAKE YOUT OWN.           
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+;; cookies : Ingredients -> Cookies
+;; Given ingredients, produces cookies.
+(define cookies 
+  (lambda () 
+    (bake 
+     '(350 degrees) 
+     '(12 minutes) 
+     (mix 
+      '(walnuts 1 cup) 
+      '(chocolate-chips 16 ounces) 
+      (mix 
+       (mix 
+        '(flour 2 cups) 
+        '(oatmeal 2 cups) 
+        '(salt .5 teaspoon) 
+        '(baking-powder 1 teaspoon) 
+        '(baking-soda 1 teaspoon)) 
+       (mix 
+        '(eggs 2 large) 
+        '(vanilla 1 teaspoon) 
+        (cream 
+         '(butter 1 cup) 
+         '(sugar 2 cups)))))))) |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
-
-#| Q: |#
-#| A: |#
