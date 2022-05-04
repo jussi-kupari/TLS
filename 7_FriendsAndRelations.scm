@@ -741,7 +741,7 @@
 ;; cookies : Ingredients -> Cookies
 ;; Given ingredients, produces cookies.
 (define cookies 
-  (lambda () 
+  (λ () 
     (bake 
      '(350 degrees) 
      '(12 minutes) 
@@ -761,8 +761,3 @@
         (cream 
          '(butter 1 cup) 
          '(sugar 2 cups)))))))) |#
-
-
-
-
-
