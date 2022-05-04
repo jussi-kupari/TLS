@@ -466,12 +466,13 @@
       ((null? (cdr (cdr sexp))) #t)
       (else #f))))
 
-(a-pair.v1? 'pear)           ; ==> #f
-(a-pair.v1? '(pear))         ; ==> #f
-(a-pair.v1? '(pear pear))    ; ==> #t
-(a-pair.v1? '(3 7))          ; ==> #t
-(a-pair.v1? '((2) (pair)))   ; ==> #t
-(a-pair.v1? '(full (house))) ; ==> #t
+(a-pair.v1? 'pear)                 ; ==> #f
+(a-pair.v1? '(pear))               ; ==> #f
+(a-pair.v1? '(pear pear))          ; ==> #t
+(a-pair.v1? '(3 7))                ; ==> #t
+(a-pair.v1? '((2) (pair)))         ; ==> #t
+(a-pair.v1? '(full (house)))       ; ==> #t
+(a-pair.v1? '(full (house) again)) ; ==> #f
 
 
 ; Book solution below. I ended with the same after thinking I had come up with something better...
@@ -485,12 +486,13 @@
       ((null? (cdr (cdr x))) #t) 
       (else #f)))) 
 
-(a-pair? 'pear)           ; ==> #f
-(a-pair? '(pear))         ; ==> #f
-(a-pair? '(pear pear))    ; ==> #t
-(a-pair? '(3 7))          ; ==> #t
-(a-pair? '((2) (pair)))   ; ==> #t
-(a-pair? '(full (house))) ; ==> #t
+(a-pair? 'pear)                 ; ==> #f
+(a-pair? '(pear))               ; ==> #f
+(a-pair? '(pear pear))          ; ==> #t
+(a-pair? '(3 7))                ; ==> #t
+(a-pair? '((2) (pair)))         ; ==> #t
+(a-pair? '(full (house)))       ; ==> #t
+(a-pair? '(full (house) again)) ; ==> #f
 
 #| Q: How can you refer to the first S-expression of a pair? |#
 #| A: By taking the car of the pair. |#
@@ -559,68 +561,174 @@
   (λ (l)
     (car (cdr (cdr l)))))
 
-#| Q: |#
-#| A: |#
+#| Q: Is l a rel where l is (apples peaches pumpkin pie) |#
+#| A: No, since l is not a list of pairs. We use rel to stand for relation. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is l a rel where l is ((apples peaches) (pumpkin pie) (apples peaches)) |#
+#| A: No, since l is not a set of pairs. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is l a rel where l is ((apples peaches) (pumpkin pie)) |#
+#| A: Yes. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is l a rel where l is ((4 3) (4 2) (7 6) (6 2) (3 4)) |#
+#| A: Yes. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is rel a fun where rel is ((4 3) (4 2) (7 6) (6 2) (3 4)) |#
+#| A: No. We use fun to stand for function. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (fun? rel) where rel is ((8 3) (4 2) (7 6) (6 2) (3 4)) |#
+#| A: #t, because (firsts rel) is a set -See chapter 3. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (fun? rel) where rel is ((d 4) (b 0) (b 9) (e 5) (g 4)) |#
+#| A: #f, because b is repeated.|#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#| Q: Write fun? with set? and firsts |#
+#| A: Ok. |#
 
-#| Q: |#
-#| A: |#
+;; fun? : Rel -> Boolean
+;; Given rel, produces true if the first elements produce a set.
+(define fun?
+  (λ (rel)
+    (set? (firsts rel))))
 
-#| Q: |#
-#| A: |#
+(fun? '((4 3) (4 2) (7 6) (6 2) (3 4)))                   ; ==> #f
+(fun? '((apples peaches) (pumpkin pie) (apples peaches))) ; ==> #f
+(fun? '((apples peaches) (pumpkin pie)))                  ; ==> #t
+(fun? '((8 3) (4 2) (7 6) (6 2) (3 4)))                   ; ==> #t
+(fun? '((d 4) (b 0) (b 9) (e 5) (g 4)))                   ; ==> #f
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is fun? a simple one-liner? |#
+#| A: It sure is. |#
 
-#| Q: |#
-#| A: |#
+#| Q: How do we represent a finite function? |#
+#| A: For us, a finite function is a list of pairs in which no first element
+      of any pair is the same as any other first element. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is (revrel rel) where rel is ((8 a) (pumpkin pie) (got sick)) |#
+#| A: ((a 8) (pie pumpkin) (sick got)). |#
 
-#| Q: |#
-#| A: |#
+#| Q: You can now write revrel |#
+#| A: Ok. |#
 
-#| Q: |#
-#| A: |#
+;; revrel : Rel -> Rel
+;; Given rel, reverses the order of each pair in the rel.
+(define revrel
+  (λ (rel)
+    (cond
+      ((null? rel) '())
+      (else
+       (cons (build (second (car rel))
+                    (first (car rel)))
+             (revrel (cdr rel)))))))
 
-#| Q: |#
-#| A: |#
+(revrel '((8 a) (pumpkin pie) (got sick))) ; ==> '((a 8) (pie pumpkin) (sick got))
 
-#| Q: |#
-#| A: |#
+; Book solution is identical.
 
-#| Q: |#
-#| A: |#
+
+#| Q: Would the following also be correct: |#
+(define revrel.v2 
+  (lambda (rel) 
+    (cond 
+      ((null? rel) '()) 
+      (else (cons (cons 
+                   (car (cdr (car rel))) 
+                   (cons (car (car rel)) 
+                         '())) 
+                  (revrel.v2 (cdr rel)))))))
+
+(revrel.v2 '((8 a) (pumpkin pie) (got sick))) ; ==> '((a 8) (pie pumpkin) (sick got))
+
+#| A: Yes, but now do you see how representation aids readability?
+      Note: Yes, I do see. |#
+
+#| Q: Suppose we had the function revpair that reversed the two components
+      of a pair like this (see below). How would you rewrite revrel to use
+      this help function? |#
+
+;; revpair : Pair -> Pair
+;; Given pair, reverses the order of the S-expressions
+(define revpair 
+  (λ (pair) 
+    (build (second pair) (first pair)))) 
+
+
+#| A: See my solution below. |#
+
+(define revrel.v3
+  (λ (rel)
+    (cond
+      ((null? rel) '())
+      (else (cons (revpair (car rel))
+                  (revrel.v3 (cdr rel)))))))
+
+; No problem, and it is even easier to read: 
+; Book solution is exactly the same.
+
+(revrel.v3 '((8 a) (pumpkin pie) (got sick))) ; ==> '((a 8) (pie pumpkin) (sick got))
+
+#| Q: Can you guess why fun is not a fullfun where fun is
+      ((8 3) (4 2) (7 6) (6 2) (3 4)) |#
+#| A: fun is not a fullfun, since the 2 appears more than once as a second item of a pair. |#
+
+#| Q: Why is #t the value of (fullfun? fun) where fun is
+      ((8 3) (4 8) (7 6) (6 2) (3 4)) |#
+#| A: Because (3 8 6 2 4) is a set. |#
+
+#| Q: What is (fullfun? fun) where fun is
+      ((grape raisin) 
+       (plum prune) 
+       (stewed prune)) |#
+#| A: #f. |#
+
+#| Q: What is (fullfun? fun) where fun is
+      ((grape raisin) 
+       (plum prune) 
+       (stewed grape)) |#
+#| A: #t, because (raisin prune grape) is a set. |#
+
+#| Q: Define fullfun? |#
+#| A: Ok. But first I will create a helper. |#
+
+; Note: My fullfun? below is the same as in the book (no helper in the book yet).
+
+;; seconds : Fun -> List
+;; Given fun, produces a list composed of the second expressions of each sublist.
+(define seconds
+  (λ (fun)
+    (cond
+      ((null? fun) '())
+      ((null? (car fun)) (seconds (cdr fun)))
+      (else
+       (cons (car (cdr (car fun))) (seconds (cdr fun)))))))
+
+(seconds '((8 3) (4 8) (7 6) (6 2) (3 4))) ; ==> '(3 8 6 2 4)
+
+;; fullfun? : Fun -> Boolean
+;; Given fun, produces true if the secons elements in fun create a set.
+(define fullfun?
+  (λ (fun)
+    (set? (seconds fun))))
+
+(fullfun? '((8 3) (4 8) (7 6) (6 2) (3 4))) ; ==> #t
+
+#| Q: Can you define seconds |#
+#| A: It is just like firsts. |#
+
+#| Q: What is another name for fullfun? |#
+#| A: one-to-one?. |#
+
+#| Q: Can you think of a second way to write one-to-one? |#
+#| A: Not of the top of my head, no. |#
+
+(define one-to-one? 
+  (λ (fun) 
+    (fun? (revrel fun)))) 
+
+; Note: Didn't remember we had revrel
 
 #| Q: |#
 #| A: |#
