@@ -323,7 +323,7 @@
 ((insert-G-verbose eq? 'left) 'chicken 'tuna '(This is a very good tuna salad!))
 ; ==> '(This is a very good chicken tuna salad!) Correct.
 ((insert-G-verbose eq? 'xxx) 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good tuna chicken salad!) Left is default so this is also correct.
+; ==> '(This is a very good chicken tuna salad!) Left is default so this is also correct.
 
 ; This can be written with the predefined insertR-f and insertL-f functions in short format.
 
@@ -340,7 +340,7 @@
 ((insert-G eq? 'left) 'chicken 'tuna '(This is a very good tuna salad!))
 ; ==> '(This is a very good chicken tuna salad!) Correct.
 ((insert-G eq? 'xxx) 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good tuna chicken salad!) Left is default so this is also correct.
+; ==> '(This is a very good chicken tuna salad!) Left is default so this is also correct.
 
 #| Q: |#
 #| A: |#
