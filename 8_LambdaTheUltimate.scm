@@ -67,17 +67,18 @@
 (rember-f.v1 eq? 'jelly '(jelly beans are good)) ; ==> '(beans are good)
 (rember-f.v1 equal? '(pop corn) '(lemonade (pop corn) and (cake))) ; ==> '(lemonade and (cake))
 
-; The first book solution is more verbose as using the extra cond structure.
+; The first book solution is more verbose and returns (cdr l) when the first match is found.
 
 (define rember-f.v2 
   (λ (test? a l) 
     (cond 
       ((null? l) '()) 
-      (else (cond 
-              ((test? (car l) a) (cdr l)) 
-              (else (cons (car l) 
-                          (rember-f.v2 test? a 
-                                       (cdr l)))))))))
+      (else
+       (cond 
+         ((test? (car l) a) (cdr l)) 
+         (else (cons (car l) 
+                     (rember-f.v2 test? a 
+                                  (cdr l)))))))))
 
 (rember-f.v2 = 5 '(6 2 5 3)) ; ==> '(6 2 3)
 (rember-f.v2 eq? 'jelly '(jelly beans are good)) ; ==> '(beans are good)
@@ -118,7 +119,7 @@
        rember-f. |#
 
 #| Q: And rember-f can behave like all the others. |#
-#| A: Let's generate all versions with rember-f . |#
+#| A: Let's generate all versions with rember-f. |#
 
 #| Q: What kind of values can functions return? |#
 #| A: Lists and atoms. |#
@@ -127,9 +128,7 @@
 #| A: Yes, but you probably did not know that yet. |#
 
 #| Q: Can you say what (λ (a l) ...) is? |#
-#| A: (lambda (a l) ...) is a function of two arguments, a and l. |#
-
-
+#| A: (λ (a l) ...) is a function of two arguments, a and l. |#
 
 #| Q: Now what is
  
@@ -207,7 +206,7 @@
       with a, and the first one that is eq? to a is removed. |#
 
 #| Q: Give a name to the function returned by (rember-f test?) where test? is eq? |#
-#| A: (define rember-eq ? (rember-f test?)) where test? is eq?. |#
+#| A: (define rember-eq? (rember-f test?)) where test? is eq?. |#
 
 #| Q: What is (rember-eq? a l) where a is tuna and l is (tuna salad is good) |#
 #| A: (salad is good). |#
@@ -232,7 +231,7 @@
          (cons (car l)
                ((rember-f test?) a (cdr l))))))))
 
-; This is the book solution.
+; This is identical to the book solution.
 
 #| Q: What is ((rember-f eq?) a l) where a is tuna and 
       l is (shrimp salad and tuna salad) |#
@@ -243,7 +242,7 @@
 #| Q: What is ((rember-f eq?) a l) where a is 'eq? and l is (equal? eq? eqan? eqlist? eqpair?)
       Did you notice the difference between 'eq? and eq? Remember that the former is the atom
       and the latter is the function. |#
-#| A: |#
+#| A: (equal? eqan? eqlist? eqpair?). |#
 
 ((rember-f eq?) 'eq? '(equal? eq? eqan? eqlist? eqpair?)) ; ==> '(equal? eqan? eqlist? eqpair?)
 
@@ -292,7 +291,7 @@
 #| Q: Can you write a function insert-g that would insert either at the left or at the right?
       If you can, get yourself some coffee cake and relax! Otherwise, don't give up. You'll see it 
       in a minute. |#
-#| A: Ok. My attempt below seems to work! |#
+#| A: Ok. My clumsy attempt is below, but it seems to work. |#
 
 ;; insert-G-verbose : Predicate Atom -> Function
 ;; Given predicate and position, produces a function to insert atoms in a list.
@@ -325,7 +324,7 @@
 ((insert-G-verbose eq? 'xxx) 'chicken 'tuna '(This is a very good tuna salad!))
 ; ==> '(This is a very good chicken tuna salad!) Left is default so this is also correct.
 
-; This can be written with the predefined insertR-f and insertL-f functions in short format.
+; This can be written with the predefined insertR-f and insertL-f functions in shorter format.
 
 (define insert-G
   (λ (test? pos)
@@ -341,6 +340,333 @@
 ; ==> '(This is a very good chicken tuna salad!) Correct.
 ((insert-G eq? 'xxx) 'chicken 'tuna '(This is a very good tuna salad!))
 ; ==> '(This is a very good chicken tuna salad!) Left is default so this is also correct.
+
+#| Q: Which pieces differ? |#
+#| A: The second lines differ from each other. In insertL it is: 
+      ((eq? (car l) old) 
+      (cons new (cons old (cdr l)))), 
+
+      but in insertR it is: 
+      ((eq? (car l) old) 
+      (cons old (cons new (cdr l)))). |#
+
+#| Q: Put the difference in words! |#
+#| A: We say: 
+      "The two functions cons old and new in a 
+       different order onto the cdr of the list l." |#
+
+#| Q: So how can we get rid of the difference? |#
+#| A: You probably guessed it: by passing in a function that expresses
+      the appropriate consing. |#
+
+#| Q: Define a function seqL that 
+      1. takes three arguments, and 
+      2. conses the first argument 
+         onto the result of consing 
+         the second argument onto the third argument. |#
+#| A: Ok. |#
+
+;; define seqL.v1 : Sexp Sexp Sexp -> List
+;; Given three s-expressions, produces a list from first sexp to last.
+(define seqL.v1
+  (λ (first second third)
+    (cons first
+          (cons second
+                (cons third '())))))
+
+(seqL.v1 'a 'b 'c) ; ==> '(a b c)
+(seqL.v1 'a 'b '(c)) ; ==> '(a b (c))
+
+; The book function is not quite that.
+(define seqL 
+  (λ (new old l) 
+    (cons new (cons old l))))
+
+
+#| Q: What is: |#
+
+(define seqR
+  (λ (new old l)
+    (cons old (cons new l))))
+
+#| A: A function that 
+      1. takes three arguments, and 
+      2. conses the second argument 
+         onto the result of consing 
+         the first argument onto 
+         the third argument. |#
+
+#| Q: Do you know why we wrote these functions? |#
+#| A: Because they express what the two differing lines in insertL and insertR express. |#
+
+#| Q: Try to write the function insert-g of one
+      argument seq 
+        which returns insertL 
+            where seq is seqL 
+      and 
+        which returns insertR 
+            where seq is seqR |#
+
+#| A: Ok. I am using the defined insertR and insertL functions from chapter 3. |#
+
+(define insert-g.v1
+  (λ (seq)
+    (cond
+      ((equal? seq seqL)
+       insertL)
+      ((equal? seq seqR)
+       insertR))))
+
+((insert-g.v1 seqR) 'chicken 'tuna '(This is a very good tuna salad!))
+; ==> '(This is a very good tuna chicken salad!)
+
+((insert-g.v1 seqL) 'chicken 'tuna '(This is a very good tuna salad!))
+; ==> '(This is a very good chicken tuna salad!)
+
+
+; The book solution is obviously not using the predefined functions.
+
+(define insert-g 
+  (λ (seq) 
+    (λ (new old l) 
+      (cond 
+        ((null? l) '()) 
+        ((eq? (car l) old) 
+         (seq new old (cdr l))) 
+        (else (cons (car l) 
+                    ((insert-g seq) new old 
+                                    (cdr l)))))))) 
+
+((insert-g seqR) 'chicken 'tuna '(This is a very good tuna salad!))
+; ==> '(This is a very good tuna chicken salad!)
+
+((insert-g seqL) 'chicken 'tuna '(This is a very good tuna salad!))
+; ==> '(This is a very good chicken tuna salad!)
+
+
+#| Q: Now define insertL with insert-g |#
+#| A: Ok. |#
+(define insertl (insert-g seqL)) 
+
+#| Q: And insert. |#
+#| A: Sure. |#
+(define insertr (insert-g seqR))
+
+(insertr 'chicken 'tuna '(This is a very good tuna salad!))
+; ==> '(This is a very good tuna chicken salad!)
+
+(insertl 'chicken 'tuna '(This is a very good tuna salad!))
+; ==> '(This is a very good chicken tuna salad!)
+
+#| Q: Is there something unusual about these two definitions? |#
+#| A: Yes. Earlier we would probably have written 
+        (define insertL (insert-g seq)) 
+      where 
+        seq is seqL 
+      and 
+        (define insertR (insert-g seq)) 
+      where 
+        seq is seqR. 
+      But, using "where" is unnecessary when you 
+      pass functions as arguments. |#
+
+#| Q: Is it necessary to give names to seqL and seqR |#
+#| A: Not really. We could have passed their definitions instead. |#
+
+#| Q: Define insertL again with insert-g 
+      Do not pass in seqL this time. |#
+
+#| A: Ok .|#
+
+(define insert-l
+  (insert-g
+   (λ (new old l) 
+     (cons new (cons old l)))))
+
+#| Q: Is this better? |#
+#| A: Yes, because you do not need to remember as many names. You can
+      (rember func-name "your-mind") where func-name is seqL. |#
+
+#| Q: Do you remember the definition of subst |#
+#| A: Here is one.
+
+(define subst 
+  (λ (new old l) 
+    (cond 
+      ((null? l) '()) 
+      ((eq? (car l) old) 
+       (cons new (cdr l))) 
+      (else (cons (car l) 
+                  (subst new old (cdr l))))))) |#
+
+#| Q: Does this look familiar? |#
+#| A: Yes, it looks like insertL or insertR. Just the 
+      answer of the second cond-line is different. |#
+
+#| Q: Define a function like seqL or seqR for subst |#
+#| A: What do you think about this? |#
+
+(define seqS 
+  (λ (new old l) 
+    (cons new l))) 
+
+#| Q: And now define subst using insert-g |#
+#| A: Ok. |#
+
+(define subst (insert-g seqS))
+
+(subst 'xx 'b '(a b c)) ; ==> '(a xx c)
+
+#| Q: And what do you think yyy is |#
+
+(define yyy 
+  (λ (a l) 
+    ((insert-g seqrem) #f a l)))
+
+;where
+
+(define seqrem 
+  (λ (new old l) l))
+
+#| A:
+
+Step-by-step:
+
+1. seqrem always returns l and ignores new and old
+
+2. Here is insert-g:
+
+(define insert-g 
+  (λ (seq) 
+    (λ (new old l) 
+      (cond 
+        ((null? l) '()) 
+        ((eq? (car l) old) 
+         (seq new old (cdr l)))
+        (else (cons (car l) 
+                    ((insert-g seq) new old 
+                                    (cdr l))))))))
+
+3. If we put seqrem in place of seq, we see that this is like rember.
+
+4. The #f and a arguments in yyy are ignored.
+
+5. yyy is just rember.
+
+
+This is from the book:
+
+Surprise! It is our old friend rember
+
+ Hint: Step through the evaluation of
+   (yyy a l) 
+ where 
+   a is sausage 
+ and 
+   l is (pizza with sausage and bacon).
+
+What role does #f play?
+
+|#
+
+(yyy 'a '(b c f a d)) ; ==> '(b c f d)
+
+
+
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
+
+#| Q: |#
+#| A: |#
 
 #| Q: |#
 #| A: |#

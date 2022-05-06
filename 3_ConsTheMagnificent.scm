@@ -640,18 +640,18 @@ In any case, what is the value of (firsts l) |#
 ;; insertR : Atom Atom LAT -> LAT
 ;; Given two atoms and a lat, inserts the first atom to the right of
 ;; the first occurrence of the second atom.
-(define insertR.v1
+(define insertR
   (λ (new old lat)
     (cond
       ((null? lat) '())
       ((eq? (car lat) old)
        (cons old (cons new (cdr lat))))
       (else
-       (cons (car lat) (insertR.v1 new old (cdr lat)))))))
+       (cons (car lat) (insertR new old (cdr lat)))))))
 
-(insertR.v1 'topping 'fudge '(ice cream with fudge for dessert)) ; ==> '(ice cream with fudge topping for dessert)
-(insertR.v1 'jalapeno 'and '(tacos tamales and salsa)) ; == > '(tacos tamales and jalapeno salsa)
-(insertR.v1 'e 'd '(a b c d f g d h)) ; ==> '(a b c d e f g d h)
+(insertR 'topping 'fudge '(ice cream with fudge for dessert)) ; ==> '(ice cream with fudge topping for dessert)
+(insertR 'jalapeno 'and '(tacos tamales and salsa)) ; == > '(tacos tamales and jalapeno salsa)
+(insertR 'e 'd '(a b c d f g d h)) ; ==> '(a b c d e f g d h)
 
 #| Q: Which argument changes when we recur with insertR |#
 #| A: lat, because we can only look at one of its atoms at a time. |#
@@ -758,7 +758,7 @@ In any case, what is the value of (firsts l) |#
 
 (insertR.v4 'topping 'fudge '(ice cream with fudge for dessert))
 ; ==> '(ice cream with fudge topping for dessert)
-(insertR.v1 'topping 'fudge '(ice cream with fudge for dessert))
+(insertR.v4 'topping 'fudge '(ice cream with fudge for dessert))
 ; ==> '(ice cream with fudge topping for dessert)
 
 #| Q: Now try insertL 
@@ -768,16 +768,16 @@ In any case, what is the value of (firsts l) |#
 ;; insertL : Atom Atom LAT -> LAT
 ;; Given two atoms and a list of atoms, inserts the first atom to the left of
 ;; the first occurrence of the second atom in the list
-(define insertL.v1
+(define insertL
   (λ (new old lat)
     (cond
       ((null? lat) '())
       ((eq? (car lat) old)
        (cons new (cons old (cdr lat))))
       (else
-       (cons (car lat) (insertL.v1 new old (cdr lat)))))))
+       (cons (car lat) (insertL new old (cdr lat)))))))
 
-(insertL.v1 'topping 'fudge '(ice cream with fudge for dessert))
+(insertL 'topping 'fudge '(ice cream with fudge for dessert))
 ; ==> '(ice cream with topping fudge for dessert)
 
 #| Q: Did you think of a different way to do it? |#
