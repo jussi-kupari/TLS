@@ -523,7 +523,7 @@
   (λ (a l) 
     ((insert-g seqrem) #f a l)))
 
-;where
+; where
 
 (define seqrem 
   (λ (new old l) l))
@@ -532,9 +532,10 @@
 
 Step-by-step:
 
-1. seqrem always returns l and ignores new and old
+1. seqrem is a function that takes three arguments: new old and l and
+   always returns l ignoring the others.
 
-2. Here is insert-g:
+2. Here is insert-g again:
 
 (define insert-g 
   (λ (seq) 
@@ -542,16 +543,22 @@ Step-by-step:
       (cond 
         ((null? l) '()) 
         ((eq? (car l) old) 
-         (seq new old (cdr l)))
+         (seq new old (cdr l)))  ; With seqrem this always returns (cdr l)
         (else (cons (car l) 
                     ((insert-g seq) new old 
                                     (cdr l))))))))
 
-3. If we put seqrem in place of seq, we see that this is like rember.
+3. If we use seqrem with insert-g, we get a function that takes
+   three arguments: new old and l, that returns (cdr l) when it encounters
+   old in the list. The argument new is not used. 
 
-4. The #f and a arguments in yyy are ignored.
+4. When we define yyy we create function that takes two arguments: a and l
+   that removes the first encounter of a in l. 
 
 5. yyy is just rember.
+
+6. It appears that #f in the inner function allows us to bypass the unused argument
+   See further down.
 
 
 This is from the book:
@@ -563,41 +570,149 @@ Surprise! It is our old friend rember
  where 
    a is sausage 
  and 
-   l is (pizza with sausage and bacon).
+   l is (pizza with sausage and bacon). |#
 
-What role does #f play?
+;; What role does #f play?
 
-|#
+;; Let's try something ==>
 
-(yyy 'a '(b c f a d)) ; ==> '(b c f d)
+;; Function that takes three arguments but doesn't use one of them.
+(define inner
+  (λ (x y z)
+    (+ x y)))
+
+;; Function that takes only two arguments but uses the other fn that takes three arguments.
+(define outer
+  (λ (x y)
+    (inner x y #f)))
+
+(outer 15 62) ; ==> 77
+
+;; Using #f we can bypass the unused argument.
 
 
 
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#|             What you have just seen is the power of abstraction.          |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#|                        ** The Ninth Commandment **
+                  Abstract common patterns with a new function.               |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#| Q: Have we seen similar functions before? |#
+#| A: Yes, we have even seen functions with similar lines. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Do you remember value from chapter 6? |#
+#| A: Let me look it up.
+
+;; value : Nexp -> WN
+;; Given nexp, produces its value
+(define value
+  (λ (nexp)
+    (cond
+      ((atom? nexp) nexp)
+      ((eq? (car (cdr nexp)) '+)
+       (plus (value (car nexp))
+             (value (car (cdr (cdr nexp))))))                     
+      ((eq? (car (cdr nexp)) '*)
+       (* (value (car nexp))
+          (value (car (cdr (cdr nexp))))))
+      (else                                    
+       (** (value (car nexp))
+           (value (car (cdr (cdr nexp))))))))) |#
+
+#| Q: Do you see the similarities? |#
+#| A: The last three answers are the same except for the plus, *, and **. |#
+
+#| Q: Can you write the function atom-to-function 
+      which: 
+         1. Takes one argument x and 
+         2. returns the function + 
+      if (eq? x '+) 
+         returns the function * 
+      if (eq? x '*) and 
+         returns the function ** 
+         otherwise? |#
+#| A: Let me try. |#
+
+;; atom-to-function : Atom -> Function
+;; Given atom, produces the appropriate function
+(define atom-to-function
+  (λ (a)
+    (cond
+      ((eq? a '+) plus) 
+      ((eq? a ' *) x)   
+      (else **))))      
+
+(atom-to-function '+)  ; ==> #<procedure:plus>
+(atom-to-function '*)  ; ==> #<procedure:x>
+(atom-to-function '**) ; ==> #<procedure:**>
+
+#| Q: What is (atom-to-function (operator nexp)) where nexp is (+ 5 3)
+
+Note! This is referring to functions define in previous chapters
+
+;; operator : Aexp -> Atom
+;; Given aexp, produces the operator between the sub-expressions.
+(define operator
+  (λ (nexp)
+    (car nexp))) |#
+
+#| A: The function plus, not the atom +. |#
+
+(operator '(+ 5 3)) ; ==> '+
+(atom-to-function (operator '(+ 5 3))) ; ==> #<procedure:plus>
+
+#| Q: Can you use atom-to-function to rewrite value with only two cond-lines? |#
+#| A: Of course.
+
+Here is the original function btw
+
+;; value : Nexp -> WN
+;; Given nexp, produces its value
+(define value
+  (λ (nexp)
+    (cond
+      ((atom? nexp) nexp)
+      ((eq? (car (cdr nexp)) '+)
+       (plus (value (car nexp))
+             (value (car (cdr (cdr nexp))))))                     
+      ((eq? (car (cdr nexp)) '*)
+       (* (value (car nexp))
+          (value (car (cdr (cdr nexp))))))
+      (else                                    
+       (** (value (car nexp))
+           (value (car (cdr (cdr nexp))))))))) |#
+
+;; value : Nexp -> WN
+;; Given nexp, produces its value
+(define value
+  (λ (nexp)
+    (cond
+      ((atom? nexp) nexp)
+      (else
+       ((atom-to-function (car (cdr nexp))) ; operator
+        (value (car nexp))                  ; 1st-sub-exp
+        (value (car (cdr (cdr nexp))))))))) ; 2nd-sub-exp
+
+; Book uses operator, 1st-sub-exp and 2nd-sub-exp here
+
+(value 10) ; ==> 10
+(value 999) ; ==> 999
+(value '(999 + 1)) ; ==> 1000
+(value '(999 * 1)) ; ==> 999
+(value '(999 ** 1)) ; ==> 1000
+(value '(999 ** 2)) ; ==> 998001
+(value '(999 ** 0)) ; ==> 1
+
+#| Q: Is this quite a bit shorter than the first version? |#
+#| A: Yes, but that's okay. We haven't changed its meaning. |#
+
+#| Q: Time for an apple? |#
+#| A: One a day keeps the doctor away. |#
 
 #| Q: |#
 #| A: |#
