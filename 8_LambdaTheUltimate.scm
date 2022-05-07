@@ -653,7 +653,7 @@ Surprise! It is our old friend rember
 
 #| Q: What is (atom-to-function (operator nexp)) where nexp is (+ 5 3)
 
-Note! This is referring to functions define in previous chapters
+Note! This is referring to functions defined in previous chapters
 
 ;; operator : Aexp -> Atom
 ;; Given aexp, produces the operator between the sub-expressions.
@@ -714,50 +714,152 @@ Here is the original function btw
 #| Q: Time for an apple? |#
 #| A: One a day keeps the doctor away. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Here is multirember again.
 
-#| Q: |#
-#| A: |#
+(define multirember 
+  (λ (a lat) 
+    (cond 
+      ((null? lat) '()) 
+      ((eq? (car lat) a) 
+       (multirember a (cdr lat))) 
+      (else (cons (car lat) 
+                  (multirember a 
+                               (cdr lat)))))))
 
-#| Q: |#
-#| A: |#
+      Write multirember-f |#
 
-#| Q: |#
-#| A: |#
+#| A: No problem. |#
 
-#| Q: |#
-#| A: |#
+;; multirember-f : Predicate -> Function
+;; Given predicate, produces a function to remove atoms from a list
+(define multirember-f
+  (λ (test?)
+    (λ (a lat) 
+      (cond 
+        ((null? lat) '()) 
+        ((eq? (car lat) a) 
+         ((multirember-f test?) a (cdr lat))) 
+        (else
+         (cons (car lat) 
+               ((multirember-f test?) a (cdr lat))))))))
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is ((multirember-f test?) a lat)
+      where 
+        test? is eq? 
+        a is tuna 
+      and 
+        lat is (shrimp salad tuna salad and tuna) |#
+#| A: (shrimp salad salad and). |#
+((multirember-f eq?) 'tuna '(shrimp salad tuna salad and tuna))
+; ==> ,(shrimp salad salad and)
 
-#| Q: |#
-#| A: |#
+#| Q: Wasn't that easy? |#
+#| A: Yes. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Define multirember-eq ? using multirember-f |#
+#| A: Ok.
+      (define multirember-eq? (multirember-f test?))
+      where test? is eq?. |#
+      
+(define multirember-eq? (multirember-f eq?))
+(multirember-eq? 'tuna '(shrimp salad tuna salad and tuna))
+; ==> '(shrimp salad salad and)
 
-#| Q: |#
-#| A: |#
+#| Q: Do we really need to tell multirember-f about tuna |#
+#| A: As multirember-f visits all the elements in lat, it always looks for tuna.
 
-#| Q: |#
-#| A: |#
+      Note: This is confusing. What is the point of this? multirember-f takes a
+      predicate as input but the resulting function needs to be given an atom to
+      look for. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Does test? change as multirember-f goes through lat |#
+#| A: No, test? always stands for eq?, just as a always stands for tuna. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Can we combine a and test? |#
+#| A: Well, test? could be a function of just one argument and could compare
+      that argument to tuna. |#
 
-#| Q: |#
-#| A: |#
+#| Q: How would it do that? |#
+#| A: The new test? takes one argument and compares it to tuna. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Here is one way to write this function.
+
+      (define eq?-tuna  
+        (eq?-c k))
+
+      where k is tuna
+      Can you think of a different way of writing 
+      this function?  |#
+
+#| A: Yes, and here is a different way: |#
+
+(define eq?-tuna 
+  (eq?-c 'tuna))
+
+#| Q: Have you ever seen definitions that contain atoms? |#
+#| A: Yes, 0, 'x, '+, and many more. |#
+
+#| Q: Perhaps we should now write multiremberT which is similar to multirember-f 
+      Instead of taking test? and returning a function, multiremberT takes a function like 
+      eq?-tuna and a lat and then does its work. |#
+#| A: This is not really difficult. |#
+
+;; multiremberT : Predicate LAT -> LAT
+;; Given predicate and lat, removes all wanted atoms from lat
+(define multiremberT
+  (λ (test? lat) 
+    (cond 
+      ((null? lat) '()) 
+      ((test? (car lat)) 
+       (multiremberT test? (cdr lat))) 
+      (else
+       (cons (car lat) 
+             (multiremberT test? (cdr lat)))))))
+
+#| Q: What is (multiremberT test? lat) 
+      where 
+        test? is eq?-tuna 
+      and 
+        lat is (shrimp salad tuna salad and tuna) |#
+#| A: (shrimp salad salad and). |#
+
+(multiremberT eq?-tuna '(shrimp salad tuna salad and tuna))
+; ==> '(shrimp salad salad and)
+
+#| Q: Is this easy? |#
+#| A: It's not bad. |#
+
+#| Q: How about this? |#
+
+(define multirember&co 
+  (λ (a lat col) 
+    (cond 
+      ((null? lat) 
+       (col '() '())) 
+      ((eq? (car lat) a) 
+       (multirember&co a 
+                       (cdr lat) 
+                       (λ (newlat seen) 
+                         (col newlat 
+                              (cons (car lat) seen))))) 
+      (else 
+       (multirember&co a 
+                       (cdr lat) 
+                       (λ (newlat seen) 
+                         (col (cons (car lat) newlat) 
+                              seen)))))))
+
+#| A: Now that looks really complicated! |#
+
+#| Q: Here is something simpler: |#
+
+(define a-friend
+  (λ (x y)
+    (null? y)))
+
+#| A: Yes, it is simpler. It is a function that takes two arguments and asks
+      whether the second one is the empty list. It ignores its first argument. |#
 
 #| Q: |#
 #| A: |#
