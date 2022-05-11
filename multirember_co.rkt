@@ -1,11 +1,6 @@
-;; The first three lines of this file were inserted by DrRacket. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname multirember_co) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
-; Use ISL-with-lambda and run the stepper on these to get some understanding of what is going on
+#lang racket
 
-; http://www.michaelharrison.ws/weblog/2007/08/unpacking-multiremberco-from-tls/
-; https://stackoverflow.com/questions/7004636/explain-the-continuation-example-on-p-137-of-the-little-schemer/7005024#7005024
-; https://stackoverflow.com/questions/2018008/help-understanding-continuations-in-scheme?rq=1
+;; Run the stepper in ISL+
 
 ;; second-list-empty? : List List -> Boolean
 ;; Given two lists, produces true if the second is empty.
@@ -44,7 +39,22 @@
 ;(multirember&co 'tuna '(tuna) second-list-empty?)
 ;(multirember&co 'tuna '(and tuna) second-list-empty?)
 ;(multirember&co 'tuna '(strawberries tuna and swordfish) second-list-empty?)
-(multirember&co 'tuna '(strawberries tuna and swordfish) length-first?)
+;(multirember&co 'tuna '(strawberries tuna and swordfish) length-first?)
 
 
- 
+;; Run the stepper in ISL+
+;; or use #lang racket and point at the arguments to see which match
+
+((lambda (newlat seen)
+   ((lambda (newlat seen)
+      ((lambda (newlat seen)
+         ((lambda (newlat seen)
+            ((lambda (x y) (length x)) (cons (car (list 'strawberries 'tuna 'and 'swordfish)) newlat) seen))
+          newlat
+          (cons (car (list 'tuna 'and 'swordfish)) seen)))
+       (cons (car (list 'and 'swordfish)) newlat)
+       seen))
+    (cons (car (list 'swordfish)) newlat)
+    seen))
+ '()
+ '())
