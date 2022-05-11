@@ -861,53 +861,148 @@ Here is the original function btw
 #| A: Yes, it is simpler. It is a function that takes two arguments and asks
       whether the second one is the empty list. It ignores its first argument. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the value of
+        (multirember&co a lat col) 
+      where 
+        a is tuna 
+        lat is (strawberries tuna and swordfish) 
+      and 
+        col is a-friend |#
 
-#| Q: |#
-#| A: |#
+#| A: This is not simple. |#
 
-#| Q: |#
-#| A: |#
+#| Q: So let's try a friendlier example. What is the 
+      value of (multirember&co a lat col) 
+      where 
+        a is tuna 
+        lat is () 
+      and 
+        col is a-friend |#
 
-#| Q: |#
-#| A: |#
+#| A: #t, because a-friend is immediately used in the first answer on two
+      empty lists, and a-friend makes sure that its second argument is empty. |#
 
-#| Q: |#
-#| A: |#
+#| Q: And what is (multirember&co a lat col) 
+      where 
+        a is tuna 
+        lat is (tuna) 
+      and 
+        col is a-friend |#
 
-#| Q: |#
-#| A: |#
+#| A: multirember&co asks (eq? (car lat) 'tuna) 
+      where 
+        lat is (tuna). 
+      Then it recurs on (). |#
 
-#| Q: |#
-#| A: |#
+#| Q: What are the other arguments that multirember&co uses for the natural recursion? |#
+#| A: The first one is clearly tuna. The third argument is a new function. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the name of the third argument? |#
+#| A: col. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Do you know what col stands for? |#
+#| A: The name col is short for "collector."
+      A collector is sometimes called a "continuation." |#
 
-#| Q: |#
-#| A: |#
+; http://www.michaelharrison.ws/weblog/2007/08/unpacking-multiremberco-from-tls/
+; https://stackoverflow.com/questions/7004636/explain-the-continuation-example-on-p-137-of-the-little-schemer/7005024#7005024
+; https://stackoverflow.com/questions/2018008/help-understanding-continuations-in-scheme?rq=1
 
-#| Q: |#
-#| A: |#
+#| Q: Here is the new collector:
 
-#| Q: |#
-#| A: |#
+(define new-friend 
+  (λ (newlat seen) 
+    (col newlat 
+         (cons (car lat) seen))))
 
-#| Q: |#
-#| A: |#
+      where 
+       (car lat) is tuna 
+      and 
+       col is a-friend 
+      Can you write this definition differently? |#
 
-#| Q: |#
-#| A: |#
+#| A: Do you mean the new way where we put tuna into the definition?
 
-#| Q: |#
-#| A: |#
+(define new-friend 
+  (λ (newlat seen) 
+    (col newlat 
+         (cons 'tuna seen))))
 
-#| Q: |#
-#| A: |#
+      where
+       col is a-friend.
+|#
+
+#| Q: Can we also replace col with a-friend in such definitions
+      because col is to a-friend what (car lat) is to tuna |#
+
+#| A: Yes, we can:
+
+(define new-friend 
+  (λ (newlat seen) 
+    (a-friend newlat 
+              (cons 'tuna seen)))) |#
+
+#| Q: And now? |#
+#| A: multirember&co finds out that (null? lat) is true, which means
+      that it uses the collector on two empty lists. |#
+
+#| Q: Which collector is this? |#
+#| A: It is new-friend. |#
+
+#| Q: How does a-friend differ from new-friend |#
+#| A: new-friend uses a-friend on the empty list and the value of 
+      (cons 'tuna '()). |#
+
+#| Q: And what does the old collector do with such arguments? |#
+#| A: It answers #f, because its second argument is (tuna), which is not the empty list. |#
+
+#| Q: What is the value of (multirember&co a lat a-friend) 
+     where a is tuna 
+     and 
+       lat is (and tuna) |#
+
+#| A: This time around multirember&co recurs with yet another friend.
+
+(define latest-friend 
+  (λ (newlat seen) 
+    (a-friend (cons 'and newlat) 
+              seen))) |#
+
+ 
+#| Q: And what is the value of this recursive use of multirember&co |#
+#| A: #f, since (a-friend ls1 ls2)
+      where 
+        ls1 is (and) 
+      and 
+        ls2 is (tuna) 
+      is #f. |#
+
+#| Q: What does (multirember&co a lat f) do?|#
+#| A: It looks at every atom of the lat to see whether it is eq? to a.
+      Those atoms that are not are collected in one list ls1; the others 
+      for which the answer is true are collected in a second list ls2.
+      Finally, it determines the value of (f ls1 ls2). |#
+
+#| Q: Final question: What is the value of (multirember&co (quote tuna) ls col) 
+      where 
+        ls is (strawberries tuna and swordfish) 
+      and 
+        col is
+
+(define last-friend 
+  (λ (x y) 
+    (length x))) |#
+
+
+#| A: 3, because ls contains three things that are not tuna, and therefore last-friend is used on 
+      (strawberries and swordfish) and (tuna). |#
+
+
+
+#|                    *** The Tenth Commandment *** 
+        Build functions to collect more than one value at a time.          |#
+
+
 
 #| Q: |#
 #| A: |#
