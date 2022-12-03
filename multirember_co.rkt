@@ -8,13 +8,11 @@
   (λ (x y)
     (null? y)))
 
-
 ;; length-first? : List List -> Boolean
 ;; Given two lists, produces the length of the first.
 (define length-first? 
   (λ (x y) 
     (length x)))
-
 
 (define multirember&co
    (lambda (a lat co)
@@ -34,13 +32,11 @@
                          (co (cons (car lat) newlat) 
                               seen)))))))
 
-
 ;(multirember&co 'tuna '() second-list-empty?)
 ;(multirember&co 'tuna '(tuna) second-list-empty?)
 ;(multirember&co 'tuna '(and tuna) second-list-empty?)
 ;(multirember&co 'tuna '(strawberries tuna and swordfish) second-list-empty?)
 ;(multirember&co 'tuna '(strawberries tuna and swordfish) length-first?)
-
 
 ;; Run the stepper in ISL+
 ;; or use #lang racket and point at the arguments to see which match

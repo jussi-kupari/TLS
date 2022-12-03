@@ -1,6 +1,6 @@
 #lang racket
 
-(provide (all-defined-out))
+(provide atom?)
 
 ;; atom? : Any -> Boolean
 ;; Produces true if input is an atom
