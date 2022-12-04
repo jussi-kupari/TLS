@@ -1,9 +1,9 @@
 #lang racket
 
+(require rackunit "Atom.scm")
 (provide (all-defined-out))
 
-(require "Atom.scm"
-         "1_Toys.scm")
+
 
 
 
@@ -23,11 +23,12 @@
 #| Q: True or false: (lat ? l) where l is () |#
 #| A: True, because it does not contain a list. |#
 
-;Note: It is not entirely obvious to me why an empty list is considered a list of atoms.
+      ;Note: It is not entirely obvious to me why an empty list is considered a list of atoms.
 
 #| Q: True or false: a lat is a list of atoms. |#
 #| A: True! Every lat is a list of atoms! |#
-;Note: An empty/null list is also a list of atoms,
+
+      ;Note: An empty/null list is also a list of atoms,
 
 #| Q: Write the function lat? using some, but not necessarily all, of the
      following functions: car cdr cons null? atom? and eq? |#
@@ -40,16 +41,16 @@
       Below are my attempts, called list-of-atoms? 1-2-3 (very similar),
       using some techniques not introduced yet. |#
 
-;; list-of-atoms? : List-of-Anything -> Boolean
-;; Given list, produces true if it only contains atoms
-(define (list-of-atoms? l)
+;; list-of-atoms? : List-of-X -> Boolean
+;; Produces true if lox only contains atoms
+(define (list-of-atoms1? l)
   (cond
     ((null? l) #t)
     (else (if (atom? (car l))
-              (list-of-atoms? (cdr l))
+              (list-of-atoms1? (cdr l))
               #f))))
 
-; Using and instead of if with else
+; Using 'and' instead of 'if with else'
 (define (list-of-atoms2? l)
   (cond
     ((null? l) #t)
@@ -65,20 +66,20 @@
        (and (atom? (car l))
             (list-of-atoms3? (cdr l)))))))
 
-(list-of-atoms? '(Jack Sprat could eat no chicken fat)) ; ==> #t
-(list-of-atoms? '((Jack) Sprat could eat no chicken fat)) ; ==> #f
-(list-of-atoms? '(Jack (Sprat could) eat no chicken fat)) ; ==> #f
-(list-of-atoms? '()) ; ==> #t
+(check-true (list-of-atoms1? '(Jack Sprat could eat no chicken fat))) 
+(check-false (list-of-atoms1? '((Jack) Sprat could eat no chicken fat)))
+(check-false (list-of-atoms1? '(Jack (Sprat could) eat no chicken fat)))
+(check-true (list-of-atoms1? '()))
 
-(list-of-atoms2? '(Jack Sprat could eat no chicken fat)) ; ==> #t
-(list-of-atoms2? '((Jack) Sprat could eat no chicken fat)) ; ==> #f
-(list-of-atoms2? '(Jack (Sprat could) eat no chicken fat)) ; ==> #f
-(list-of-atoms2? '()) ; ==> #t
+(check-true (list-of-atoms2? '(Jack Sprat could eat no chicken fat))) 
+(check-false (list-of-atoms2? '((Jack) Sprat could eat no chicken fat)))
+(check-false (list-of-atoms2? '(Jack (Sprat could) eat no chicken fat)))
+(check-true (list-of-atoms2? '()))
 
-(list-of-atoms3? '(Jack Sprat could eat no chicken fat)) ; ==> #t
-(list-of-atoms3? '((Jack) Sprat could eat no chicken fat)) ; ==> #f
-(list-of-atoms3? '(Jack (Sprat could) eat no chicken fat)) ; ==> #f
-(list-of-atoms3? '()) ; ==> #t
+(check-true (list-of-atoms3? '(Jack Sprat could eat no chicken fat))) 
+(check-false (list-of-atoms3? '((Jack) Sprat could eat no chicken fat)))
+(check-false (list-of-atoms3? '(Jack (Sprat could) eat no chicken fat)))
+(check-true (list-of-atoms3? '()))
 
 
 
@@ -86,8 +87,8 @@
 
 
 
-;; lat? : List-of-Anything -> Boolean
-;; Given list, produces true if it only contains atoms
+;; lat? : List-of-X -> Boolean
+;; Produces true if lox only contains atoms
 (define lat? 
   (λ (l) 
     (cond 
@@ -95,12 +96,12 @@
       ((atom? (car l)) (lat? (cdr l))) 
       (else #f)))) 
 
-#| Q: What is the value of (lat ? l) where l is the argument (bacon and eggs) |#
-#| A: True. The application (lat ? l) where l is (bacon and eggs) 
-      has the value #t -true- because l is a lat. |#
-(lat? '(bacon and eggs)) ; ==> #t
+#| Q: What is the value of (lat? l) where l is the argument (bacon and eggs) |#
+#| A: True. The application (lat? l) where l is (bacon and eggs) 
+      has the value #t --true-- because l is a lat. |#
+(check-true (lat? '(bacon and eggs)))
 
-#| Q: How do we determine the answer #t for the application (lat ? l) |#
+#| Q: How do we determine the answer #t for the application (lat? l) |#
 #| A: From the book:
       "You were not expected to know this one 
       either. The answer is determined by 
@@ -109,7 +110,7 @@
       function lat? and refer to it for the next 
       group of questions. "
 
-      My answer: First we check if the list is null, if yes, then #t.
+      My answer: First we check if the list is null, if yes, then the answer is #t.
       If the list is not null, we look at the first element. If that is
       an atom, then we proceed to repeat this process for the remaining part
       of the list. If we get to the end of the list - that is - to an empty
@@ -126,7 +127,7 @@
 #| A: (null? l) asks if the argument l is the null list. If it is, the value of the application is 
       true. If it is not, we ask the next question. In this case, l is not the null list,
       so we ask the next question. |#
-(null? '(bacon and egss)) ;  ==> #f
+(check-false (null? '(bacon and egss)))
 
 #| Q: What is the next question? |#
 #| A: (atom? (car l)). |#
@@ -135,15 +136,15 @@
 #| A: (atom? (car l)) asks if the first S-expression of the list l is an atom. If (car l) is an
       atom, we want to know if the rest of l is also composed only of atoms. If (car l) is not
       an atom, we ask the next question. In this case, (car l) is an atom, so the value of the 
-      function is the value of (lat ? (cdr l)). |#
+      function is the value of (lat? (cdr l)). |#
 
 #| Q: What is the meaning of (lat? (cdr l)) |#
-#| A: (lat ? ( cdr l)) finds out if the rest of the list l is composed only of atoms,
+#| A: (lat? (cdr l)) finds out if the rest of the list l is composed only of atoms,
       by referring to the function with a new argument.  |#
 
-#| Q: Now what is the argument l for lat ? |#
+#| Q: Now what is the argument l for lat? |#
 #| A: Now the argument l is (cdr l), which is (and eggs). |#
-(cdr '(bacon and eggs)) ; ==> '(and eggs)
+(check-equal? (cdr '(bacon and eggs)) '(and eggs))
 
 #| Q: What is the next question? |#
 #| A: (null? l) |#
@@ -152,28 +153,29 @@
 #| A: (null? l) asks if the argument l is the null list. If it is, the value of
       the application is #t . If it is not, we ask the next question. In this case,
       l is not the null list, so we ask the next question. |#
-(null? '(and eggs)) ; ==> #f
+(check-false (null? '(and eggs)))
 
 #| Q: What is the next question? |#
 #| A: (atom? (car l)) |#
 
 #| Q: What is the meaning of the line ((atom? (car l)) (lat? (cdr l))) where l is (and eggs) |#
-#| A: (atom? ( car l)) asks if (car l) is an atom. If it is an atom, the value of the application
+#| A: (atom? (car l)) asks if (car l) is an atom. If it is an atom, the value of the application
       is (lat? (cdr l)). If not, we ask the next question. In this case, (car l) is an atom, so 
       we want to find out if the rest of the list l is composed only of atoms. |#
+(check-true (atom? (car '(and eggs))))
 
 #| Q: What is the meaning of (lat? (cdr l)) |#
-#| A: (lat ? (cdr l)) finds out if the rest of l is composed only of atoms, by referring again 
+#| A: (lat? (cdr l)) finds out if the rest of l is composed only of atoms, by referring again 
       to the function lat?, but this time, with the argument (cdr l), which is (eggs). |#
 
 #| Q: What is the next question? |#
 #| A: (null? l) |#
 
-#| Q: What is the meaning of the line ((null? l) #t where l is now (eggs) |#
+#| Q: What is the meaning of the line ((null? l) #t) where l is now (eggs) |#
 #| A: (null? l) asks if the argument l is the null list. If it is, the value of the application
-      is #t -true. If it is not, move to the next question. In this case, l is not null, so we
+      is #t --true. If it is not, move to the next question. In this case, l is not null, so we
       ask the next question. |#
-(null? '(eggs)) ; ==> #f
+(check-false (null? '(eggs)))
 
 #| Q: What is the next question? |#
 #| A: (atom? (car l)). |#
@@ -193,8 +195,8 @@
 #| Q: What is the meaning of the line ((null? l) #t) where l is now () |#
 #| A: (null? l) asks if the argument l is the null list. If it is, the value of the application
       is the value of #t . If not, we ask the next question. In this case, () is the null list.
-      So, the value of the application (lat? l) where l is (bacon and eggs), is #t -true. |#
-(null? '()) ; ==> #t
+      So, the value of the application (lat? l) where l is (bacon and eggs), is #t --true. |#
+(check-true (null? '()))
 
 #| Q: Do you remember the question about (lat? l) |#
 #| A: Probably not. The application (lat? l) has the value #t if the list l is a
@@ -202,10 +204,10 @@
 
 #| Q: Can you describe what the function lat? does in your own words? |#
 #| A: The function lat? tests if a list is a list of atoms by first testing if it
-      is empty. If yes, then it returns #t. If it is not empty, it checks if the first
-      element is an atom. If this is true, then it repeats lat? with the remaining list.
+      is empty. If yes, then it returns #t. If it is not empty, lat? checks if the first
+      element is an atom. If this is true, then lat? is called with the remaining list.
       If the first element is not an atom, lat? returns #f. If lat? reaches the end of the
-      list, which is a null list, it returns #t meaning the list was a list of atoms.
+      list, which is a null list, it returns #t, meaning the list was a list of atoms.
 
      From the book:
      "Here are our words: lat? looks at each S-expression in a list, in 
@@ -215,9 +217,21 @@
 
       To see how we could arrive at a value of #f, consider the next few questions." |#
 
-#| Q: What is the value of (lat? l) where l is now (bacon (and eggs)) |#
+#| Q: Here is the function lat? again:
+
+      ;; lat? : List-of-X -> Boolean
+      ;; Produces true if lox only contains atoms
+      (define lat? 
+        (λ (l) 
+          (cond 
+            ((null? l) #t) 
+            ((atom? (car l)) (lat? (cdr l))) 
+            (else #f))))
+
+      What is the value of (lat? l) where l is now (bacon (and eggs)) |#
+
 #| A: #f, since the list l contains an S-expression that is a list. |#
-(lat? '(bacon (and eggs))) ; ==> #f
+(check-false (lat? '(bacon (and eggs))))
 
 #| Q: What is the first question? |#
 #| A: (null? l). |#
@@ -225,7 +239,7 @@
 #| Q: What is the meaning of the line ((null? l) #t) where l is (bacon (and eggs)) |#
 #| A: (null? l) asks if l is the null list. If it is, the value is #t . If l is not null,
        move to the next question. In this case, it is not null, so we ask the next question. |#
-(null? '(bacon (and eggs))) ; ==> #f
+(check-false (null? '(bacon (and eggs))))
 
 #| Q: What is the next question? |#
 #| A: (atom? (car l)). |#
@@ -234,16 +248,16 @@
 #| A: (atom? (car l)) asks if (car l) is an atom. If it is, the value is (lat? (cdr l)).
       If it is not, we ask the next question. In this case, (car l) is an atom, so we want to
       check if the rest of the list l is composed only of atoms. |#
-(atom? (car '(bacon (and eggs)))) ; ==> #t
+(check-true (atom? (car '(bacon (and eggs)))))
 
 #| Q: What is the meaning of (lat? (cdr l)) |#
-#| A: (lat ? (cdr l)) checks to see if the rest of the list l is composed only of atoms,
-      by referring to lat ? with l replaced by (cdr l). |#
+#| A: (lat? (cdr l)) checks to see if the rest of the list l is composed only of atoms,
+      by referring to lat? with l replaced by (cdr l). |#
 
 #| Q: What is the meaning of the line ((null? l) #t) where l is now ((and eggs)) |#
-#| A: (null? l) asks if l is the null list. If it is null, the value is #t . If it is
+#| A: (null? l) asks if l is the null list. If it is null, the value is #t. If it is
       not null, we ask the next question. In this case, l is not null, so move to the next question. |#
-(null? '((and eggs))) ; ==> #f
+(check-false (null? '((and eggs))))
 
 #| Q: What is the next question? |#
 #| A: (atom? (car l)). |#
@@ -252,7 +266,7 @@
 #| A: (atom? (car l)) asks if (car l) is an atom. If it is, the value is (lat ? (cdr l)).
       If it is not, we move to the next question. In this case, (car l) is not an atom,
       so we ask the next question. |#
-(atom? '((and eggs))) ; ==> #f
+(check-false (atom? '((and eggs))))
 
 #| Q: What is the next question? |#
 #| A: else. |#
@@ -274,7 +288,7 @@
       in the first position. |#
 
 #| Q: What is the meaning of the line (else #f) |#
-#| A: else asks if else is true. If else is true -as it always is- then the answer is #f-false. |#
+#| A: else asks if else is true. If else is true --as it always is-- then the answer is #f --false. |#
 
 #| Q: What is ))) |#
 #| A: These are the closing or matching parentheses of
@@ -295,18 +309,21 @@
 
 #| Q: Is (or (null? l1 ) (atom? l2)) true or false where l1 is () and l2 is (d e f g) |#
 #| A: True, because (null? l1 ) is true where l1 is (). |#
-(or (null? '() ) (atom? '(d e f g))) ; ==> #t
+(check-true (or (null? '() ) (atom? '(d e f g))))
 
 #| Q: Is (or (null? l1) (null? l2)) true or false where l1 is (a b c) and l2 is () |#
 #| A: True, because (null? l2) is true where l2 is (). |#
-(or (null? '(a b c)) (null? '())) ; ==> #t
+(check-true (or (null? '(a b c)) (null? '())))
 
 #| Q: Is (or (null? l1) (null? l2)) true or false where l1 is (a b c) and l2 is (atom) |#
 #| A: False, because neither (null? l1 ) nor (null? l2) is true where l1 is (a b c) and 
       l2 is (atom). |#
-(null? '(a b c)) ; ==> #f
-(null? '(atom)) ; ==> #f
-(or (null? '(a b c)) (null? '(atom))) ; ==> #f
+(check-false (null? '(a b c)))
+(check-false (null? '(atom)))
+(check-false (or (null? '(a b c)) (null? '(atom))))
+
+
+;;;;;CONTINUE
 
 #| Q: What does (or ... ) do? |#
 #| A: (or ...) asks two questions, one at a time. If the first one is true it stops and answers true. 
