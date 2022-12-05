@@ -1,7 +1,7 @@
 #lang racket
 
 (require rackunit "Atom.scm")
-(provide (all-defined-out))
+(provide lat? member?)
 
 
 
@@ -23,12 +23,12 @@
 #| Q: True or false: (lat ? l) where l is () |#
 #| A: True, because it does not contain a list. |#
 
-      ;Note: It is not entirely obvious to me why an empty list is considered a list of atoms.
+;Note: It is not entirely obvious to me why an empty list is considered a list of atoms.
 
 #| Q: True or false: a lat is a list of atoms. |#
 #| A: True! Every lat is a list of atoms! |#
 
-      ;Note: An empty/null list is also a list of atoms,
+;Note: An empty/null list is also a list of atoms,
 
 #| Q: Write the function lat? using some, but not necessarily all, of the
      following functions: car cdr cons null? atom? and eq? |#
@@ -322,9 +322,6 @@
 (check-false (null? '(atom)))
 (check-false (or (null? '(a b c)) (null? '(atom))))
 
-
-;;;;;CONTINUE
-
 #| Q: What does (or ... ) do? |#
 #| A: (or ...) asks two questions, one at a time. If the first one is true it stops and answers true. 
       Otherwise it asks the second question and answers with whatever the second question answers. |#
@@ -335,10 +332,10 @@
 #| Q: Is (member? a lat) true or false where a is poached and lat is (fried eggs and scrambled eggs) |#
 #| A: False, since a is not one of the atoms of the lat. |#
 
-#| This is the function member |#
+#| This is the function member? |#
 
 ;; member? : Atom LAT -> Boolean
-;; Given atom and lat, produces true if atom is found in lat
+;; Produces true if atom is found in lat
 (define member? 
   (λ (a lat) 
     (cond 
@@ -348,7 +345,7 @@
 
 #| Q: What is the value of (member? a lat) where a is meat and lat is (mashed potatoes and meat gravy) |#
 #| A: #t, because the atom meat is one of the atoms of lat, (mashed potatoes and meat gravy). |#
-(member? 'meat '(mashed potatoes and meat gravy)) ; ==> #t
+(check-true (member? 'meat '(mashed potatoes and meat gravy)))
 
 #| Q: How do we determine the value #t for the above application? |#
 #| A: The value is determined by asking the questions about (member? a lat). 
@@ -356,7 +353,7 @@
       work on the next group of questions. |#
 
 #| Q: What is the first question asked by (member? a lat) |#
-#| A: (null? lat). This is also the first question asked by lat ?. |#
+#| A: (null? lat). This is also the first question asked by lat?. |#
 
 
 
@@ -372,7 +369,7 @@
 #| A: (null? lat) asks if lat is the null list. If it is, the value is #f, since the atom meat was
       not found in lat. If not, we ask the next question. In this case, it is not null, so we ask
       the next question. |#
-(null? '(mashed potatoes and meat gravy)) ; ==> #f
+(check-false (null? '(mashed potatoes and meat gravy)))
 
 #| Q: What is the next question? |#
 #| A: else. |#
@@ -396,14 +393,13 @@
       where a is meat and lat is (mashed potatoes and meat gravy) |#
 #| A: True, b/c meat is an expression in the list (mashed potatoes and meat gravy).
       We will find out by looking at each question in turn. |#
-(or (eq? (car '(mashed potatoes and meat gravy)) 'meat) 
-    (member? 'meat  (cdr '(mashed potatoes and meat gravy)))) ; ==> #t
+(check-true
+ (or (eq? (car '(mashed potatoes and meat gravy)) 'meat) 
+     (member? 'meat  (cdr '(mashed potatoes and meat gravy)))))
 
 #| Q: Is (eq? (car lat) a) true or false where a is meat and lat is (mashed potatoes and meat gravy) |#
 #| A: False, because meat is not eq? to mashed, the car of (mashed potatoes and meat gravy). |#
-(car '(mashed potatoes and meat gravy)) ; ==> 'mashed
-(eq? 'mashed 'meat) ; ==> #f
-(eq? (car '(mashed potatoes and meat gravy)) 'meat) ; ==> #f
+(check-false (eq? (car '(mashed potatoes and meat gravy)) 'meat))
 
 #| Q: What is the second question of (or ...) |#
 #| A: (member? a (cdr lat)). This refers to the function with the 
@@ -413,10 +409,11 @@
 #| A: a is meat and lat is now (cdr lat), specifically (potatoes and meat gravy). |#
 
 #| Q: What is the next question |#
-#| A: (null? lat). Rememeber the first commandment * |#
+#| A: (null? lat). Rememeber the first commandment |#
 
 #| Q: Is (null? lat) true or false where lat is (potatoes and meat gravy) |#
-#| A: #f-false. |#
+#| A: #f --false. |#
+(check-false (null? '(potatoes and meat gravy)))
 
 #| Q: What do we do now |#
 #| A: Ask the next question. |#
@@ -430,6 +427,7 @@
 
 #| Q: Is a eq? to the car of lat |#
 #| A: No, because a is meat and the car of lat is potatoes. |#
+(check-false (eq? 'meat '(potatoes and meat gravy)))
 
 #| Q: So what do we do next? |#
 #| A: We ask (member? a (cdr lat)). |#
@@ -451,10 +449,10 @@
 
 #| Q: Why? |#
 #| A: Because (eq? (car lat) a) is false. |#
-(eq? (car '(and meat gravy)) 'meat) ; ==> #f
+(check-false (eq? (car '(and meat gravy)) 'meat))
 
 #| Q: What do we do now? |#
-#| A: Recur - refer to the function with new arguments. |#
+#| A: Recur -- refer to the function with new arguments. |#
 
 #| Q: What are the new arguments? |#
 #| A: a is meat, and lat is (meat gravy). |#
@@ -471,23 +469,26 @@
 #| Q: What is the value of (or (eq? (car lat) a) (member? a (cdr lat))) |#
 #| A: #t, because (car lat), which is meat, and a, which is meat, are the same atom. 
       Therefore, (or ...) answers with #t. |#
-(car '(meat gravy)) ; ==> 'meat
-(eq? 'meat 'meat) ; ==> #t
+(check-true (eq? 'meat (car '(meat gravy))))
 
 #| Q: What is the value of the application (member? a lat) where a is meat and lat is (meat gravy) |#
 #| A: #t, because we have found that meat is a member of (meat gravy). |#
+(check-true (member? 'meat '(meat gravy)))
 
 #| Q: What is the value of the application (member? a lat) where a is meat and lat is (and meat gravy) |#
 #| A: #t, because meat is also a member of the lat (and meat gravy). |#
+(check-true (member? 'meat '(and meat gravy)))
 
 #| Q: What is the value of the application (member? a lat) where a is meat and
       lat is (potates and meat gravy) |#
 #| A: #t, because meat is also a member of the lat (potatoes and meat gravy). |#
+(check-true (member? 'meat '(potatoes and meat gravy)))
 
 #| Q: What is the value of the application (member? a lat) where a is meat and
       lat is (mashed potates and meat gravy) |#
 #| A: #t, because meat is also a member of the lat (mashed potatoes and meat gravy). 
       Of course, this is our original lat. |#
+(check-true (member? 'meat '(mashed potatoes and meat gravy)))
 
 #| Q: Just to make sure you have it right, let's quickly run through it again.
       What is the value of the application (member? a lat) where a is meat and
@@ -527,7 +528,6 @@
 
 #| Q: (eq? (car lat) a) |#
 #| A: Yes, the value is #t. |#
-(eq? (car '(meat gravy)) 'meat) ; ==> #t
 
 #| Q: (or (eq? (car lat) a) (member? a (cdr lat))) |#
 #| A: #t.|#
@@ -546,75 +546,78 @@
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is (bagels and lox) |#
 #| A: #f. |#
-(member? 'liver '(bagels and lox)) ; ==> #f
+(check-false (member? 'liver '(bagels and lox)))
 
 #| Q: Let's work out why it is #f. What's the first question member? asks? |#
 #| A: (null? lat). |#
 
 #| Q: (null? lat) |#
 #| A: No. Move to the next line. |#
-(null? '(bagels and lox)) ; ==> #f
+(check-false (null? '(bagels and lox)))
 
 #| Q: else |#
-#| A: Yes, but ( eq? ( car lat) a) is false. Recur with a and (cdr lat) where a is liver 
+#| A: Yes, but (eq? (car lat) a) is false. Recur with a and (cdr lat) where a is liver 
       and (cdr lat) is (and lox). |#
-(eq? (car '(bagels and lox)) 'liver) ; ==> #f
+(check-false (eq? (car '(bagels and lox)) 'liver))
 
 #| Q: (null? lat) |#
 #| A: (No. Move to the next line. |#
-(null? '(and lox))  ; ==> #f
+(check-false (null? '(and lox)))
 
 #| Q: else |#
 #| A: Yes, but (eq? (car lat) a) is false. Recur with a and (cdr lat) where a is liver 
       and (cdr lat) is (lox). |#
-(eq? (car '(and lox)) 'liver) ; ==> #f
+(check-false (eq? (car '(and lox)) 'liver))
 
 #| Q: (null? lat) |#
 #| A: No. Move to the next line. |#
-(null? '(lox)) ; ==> #f
+(check-false (null? '(lox)))
 
 #| Q: else |#
 #| A: Yes, but (eq? (car lat) a) is still false. Recur with a and (cdr lat) where a is liver 
       and (cdr lat) is (). |#
-(eq? (car '(lox)) 'liver) ; ==> #f
+(check-false (eq? (car '(lox)) 'liver))
 
 #| Q: (null? lat) |#
 #| A: Yes. |#
-(null? '()) ; ==> #t
+(check-true (null? '()))
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is () |#
 #| A: #f. |#
-(member? 'liver '()) ; ==> #f
+(check-false (member? 'liver '()))
 
 #| Q: What is the value of (or (eq? (car lat) a) (member? a (cdr lat))) 
       where a is liver and lat is (lox) |#
 #| A: #f. |#
-(or (eq? (car '(lox)) 'liver)
-    (member? 'liver (cdr '(lox)))) ; ==> #f
+(check-false
+ (or (eq? (car '(lox)) 'liver)
+     (member? 'liver (cdr '(lox)))))
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is (lox) |#
 #| A: #f. |#
-(member? 'liver '(lox)) ; ==> #f
+(check-false (member? 'liver '(lox)))
 
 #| Q: What is the value of (or (eq? (car lat) a)  (member? a (cdr lat)))
       where a is liver and lat is (and lox) |#
 #| A: #f. |#
-(or (eq? (car '(and lox)) 'liver)
-    (member? 'liver (cdr '(and lox)))) ; ==> #f
+(check-false
+ (or (eq? (car '(and lox)) 'liver)
+     (member? 'liver (cdr '(and lox)))))
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is (and lox) |#
 #| A: #f. |#
-(member? 'liver '(and lox)) ; ==> #f
+(check-false (member? 'liver '(and lox)))
 
 #| Q: What is the value of (or (eq? (car lat) a) (member? a (cdr lat)))
       where a is liver and lat is (bagels and lox) |#
 #| A: #f. |#
-(or (eq? (car '(bagels and lox)) 'liver)
-    (member? 'liver (cdr '(bagels and lox)))) ; ==> #f
+(check-false
+ (or (eq? (car '(bagels and lox)) 'liver)
+     (member? 'liver (cdr '(bagels and lox)))))
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is (bagels and lox) |#
 #| A: #f. |#
-(member? 'liver '(bagels and lox)) ; ==> #f
+(check-false (member? 'liver '(bagels and lox)))
 
 
 
