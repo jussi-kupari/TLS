@@ -1,9 +1,11 @@
 #lang racket
 
 (provide lat? member?)
-(require rackunit "Atom.scm")
 
+(require "Atom.scm")
 
+(module+ test
+  (require rackunit))
 
 
 
@@ -67,20 +69,21 @@
        (and (atom? (car l))
             (list-of-atoms3? (cdr l)))))))
 
-(check-true (list-of-atoms1? '(Jack Sprat could eat no chicken fat))) 
-(check-false (list-of-atoms1? '((Jack) Sprat could eat no chicken fat)))
-(check-false (list-of-atoms1? '(Jack (Sprat could) eat no chicken fat)))
-(check-true (list-of-atoms1? '()))
+(module+ test
+  (check-true (list-of-atoms1? '(Jack Sprat could eat no chicken fat))) 
+  (check-false (list-of-atoms1? '((Jack) Sprat could eat no chicken fat)))
+  (check-false (list-of-atoms1? '(Jack (Sprat could) eat no chicken fat)))
+  (check-true (list-of-atoms1? '()))
 
-(check-true (list-of-atoms2? '(Jack Sprat could eat no chicken fat))) 
-(check-false (list-of-atoms2? '((Jack) Sprat could eat no chicken fat)))
-(check-false (list-of-atoms2? '(Jack (Sprat could) eat no chicken fat)))
-(check-true (list-of-atoms2? '()))
+  (check-true (list-of-atoms2? '(Jack Sprat could eat no chicken fat))) 
+  (check-false (list-of-atoms2? '((Jack) Sprat could eat no chicken fat)))
+  (check-false (list-of-atoms2? '(Jack (Sprat could) eat no chicken fat)))
+  (check-true (list-of-atoms2? '()))
 
-(check-true (list-of-atoms3? '(Jack Sprat could eat no chicken fat))) 
-(check-false (list-of-atoms3? '((Jack) Sprat could eat no chicken fat)))
-(check-false (list-of-atoms3? '(Jack (Sprat could) eat no chicken fat)))
-(check-true (list-of-atoms3? '()))
+  (check-true (list-of-atoms3? '(Jack Sprat could eat no chicken fat))) 
+  (check-false (list-of-atoms3? '((Jack) Sprat could eat no chicken fat)))
+  (check-false (list-of-atoms3? '(Jack (Sprat could) eat no chicken fat)))
+  (check-true (list-of-atoms3? '())))
 
 
 
@@ -100,7 +103,8 @@
 #| Q: What is the value of (lat? l) where l is the argument (bacon and eggs) |#
 #| A: True. The application (lat? l) where l is (bacon and eggs) 
       has the value #t --true-- because l is a lat. |#
-(check-true (lat? '(bacon and eggs)))
+(module+ test
+  (check-true (lat? '(bacon and eggs))))
 
 #| Q: How do we determine the answer #t for the application (lat? l) |#
 #| A: From the book:
@@ -128,7 +132,8 @@
 #| A: (null? l) asks if the argument l is the null list. If it is, the value of the application is 
       true. If it is not, we ask the next question. In this case, l is not the null list,
       so we ask the next question. |#
-(check-false (null? '(bacon and egss)))
+(module+ test
+  (check-false (null? '(bacon and egss))))
 
 #| Q: What is the next question? |#
 #| A: (atom? (car l)). |#
@@ -145,7 +150,8 @@
 
 #| Q: Now what is the argument l for lat? |#
 #| A: Now the argument l is (cdr l), which is (and eggs). |#
-(check-equal? (cdr '(bacon and eggs)) '(and eggs))
+(module+ test
+  (check-equal? (cdr '(bacon and eggs)) '(and eggs)))
 
 #| Q: What is the next question? |#
 #| A: (null? l) |#
@@ -154,7 +160,8 @@
 #| A: (null? l) asks if the argument l is the null list. If it is, the value of
       the application is #t . If it is not, we ask the next question. In this case,
       l is not the null list, so we ask the next question. |#
-(check-false (null? '(and eggs)))
+(module+ test
+  (check-false (null? '(and eggs))))
 
 #| Q: What is the next question? |#
 #| A: (atom? (car l)) |#
@@ -163,7 +170,8 @@
 #| A: (atom? (car l)) asks if (car l) is an atom. If it is an atom, the value of the application
       is (lat? (cdr l)). If not, we ask the next question. In this case, (car l) is an atom, so 
       we want to find out if the rest of the list l is composed only of atoms. |#
-(check-true (atom? (car '(and eggs))))
+(module+ test
+  (check-true (atom? (car '(and eggs))))) 
 
 #| Q: What is the meaning of (lat? (cdr l)) |#
 #| A: (lat? (cdr l)) finds out if the rest of l is composed only of atoms, by referring again 
@@ -176,7 +184,8 @@
 #| A: (null? l) asks if the argument l is the null list. If it is, the value of the application
       is #t --true. If it is not, move to the next question. In this case, l is not null, so we
       ask the next question. |#
-(check-false (null? '(eggs)))
+(module+ test
+  (check-false (null? '(eggs))))
 
 #| Q: What is the next question? |#
 #| A: (atom? (car l)). |#
@@ -197,7 +206,8 @@
 #| A: (null? l) asks if the argument l is the null list. If it is, the value of the application
       is the value of #t . If not, we ask the next question. In this case, () is the null list.
       So, the value of the application (lat? l) where l is (bacon and eggs), is #t --true. |#
-(check-true (null? '()))
+(module+ test
+  (check-true (null? '())))
 
 #| Q: Do you remember the question about (lat? l) |#
 #| A: Probably not. The application (lat? l) has the value #t if the list l is a
@@ -232,7 +242,8 @@
       What is the value of (lat? l) where l is now (bacon (and eggs)) |#
 
 #| A: #f, since the list l contains an S-expression that is a list. |#
-(check-false (lat? '(bacon (and eggs))))
+(module+ test
+  (check-false (lat? '(bacon (and eggs)))))
 
 #| Q: What is the first question? |#
 #| A: (null? l). |#
@@ -240,7 +251,8 @@
 #| Q: What is the meaning of the line ((null? l) #t) where l is (bacon (and eggs)) |#
 #| A: (null? l) asks if l is the null list. If it is, the value is #t . If l is not null,
        move to the next question. In this case, it is not null, so we ask the next question. |#
-(check-false (null? '(bacon (and eggs))))
+(module+ test
+  (check-false (null? '(bacon (and eggs)))))  
 
 #| Q: What is the next question? |#
 #| A: (atom? (car l)). |#
@@ -249,7 +261,8 @@
 #| A: (atom? (car l)) asks if (car l) is an atom. If it is, the value is (lat? (cdr l)).
       If it is not, we ask the next question. In this case, (car l) is an atom, so we want to
       check if the rest of the list l is composed only of atoms. |#
-(check-true (atom? (car '(bacon (and eggs)))))
+(module+ test
+  (check-true (atom? (car '(bacon (and eggs))))))
 
 #| Q: What is the meaning of (lat? (cdr l)) |#
 #| A: (lat? (cdr l)) checks to see if the rest of the list l is composed only of atoms,
@@ -258,7 +271,8 @@
 #| Q: What is the meaning of the line ((null? l) #t) where l is now ((and eggs)) |#
 #| A: (null? l) asks if l is the null list. If it is null, the value is #t. If it is
       not null, we ask the next question. In this case, l is not null, so move to the next question. |#
-(check-false (null? '((and eggs))))
+(module+ test
+  (check-false (null? '((and eggs)))))
 
 #| Q: What is the next question? |#
 #| A: (atom? (car l)). |#
@@ -267,7 +281,8 @@
 #| A: (atom? (car l)) asks if (car l) is an atom. If it is, the value is (lat ? (cdr l)).
       If it is not, we move to the next question. In this case, (car l) is not an atom,
       so we ask the next question. |#
-(check-false (atom? '((and eggs))))
+(module+ test
+  (check-false (atom? '((and eggs)))))
 
 #| Q: What is the next question? |#
 #| A: else. |#
@@ -310,18 +325,21 @@
 
 #| Q: Is (or (null? l1 ) (atom? l2)) true or false where l1 is () and l2 is (d e f g) |#
 #| A: True, because (null? l1 ) is true where l1 is (). |#
-(check-true (or (null? '() ) (atom? '(d e f g))))
+(module+ test
+  (check-true (or (null? '() ) (atom? '(d e f g)))))
 
 #| Q: Is (or (null? l1) (null? l2)) true or false where l1 is (a b c) and l2 is () |#
 #| A: True, because (null? l2) is true where l2 is (). |#
-(check-true (or (null? '(a b c)) (null? '())))
+(module+ test
+  (check-true (or (null? '(a b c)) (null? '()))))
 
 #| Q: Is (or (null? l1) (null? l2)) true or false where l1 is (a b c) and l2 is (atom) |#
 #| A: False, because neither (null? l1 ) nor (null? l2) is true where l1 is (a b c) and 
       l2 is (atom). |#
-(check-false (null? '(a b c)))
-(check-false (null? '(atom)))
-(check-false (or (null? '(a b c)) (null? '(atom))))
+(module+ test
+  (check-false (null? '(a b c)))
+  (check-false (null? '(atom)))
+  (check-false (or (null? '(a b c)) (null? '(atom)))))
 
 #| Q: What does (or ... ) do? |#
 #| A: (or ...) asks two questions, one at a time. If the first one is true it stops and answers true. 
@@ -346,7 +364,8 @@
 
 #| Q: What is the value of (member? a lat) where a is meat and lat is (mashed potatoes and meat gravy) |#
 #| A: #t, because the atom meat is one of the atoms of lat, (mashed potatoes and meat gravy). |#
-(check-true (member? 'meat '(mashed potatoes and meat gravy)))
+(module+ test
+  (check-true (member? 'meat '(mashed potatoes and meat gravy))))
 
 #| Q: How do we determine the value #t for the above application? |#
 #| A: The value is determined by asking the questions about (member? a lat). 
@@ -370,7 +389,8 @@
 #| A: (null? lat) asks if lat is the null list. If it is, the value is #f, since the atom meat was
       not found in lat. If not, we ask the next question. In this case, it is not null, so we ask
       the next question. |#
-(check-false (null? '(mashed potatoes and meat gravy)))
+(module+ test
+  (check-false (null? '(mashed potatoes and meat gravy))))
 
 #| Q: What is the next question? |#
 #| A: else. |#
@@ -394,13 +414,15 @@
       where a is meat and lat is (mashed potatoes and meat gravy) |#
 #| A: True, b/c meat is an expression in the list (mashed potatoes and meat gravy).
       We will find out by looking at each question in turn. |#
-(check-true
- (or (eq? (car '(mashed potatoes and meat gravy)) 'meat) 
-     (member? 'meat  (cdr '(mashed potatoes and meat gravy)))))
+(module+ test
+  (check-true
+   (or (eq? (car '(mashed potatoes and meat gravy)) 'meat) 
+       (member? 'meat  (cdr '(mashed potatoes and meat gravy))))))
 
 #| Q: Is (eq? (car lat) a) true or false where a is meat and lat is (mashed potatoes and meat gravy) |#
 #| A: False, because meat is not eq? to mashed, the car of (mashed potatoes and meat gravy). |#
-(check-false (eq? (car '(mashed potatoes and meat gravy)) 'meat))
+(module+ test
+  (check-false (eq? (car '(mashed potatoes and meat gravy)) 'meat)))
 
 #| Q: What is the second question of (or ...) |#
 #| A: (member? a (cdr lat)). This refers to the function with the 
@@ -414,7 +436,8 @@
 
 #| Q: Is (null? lat) true or false where lat is (potatoes and meat gravy) |#
 #| A: #f --false. |#
-(check-false (null? '(potatoes and meat gravy)))
+(module+ test
+  (check-false (null? '(potatoes and meat gravy))))
 
 #| Q: What do we do now |#
 #| A: Ask the next question. |#
@@ -428,7 +451,8 @@
 
 #| Q: Is a eq? to the car of lat |#
 #| A: No, because a is meat and the car of lat is potatoes. |#
-(check-false (eq? 'meat '(potatoes and meat gravy)))
+(module+ test
+  (check-false (eq? 'meat '(potatoes and meat gravy))))
 
 #| Q: So what do we do next? |#
 #| A: We ask (member? a (cdr lat)). |#
@@ -450,7 +474,8 @@
 
 #| Q: Why? |#
 #| A: Because (eq? (car lat) a) is false. |#
-(check-false (eq? (car '(and meat gravy)) 'meat))
+(module+ test
+  (check-false (eq? (car '(and meat gravy)) 'meat)))
 
 #| Q: What do we do now? |#
 #| A: Recur -- refer to the function with new arguments. |#
@@ -470,26 +495,31 @@
 #| Q: What is the value of (or (eq? (car lat) a) (member? a (cdr lat))) |#
 #| A: #t, because (car lat), which is meat, and a, which is meat, are the same atom. 
       Therefore, (or ...) answers with #t. |#
-(check-true (eq? 'meat (car '(meat gravy))))
+(module+ test
+  (check-true (eq? 'meat (car '(meat gravy)))))
 
 #| Q: What is the value of the application (member? a lat) where a is meat and lat is (meat gravy) |#
 #| A: #t, because we have found that meat is a member of (meat gravy). |#
-(check-true (member? 'meat '(meat gravy)))
+(module+ test
+  (check-true (member? 'meat '(meat gravy))))
 
 #| Q: What is the value of the application (member? a lat) where a is meat and lat is (and meat gravy) |#
 #| A: #t, because meat is also a member of the lat (and meat gravy). |#
-(check-true (member? 'meat '(and meat gravy)))
+(module+ test
+  (check-true (member? 'meat '(and meat gravy))))
 
 #| Q: What is the value of the application (member? a lat) where a is meat and
       lat is (potates and meat gravy) |#
 #| A: #t, because meat is also a member of the lat (potatoes and meat gravy). |#
-(check-true (member? 'meat '(potatoes and meat gravy)))
+(module+ test
+  (check-true (member? 'meat '(potatoes and meat gravy))))
 
 #| Q: What is the value of the application (member? a lat) where a is meat and
       lat is (mashed potates and meat gravy) |#
 #| A: #t, because meat is also a member of the lat (mashed potatoes and meat gravy). 
       Of course, this is our original lat. |#
-(check-true (member? 'meat '(mashed potatoes and meat gravy)))
+(module+ test
+  (check-true (member? 'meat '(mashed potatoes and meat gravy))))
 
 #| Q: Just to make sure you have it right, let's quickly run through it again.
       What is the value of the application (member? a lat) where a is meat and
@@ -547,78 +577,93 @@
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is (bagels and lox) |#
 #| A: #f. |#
-(check-false (member? 'liver '(bagels and lox)))
+(module+ test
+  (check-false (member? 'liver '(bagels and lox))))
 
 #| Q: Let's work out why it is #f. What's the first question member? asks? |#
 #| A: (null? lat). |#
 
 #| Q: (null? lat) |#
 #| A: No. Move to the next line. |#
-(check-false (null? '(bagels and lox)))
+(module+ test
+  (check-false (null? '(bagels and lox))))
 
 #| Q: else |#
 #| A: Yes, but (eq? (car lat) a) is false. Recur with a and (cdr lat) where a is liver 
       and (cdr lat) is (and lox). |#
-(check-false (eq? (car '(bagels and lox)) 'liver))
+(module+ test
+  (check-false (eq? (car '(bagels and lox)) 'liver)))
 
 #| Q: (null? lat) |#
 #| A: (No. Move to the next line. |#
-(check-false (null? '(and lox)))
+(module+ test
+  (check-false (null? '(and lox))))
 
 #| Q: else |#
 #| A: Yes, but (eq? (car lat) a) is false. Recur with a and (cdr lat) where a is liver 
       and (cdr lat) is (lox). |#
-(check-false (eq? (car '(and lox)) 'liver))
+(module+ test
+  (check-false (eq? (car '(and lox)) 'liver)))
 
 #| Q: (null? lat) |#
 #| A: No. Move to the next line. |#
-(check-false (null? '(lox)))
+(module+ test
+  (check-false (null? '(lox))))
 
 #| Q: else |#
 #| A: Yes, but (eq? (car lat) a) is still false. Recur with a and (cdr lat) where a is liver 
       and (cdr lat) is (). |#
-(check-false (eq? (car '(lox)) 'liver))
+(module+ test
+  (check-false (eq? (car '(lox)) 'liver)))
 
 #| Q: (null? lat) |#
 #| A: Yes. |#
-(check-true (null? '()))
+(module+ test
+  (check-true (null? '())))
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is () |#
 #| A: #f. |#
-(check-false (member? 'liver '()))
+(module+ test
+  (check-false (member? 'liver '())))
 
 #| Q: What is the value of (or (eq? (car lat) a) (member? a (cdr lat))) 
       where a is liver and lat is (lox) |#
 #| A: #f. |#
-(check-false
- (or (eq? (car '(lox)) 'liver)
-     (member? 'liver (cdr '(lox)))))
+(module+ test
+  (check-false
+   (or (eq? (car '(lox)) 'liver)
+       (member? 'liver (cdr '(lox))))))
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is (lox) |#
 #| A: #f. |#
-(check-false (member? 'liver '(lox)))
+(module+ test
+  (check-false (member? 'liver '(lox))))
 
 #| Q: What is the value of (or (eq? (car lat) a)  (member? a (cdr lat)))
       where a is liver and lat is (and lox) |#
 #| A: #f. |#
-(check-false
- (or (eq? (car '(and lox)) 'liver)
-     (member? 'liver (cdr '(and lox)))))
+(module+ test
+  (check-false
+   (or (eq? (car '(and lox)) 'liver)
+       (member? 'liver (cdr '(and lox))))))
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is (and lox) |#
 #| A: #f. |#
-(check-false (member? 'liver '(and lox)))
+(module+ test
+  (check-false (member? 'liver '(and lox))))
 
 #| Q: What is the value of (or (eq? (car lat) a) (member? a (cdr lat)))
       where a is liver and lat is (bagels and lox) |#
 #| A: #f. |#
-(check-false
- (or (eq? (car '(bagels and lox)) 'liver)
-     (member? 'liver (cdr '(bagels and lox)))))
+(module+ test
+  (check-false
+   (or (eq? (car '(bagels and lox)) 'liver)
+       (member? 'liver (cdr '(bagels and lox))))))
 
 #| Q: What is the value of (member? a lat) where a is liver and lat is (bagels and lox) |#
 #| A: #f. |#
-(check-false (member? 'liver '(bagels and lox)))
+(module+ test
+  (check-false (member? 'liver '(bagels and lox))))
 
 
 
