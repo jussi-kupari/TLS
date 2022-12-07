@@ -1,9 +1,8 @@
 #lang racket
 
-(provide (all-defined-out))
-
-(require "Atom.scm"
-         "1_Toys.scm"
+;(provide (all-defined-out))
+(require rackunit
+         "Atom.scm"
          "2_Doitdoitagainandagainandagain.scm")
 
 
@@ -29,7 +28,7 @@
       occurrence of the atom in the old lat removed. |#
 
 #| Q: What steps should we use to do this? |#
-#| A: First we will test (null? lat) - The First Commandment. |#
+#| A: First we will test (null? lat) -- The First Commandment. |#
 
 #| Q: And if (null? lat) is true? |#
 #| A: Return (). |#
@@ -65,23 +64,29 @@
 #| A: No. |#
 
 ; Now, let's write down what we have so far:
-(define rember-proto ;This is rember-proto because the final version will be rember
+; This is rember.v1 because the final version will be rember
+
+;; rember.v1 : Atom LAT -> LAT
+;; Removes the first occurrence of the atom from the list
+(define rember.v1 
   (λ (a lat)
     (cond
       ((null? lat) '())
       (else
        (cond
          ((eq? (car lat) a) (cdr lat))
-         (else (rember-proto a (cdr lat))))))))
+         (else (rember.v1 a (cdr lat))))))))
 
-#| Q: What is the value of (rember a lat) where a is bacon and lat is (bacon lettuce and tomato) |#
+#| Q: What is the value of (rember.v1 a lat) where a is bacon and lat is (bacon lettuce and tomato) |#
 #| A: (lettuce and tomato)
 
-      Hint: Write down the function rember and 
+      Hint: Write down the function rember.v1 and 
       its arguments, and refer to them as you go 
       through the next sequence of questions. |#
 
-(rember-proto 'bacon '(bacon lettuce and tomato)) ; ==> '(lettuce and tomato)
+(check-equal?
+ (rember.v1 'bacon '(bacon lettuce and tomato))
+ '(lettuce and tomato))
 
 #| Q: Now, let's see if this function works. What is the first question? |#
 #| A: (null? lat). |#
@@ -96,7 +101,7 @@
 #| A: Ask the next question. |#
 
 #| Q: (eq? (car lat) a) |#
-#| A: Yes, so the value is ( cdr lat). In this case, it is the list 
+#| A: Yes, so the value is (cdr lat). In this case, it is the list 
       (lettuce and tomato). |#
 
 #| Q: Is this the correct value? |#
@@ -113,15 +118,15 @@
 #| A: We compare each atom of the lat with the atom a, and if the comparison fails we build 
       a list that begins with the atom we just compared. |#
 
-#| Q: What is the value of (rember a lat) where a is 'and and lat is (bacon lettuce and tomato) |#
+#| Q: What is the value of (rember.v1 a lat) where a is 'and and lat is (bacon lettuce and tomato) |#
 #| A: (bacon lettuce tomato) |#
 
-;Note
-(rember-proto 'and '(bacon lettuce tomato)) ; ==> '()
+;Spoiler: the function does not work
+(check-equal? (rember.v1 'and '(bacon lettuce and tomato)) '(tomato))
 
 #| Q: Let us see if our function rember works. What is the first question asked by rember |#
 #| A: (null? lat). |#
-(null? '(bacon lettuce and tomato)) ; ==> #f
+(check-false (null? '(bacon lettuce and tomato)))
 
 #| Q: What do we do now? |#
 #| A:Move to the next line, and ask the next question. |#
@@ -131,47 +136,51 @@
 
 #| Q: (eq? (car lat) a) |#
 #| A: No, so move to the next line. |#
+(check-false (eq? 'and (car '(bacon lettuce and tomato))))
 
 #| Q: What is the meaning of (else (rember a (cdr lat))) |#
-#| A: else asks if else is true - as it always is - and the rest of the line
-     says to recur with a and (cdr lat), where a is and and (cdr lat) is (lettuce and tomato). |#
+#| A: else asks if else is true -- as it always is -- and the rest of the line
+     says to recur with a and (cdr lat), where a is 'and and (cdr lat) is (lettuce and tomato). |#
 
 #| Q: (null? lat) |#
 #| A: No, so move to the next line. |#
+(check-false (null? '(lettuce and tomato)))
 
 #| Q: else |#
 #| A: Sure. |#
 
 #| Q: (eq? (car lat) a) |#
 #| A: No, so move to the next line. |#
+(check-false (eq? 'and (car '(lettuce and tomato))))
 
 #| Q: What is the meaning of (rember a (cdr lat)) |#
 #| A: Recur where a is and and (cdr lat) is (and tomato). |#
 
 #| Q: (null? lat) |#
 #| A: No, so move to the next line, and ask the next question. |#
+(check-false (null? '(and tomato)))
 
 #| Q: else |#
 #| A: Of course. |#
 
 #| Q: (eq? (car lat) a) |#
 #| A: Yes. |#
-(car '(and tomato))  ; ==> 'and
-(eq? 'and 'and) ; ==> #t
+(check-true (eq? 'and (car '(and tomato))))
 
 #| Q: So what is the result? |#
-#| A: ( cdr l at) - (tomato). |#
+#| A: (cdr lat) -- (tomato). |#
+(check-equal? (cdr '(and tomato)) '(tomato))
 
 #| Q: Is this correct? |#
 #| A: No, since (tomato) is not the list (bacon lettuce and tomato) with just a-and-removed. |#
 
 #| Q: What did we do wrong? |#
-#| A: We dropped and , but we also lost all the atoms preceding and. |#
+#| A: We dropped and, but we also lost all the atoms preceding and. |#
 
 #| Q: How can we keep from losing the atoms bacon and lettuce |#
 #| A: We use Cons the Magnificent. Remember cons, from chapter 1? |#
 
-
+;;;;;; CONTINUE
 
 #|          *** The Second Commandment ***
                 Use cons to build lists.              |#
@@ -180,9 +189,9 @@
 
 ; Let's see what happens when we use cons
 
-;; rember.v1 : Atom LAT -> LAT
+;; rember.v2 : Atom LAT -> LAT
 ;; Given atom and lat, removes the first occurrence of atom or if it is not found returns lat
-(define rember.v1
+(define rember.v2
   (λ (a lat)
     (cond
       ((null? lat) '())
@@ -190,7 +199,7 @@
        (cond
          ((eq? (car lat) a) (cdr lat))
          (else
-          (cons (car lat) (rember.v1 a (cdr lat)))))))))
+          (cons (car lat) (rember.v2 a (cdr lat)))))))))
 
 #| Q: What is the value of (rember a lat) where a is 'and and lat is (bacon lettuce and tomato) |#
 #| A: (bacon lettuce tomato)

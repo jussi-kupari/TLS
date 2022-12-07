@@ -1,7 +1,8 @@
 #lang racket
 
-(require rackunit "Atom.scm")
 (provide lat? member?)
+(require rackunit "Atom.scm")
+
 
 
 
