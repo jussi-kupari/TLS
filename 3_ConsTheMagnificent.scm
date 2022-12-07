@@ -1,10 +1,13 @@
 #lang racket
 
 ;(provide (all-defined-out))
-(require rackunit
-         "Atom.scm"
-         "2_Doitdoitagainandagainandagain.scm")
 
+(require
+  (only-in "Atom.scm" atom?)
+  (only-in "2_Doitdoitagainandagainandagain.scm" lat? member?))
+
+(module+ test
+  (require rackunit))
 
 
 #|               Cons the Magnificent               |#
@@ -84,9 +87,10 @@
       its arguments, and refer to them as you go 
       through the next sequence of questions. |#
 
-(check-equal?
- (rember.v1 'bacon '(bacon lettuce and tomato))
- '(lettuce and tomato))
+(module+ test
+  (check-equal?
+   (rember.v1 'bacon '(bacon lettuce and tomato))
+   '(lettuce and tomato)))
 
 #| Q: Now, let's see if this function works. What is the first question? |#
 #| A: (null? lat). |#
@@ -122,11 +126,13 @@
 #| A: (bacon lettuce tomato) |#
 
 ;Spoiler: the function does not work
-(check-equal? (rember.v1 'and '(bacon lettuce and tomato)) '(tomato))
+(module+ test
+  (check-equal? (rember.v1 'and '(bacon lettuce and tomato)) '(tomato)))
 
 #| Q: Let us see if our function rember works. What is the first question asked by rember |#
 #| A: (null? lat). |#
-(check-false (null? '(bacon lettuce and tomato)))
+(module+ test
+  (check-false (null? '(bacon lettuce and tomato))))
 
 #| Q: What do we do now? |#
 #| A:Move to the next line, and ask the next question. |#
@@ -136,7 +142,8 @@
 
 #| Q: (eq? (car lat) a) |#
 #| A: No, so move to the next line. |#
-(check-false (eq? 'and (car '(bacon lettuce and tomato))))
+(module+ test
+  (check-false (eq? 'and (car '(bacon lettuce and tomato)))))
 
 #| Q: What is the meaning of (else (rember a (cdr lat))) |#
 #| A: else asks if else is true -- as it always is -- and the rest of the line
@@ -144,32 +151,37 @@
 
 #| Q: (null? lat) |#
 #| A: No, so move to the next line. |#
-(check-false (null? '(lettuce and tomato)))
+(module+ test
+  (check-false (null? '(lettuce and tomato))))
 
 #| Q: else |#
 #| A: Sure. |#
 
 #| Q: (eq? (car lat) a) |#
 #| A: No, so move to the next line. |#
-(check-false (eq? 'and (car '(lettuce and tomato))))
+(module+ test
+  (check-false (eq? 'and (car '(lettuce and tomato)))))
 
 #| Q: What is the meaning of (rember a (cdr lat)) |#
 #| A: Recur where a is and and (cdr lat) is (and tomato). |#
 
 #| Q: (null? lat) |#
 #| A: No, so move to the next line, and ask the next question. |#
-(check-false (null? '(and tomato)))
+(module+ test
+  (check-false (null? '(and tomato))))
 
 #| Q: else |#
 #| A: Of course. |#
 
 #| Q: (eq? (car lat) a) |#
 #| A: Yes. |#
-(check-true (eq? 'and (car '(and tomato))))
+(module+ test
+  (check-true (eq? 'and (car '(and tomato)))))
 
 #| Q: So what is the result? |#
 #| A: (cdr lat) -- (tomato). |#
-(check-equal? (cdr '(and tomato)) '(tomato))
+(module+ test
+  (check-equal? (cdr '(and tomato)) '(tomato)))
 
 #| Q: Is this correct? |#
 #| A: No, since (tomato) is not the list (bacon lettuce and tomato) with just a-and-removed. |#

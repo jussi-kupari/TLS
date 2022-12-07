@@ -2,7 +2,7 @@
 
 (provide lat? member?)
 
-(require "Atom.scm")
+(require (only-in "Atom.scm" atom?))
 
 (module+ test
   (require rackunit))
