@@ -1,6 +1,6 @@
 #lang racket
 
-;(provide (all-defined-out))
+(provide rember firsts insertR insertL)
 
 (require
   (only-in "Atom.scm" atom?)
@@ -67,7 +67,7 @@
 #| A: No. |#
 
 ; Now, let's write down what we have so far:
-; This is rember.v1 because the final version will be rember
+; Note: This is rember.v1 because the final version will be rember
 
 ;; rember.v1 : Atom LAT -> LAT
 ;; Removes the first occurrence of the atom from the list
@@ -192,7 +192,7 @@
 #| Q: How can we keep from losing the atoms bacon and lettuce |#
 #| A: We use Cons the Magnificent. Remember cons, from chapter 1? |#
 
-;;;;;; CONTINUE
+
 
 #|          *** The Second Commandment ***
                 Use cons to build lists.              |#
@@ -202,7 +202,7 @@
 ; Let's see what happens when we use cons
 
 ;; rember.v2 : Atom LAT -> LAT
-;; Given atom and lat, removes the first occurrence of atom or if it is not found returns lat
+;; Removes the first occurrence of the atom from the list
 (define rember.v2
   (λ (a lat)
     (cond
@@ -213,17 +213,20 @@
          (else
           (cons (car lat) (rember.v2 a (cdr lat)))))))))
 
-#| Q: What is the value of (rember a lat) where a is 'and and lat is (bacon lettuce and tomato) |#
+#| Q: What is the value of (rember.v2 a lat) where a is 'and and lat is (bacon lettuce and tomato) |#
 #| A: (bacon lettuce tomato)
       Hint: Make a copy of this function with 
       cons and the arguments a and lat so you 
       can refer to it for the following questions. |#
 
-(rember.v1 'and '(bacon lettuce and tomato)) ; ==> '(bacon lettuce tomato)
+(module+ test
+  (check-equal? (rember.v2 'and '(bacon lettuce and tomato))
+                '(bacon lettuce tomato)))
 
 #| Q: What is the first question? |#
 #| A: (null? lat). |#
-(null? '(bacon lettuce and tomato)) ; ==> #f
+(module+ test
+  (check-false (null? '(bacon lettuce and tomato))))
 
 #| Q: What do we do now? |#
 #| A: Ask the next question. |#
@@ -233,120 +236,133 @@
 
 #| Q: (eq? (car lat) a) |#
 #| A: No, so move to the next line. |#
+(module+ test
+  (check-false (eq? (car '(bacon lettuce and tomato)) 'and)))
 
-#| Q: What is the meaning of (cons (car lat) (rember a (cdr lat)))
+#| Q: What is the meaning of (cons (car lat) (rember.v2 a (cdr lat)))
       where a is 'and and lat is (bacon lettuce and tomato) |#
-#| A: It says to cons the car of lat -bacon- onto the value of (rember a (cdr lat)). 
-      But since we don't know the value of (rember a (cdr lat)) yet, we must find it 
+#| A: It says to cons the car of lat --bacon-- onto the value of (rember.v2 a (cdr lat)). 
+      But since we don't know the value of (rember.v2 a (cdr lat)) yet, we must find it 
       before we can cons (car lat) onto it. |#
 
-#| Q: What is the meaning of (rember a (cdr lat)) |#
-#| A: This refers to the function with lat replaced by (cdr lat)-(lettuce and tomato). |#
+#| Q: What is the meaning of (rember.v2 a (cdr lat)) |#
+#| A: This refers to the function with lat replaced by (cdr lat) -- (lettuce and tomato). |#
 
 #| Q: (null? lat) |#
 #| A: No, so move to the next line. |#
-(null? '(lettuce and tomato)) ; ==> #f
+(module+ test
+  (check-false (null? '(lettuce and tomato))))
 
 #| Q: else |#
 #| A: Yes, ask the next question. |#
 
 #| Q: (eq? (car lat) a) |#
 #| A: No, so move to the next line. |#
-(eq? (car '(lettuce and tomato)) 'and) ; ==> #f
+(module+ test
+  (check-false (eq? (car '(lettuce and tomato)) 'and)))
 
-#| Q: What is the meaning of (cons (car lat) (rember a (cdr lat))) |#
-#| A: It says to cons the car of lat -lettuce- onto the value of (rember a (cdr lat)). 
-      But since we don't know the value of (rember a (cdr lat)) yet, we must find it 
+#| Q: What is the meaning of (cons (car lat) (rember.v2 a (cdr lat))) |#
+#| A: It says to cons the car of lat --lettuce-- onto the value of (rember.v2 a (cdr lat)). 
+      But since we don't know the value of (rember.v2 a (cdr lat)) yet, we must find it 
       before we can cons (car lat) onto it. |#
 
-#| Q: What is the meaning of (rember a (cdr lat)) |#
+#| Q: What is the meaning of (rember.v2 a (cdr lat)) |#
 #| A: This refers to the function with lat replaced by (cdr lat), that is, (and tomato). |#
 
 #| Q: (null? lat) |#
 #| A: No, so ask the next question. |#
-(null? '(and tomato)) ; ==> #f
+(module+ test
+  (check-false (null? '(and tomato))))
 
 #| Q: else |#
 #| A: Still. |#
 
 #| Q: (eq? (car lat) a) |#
 #| A: Yes. |#
-(eq? (car '(and tomato)) 'and) ; ==> #t
+(module+ test
+  (check-true (eq? (car '(and tomato)) 'and)))
 
 #| Q: What is the value of the line ((eq? (car lat) a) (cdr lat))|#
-#| A: (cdr lat) - (tomato). |#
-(cdr '(and tomato)) ; ==> '(tomato)
+#| A: (cdr lat) -- (tomato). |#
+(module+ test
+  (check-equal? (cdr '(and tomato)) '(tomato)))
 
 #| Q: Are we finished? |#
 #| A: From the book:
-      Certainly not! We know what (rember a lat) is when lat is (and tomato), but we don't yet 
+      Certainly not! We know what (rember.v2 a lat) is when lat is (and tomato), but we don't yet 
       know what it is when lat is (lettuce and tomato) or (bacon lettuce and tomato). |#
 
-#| Q: We now have a value for (rember a (cdr lat)) where a is and and (cdr lat) is (and tomato) 
+#| Q: We now have a value for (rember.v2 a (cdr lat)) where a is 'and and (cdr lat) is (and tomato) 
       This value is (tomato) What next? |#
 
-#| A: Recall that we wanted to cons lettuce onto the value of (rember a (cdr lat)) 
+#| A: Recall that we wanted to cons lettuce onto the value of (rember.v2 a (cdr lat)) 
       where a was 'and and (cdr lat) was (and tomato). Now that we have this value,
       which is (tomato), we can cons lettuce onto it. |#
 
 #| Q: What is the result when we cons lettuce onto (tomato) |#
 #| A: (lettuce tomato). |#
+(module+ test
+  (check-equal? (cons 'lettuce '(and tomato)) '(lettuce and tomato)))
 
 #| Q: What does (lettuce tomato) represent |#
-#| A: It represents the value of (cons (car lat) (rember a (cdr lat))),
-      when lat is (lettuce and tomato) and (rember a (cdr lat)) is (tomato). |#
+#| A: It represents the value of (cons (car lat) (rember.v2 a (cdr lat))),
+      when lat is (lettuce and tomato) and (rember.v2 a (cdr lat)) is (tomato). |#
 
 #| Q: Are we finished yet? |#
-#| A: Not quite. So far we know what (rember a lat) is when lat is (lettuce and tomato), 
+#| A: Not quite. So far we know what (rember.v2 a lat) is when lat is (lettuce and tomato), 
       but we don't yet know what it is when lat is (bacon lettuce and tomato). |#
 
-#| Q: We now have a value for (rember a (cdr lat)) where a is 'and and 
+#| Q: We now have a value for (rember.v2 a (cdr lat)) where a is 'and and 
      (cdr lat) is (lettuce and tomato). This value is (lettuce tomato)
      This is not the final value, so what must we do again? |#
 
-#| A: Recall that, at one time, we wanted to cons bacon onto the value of (rember a (cdr lat)), 
+#| A: Recall that, at one time, we wanted to cons bacon onto the value of (rember.v2 a (cdr lat)), 
       where a was 'and and (cdr lat) was (lettuce and tomato). Now that we have this value, which is 
       (lettuce tomato), we can cons bacon onto it. |#
 
 #| Q: What is the result when we cons bacon onto (lettuce tomato) |#
 #| A: (bacon lettuce tomato). |#
+(module+ test
+  (check-equal? (cons 'bacon '(lettuce tomato)) '(bacon lettuce tomato)))
 
 #| Q: What does (bacon lettuce tomato) represent? |#
-#| A: I represent the value of (cons (car lat) (rember a (cdr lat))),
-      lat is (bacon lettuce and tomato), (car lat) is bacon and
-      (rember a (cdr lat)) is (lettuce tomato) |#
+#| A: I represent the value of (cons (car lat) (rember.v2 a (cdr lat))),
+      when
+       lat is (bacon lettuce and tomato), (car lat) is bacon
+      and
+      (rember.v2 a (cdr lat)) is (lettuce tomato) |#
 
 #| Q: Are we finished yet? |#
 #| A: Yes. |#
 
 #| Q: Can you put in your own words how we determined the final value (bacon lettuce tomato) |#
-#| A: Rember checks each atom of a list against a given atom-of-interest one at a time. If the
+#| A: Rember.v2 checks each atom of a list against the given atom one at a time. If the
       list is null, it returns an empty list. If the list is not empty, it checks if the first atom
       is the same. If it is, it returns the list without the atom. If the atoms are not the same, it
-      saves the first atom on the list to be consed with the result of running rember with the
-      atom-of-interest and the rest of the list. Each round when the atoms are not the same it saves
-      the first atom to be consed to the result of running with the remaining list. When it reaches
-      the end - finds the atom or the end of the list - it conses the saved atoms to the
+      saves the first atom on the list to be consed with the result of running rember.v2 with the
+      given atom and the rest of the list. Each round when the atoms are not the same it saves
+      the first atom to be consed to the result of running rember.v2with the remaining list. When it reaches
+      the end --finds the atom or the end of the list-- it conses the saved atoms to the
       result.
 
       from the book:
-      "The function rember checked each atom of the lat, one at a time, to see if it was the 
-       same as the atom and. If the car was not the same as the atom, we saved it to be 
-       consed to the final value later. When rember found the atom and, it dropped it, 
+      "The function rember.v2 checked each atom of the lat, one at a time, to see if it was the 
+       same as the atom 'and. If the car was not the same as the atom, we saved it to be 
+       consed to the final value later. When rember.v2 found the atom 'and, it dropped it, 
        and consed the previous atoms back onto the rest of the lat."|#
 
 #| Q: Can you rewrite rember so that it reflects the above description? |#
 #| A: Yes, we can simplify it. |#
 
-;; Rember : Atom LAT -> LAT
-;; Given atom and lat, removes the first occurrence of the atom, if it finds it in the lat.
-(define Rember
+;; rember : Atom LAT -> LAT
+;; Removes the first occurrence of the atom from the list
+(define rember
   (λ (a lat)
     (cond
       ((null? lat) '())
       ((eq? (car lat) a) (cdr lat))
       (else
-       (cons (car lat) (Rember a (cdr lat)))))))
+       (cons (car lat) (rember a (cdr lat)))))))
 
 #| Q: Do you think this is simpler? |#
 #| A: Functions like rember can always be simplified in this manner. |#
@@ -360,32 +376,37 @@
       Hint: Write down the function rember and 
       its arguments and refer to them as you go 
       through the next sequence of questions. |#
-(Rember 'and '(bacon lettuce tomato)); ==> '(bacon lettuce tomato)
+(module+ test
+  (check-equal? (rember 'and '(bacon lettuce tomato)) '(bacon lettuce tomato)))
 
 #| Q: (null? lat) |#
 #| A: No. |#
-(null? '(bacon lettuce and tomato)) ; ==> #f
+(module+ test
+  (check-false (null? '(bacon lettuce and tomato))))
 
 #| Q: (eq? (car lat) a) |#
 #| A: No. |#
-(eq? (car '(bacon lettuce and tomato)) 'and) ; ==> #f
+(module+ test
+  (check-false (eq? (car '(bacon lettuce and tomato)) 'and)))
 
 #| Q: else |#
 #| A: Yes, so the value is (cons (car lat) (rember a (cdr lat))). |#
 
-#| Q: What is the meaning of (cons (car lat) (rember a (cdr lat)))|#
+#| Q: What is the meaning of (cons (car lat) (rember a (cdr lat))) |#
 
-#| A: This says to refer to the function rember but with the argument lat replaced by ( cdr lat), 
+#| A: This says to refer to the function rember but with the argument lat replaced by (cdr lat), 
       and that after we arrive at a value for (rember a (cdr lat)) we must cons 
-      (car lat) -bacon- onto it. |#
+      (car lat) --bacon-- onto it. |#
 
 #| Q: (null? lat) |#
 #| A: No. |#
-(null? '(lettuce and tomato)) ; ==> #f
+(module+ test
+  (check-false (null? '(lettuce and tomato))))
 
 #| Q: (eq? (car lat) a) |#
 #| A: No. |#
-(eq? (car '(lettuce and tomato)) 'and) ; ==> #f
+(module+ test
+  (check-false (eq? (car '(lettuce and tomato)) 'and)))
 
 #| Q: else |#
 #| A: Yes, so the value is (cons (car lat) (rember a (cdr lat))). |#
@@ -393,30 +414,35 @@
 #| Q: What is the meaning of (cons (car lat) (rember a (cdr lat)))|#
 #| A: This says we recur using the function rember, with the argument lat replaced by 
       (cdr lat), and that after we arrive at a value for (rember a (cdr lat)), we must cons 
-      (car lat) -lettuce- onto it. |#
+      (car lat) --lettuce-- onto it. |#
 
 #| Q: (null? lat) |#
 #| A: No. |#
-(null? '(and tomato)) ; ==> #f
+(module+ test
+  (check-false (null? '(and tomato))))
 
 #| Q: (eq? (car lat) a) |#
 #| A: Yes. |#
-(eq? (car '(and tomato)) 'and) ; ==> #t
+(module+ test
+  (check-true (eq? (car '(and tomato)) 'and)))
 
 #| Q: What is the value of the line ((eq? (car lat) a) (cdr lat)) |#
-#| A: It is (cdr lat) - (tomato). |#
-(cdr '(and tomato)) ; ==> '(tomato)
+#| A: It is (cdr lat) -- (tomato). |#
+(module+ test
+  (check-equal? (cdr '(and tomato)) '(tomato)))
 
 #| Q: Now what? |#
-#| A: Now cons ( car lat) -lettuce- onto (tomato). |#
+#| A: Now cons (car lat) --lettuce-- onto (tomato). |#
 
 #| Q: Now what? |#
-#| A: Now cons (car lat) -bacon- onto (lettuce tomato). |#
+#| A: Now cons (car lat) --bacon-- onto (lettuce tomato). |#
 
 #| Q: Now that we have completed rember try this example: (rember a lat) 
       where a is sauce and lat is (soy sauce and tomato sauce) |#
-#| A: ( rember a lat) is (soy and tomato sauce). |#
-(Rember 'sauce '(soy sauce and tomato sauce)) ; ==> '(soy and tomato sauce)
+#| A: (rember a lat) is (soy and tomato sauce). |#
+(module+ test
+  (check-equal? (rember 'sauce '(soy sauce and tomato sauce))
+                '(soy and tomato sauce)))
 
 #| Q: What is (firsts l)  where l is
     ((apple peach pumpkin) 
@@ -428,7 +454,7 @@
 #| Q: What is (firsts l) where l is
      ((a b)
       (c d)
-      (e f))|#
+      (e f)) |#
 #| A: (a c e). |#
 
 #| Q: What is (firsts l) where l is () |#
@@ -449,7 +475,7 @@
 
 #| Q: In your own words, what does (firsts l) do? |#
 #| A: It takes one argument, a list of non-empty lists, and returns a list composed of the first
-      expression of each sublist. If the list main is null, it returns a null list.
+      expressions of each sublist. If the list main is null, it returns a null list.
 
       Book:
       "The function firsts takes one argument, a list, which is either a null list or contains 
@@ -465,38 +491,52 @@
         (else (cons ... (firsts (cdr l))))))) |#
 
 ; Here is my attempt
+
 ;; firsts : List-of-lists -> List-of-expressions
-;; Given a list-of-lists, produces alist composed of the first expression of each list internal list.
+;; Produces a list composed of the first S-expression of each sublist.
 (define firsts
   (λ (lol)
     (cond
       ((null? lol) '())
-      ((null? (car lol)) (firsts (cdr lol))) ; guarding agains having null-lists inside
+      ((null? (car lol)) (firsts (cdr lol))) ; guarding agains having null-lists inside!
       (else
        (cons (car (car lol)) (firsts (cdr lol)))))))
 
-(firsts '((apple peach pumpkin) 
-          (plum pear cherry) 
-          (grape raisin pea) 
-          (bean carrot eggplant))) ; ==> '(apple plum grape bean)
+(module+ test
+  (check-equal?
+   (firsts '((apple peach pumpkin) 
+             (plum pear cherry) 
+             (grape raisin pea) 
+             (bean carrot eggplant)))
+   '(apple plum grape bean)) 
 
-(firsts ' ((a b)
-           (c d)
-           (e f))) ; ==> '(a c e)
+  (check-equal?
+   (firsts ' ((a b)
+              (c d)
+              (e f)))
+   '(a c e))
 
-(firsts '()) ; ==> '()
+  (check-equal?
+   (firsts '())
+   '())
 
-(firsts '((five plums) 
-          (four) 
-          (eleven green oranges))) ; ==> '(five four eleven)
+  (check-equal?
+   (firsts '((five plums) 
+             (four) 
+             (eleven green oranges)))
+   '(five four eleven)) 
 
-(firsts '(((five plums) four) 
-          (eleven green oranges) 
-          ((no) more))) ; ==> '((five plums) eleven (no))
+  (check-equal?
+   (firsts '(((five plums) four) 
+             (eleven green oranges) 
+             ((no) more)))
+   '((five plums) eleven (no))) 
 
-(firsts '(((five plums) four) 
-          () 
-          ((no) more))) ; ==> '((five plums) (no))
+  (check-equal?
+   (firsts '(((five plums) four) 
+             () 
+             ((no) more)))
+   '((five plums) (no))))
 
 #| Q: Why 
      (define firsts 
@@ -519,7 +559,7 @@
 #| A: See above. And because the last question is always else. |#
 
 #| Q: Why (cons |#
-#| A: Because we are building a list - The Second Commandment. |#
+#| A: Because we are building a list -- The Second Commandment. |#
 
 #| Q: Why (firsts (cdr l)) |#
 #| A: Because we can only look at one S-expression at a time.
@@ -541,10 +581,10 @@
 #| A: b, d, or f. |#
 
 #| Q: How do we describe a typical element for (firsts l) |#
-#| A: As the car of an element of l  -(car (car l)). See chapter 1. |#
+#| A: As the car of an element of l -- (car (car l)). See chapter 1. |#
 
 #| Q: When we find a typical element of (firsts l) what do we do with it? |#
-#| A: cons it onto the recursion-(firsts (cdr l)). |#
+#| A: cons it onto the recursion -- (firsts (cdr l)). |#
 
 
 
@@ -579,21 +619,26 @@
 
 #| Q: (null? l) where l is ((a b) (c d) (e f)) |#
 #| A: No, so move to the next line. |#
-(null? '((a b) (c d) (e f))) ; ==> #f
+(module+ test
+  (check-false (null? '((a b) (c d) (e f)))))
 
 #| Q: What is the meaning of (cons (car (car l)) (firsts (cdr l))) |#
-#| A: It saves ( car ( car l)) to cons onto (firsts (cdr l)) .
+#| A: It saves (car (car l)) to cons onto (firsts (cdr l)) .
       To find (firsts (cdr l)), we refer to the function with the new argument 
       (cdr l). |#
 
 #| Q: (null? l) where l is ((c d) (e f))|#
 #| A: No, so move to the next line. |#
+(module+ test
+  (check-false (null? '((c d) (e f)))))
 
 #| Q: What is the meaning of (cons (car (car l)) (firsts (cdr l))) |#
 #| A: Save (car (car l)), and recur with (firsts (cdr l)). |#
 
 #| Q: (null? l) where l is ((e f)) |#
 #| A: No, so move to the next line. |#
+(module+ test
+  (check-false (null? '((e f)))))
 
 #| Q: What is the meaning of (cons (car (car l)) (firsts (cdr l))) |#
 #| A: Save (car (car l)), and recur with (firsts (cdr l)). |#
@@ -631,6 +676,8 @@ In any case, what is the value of (firsts l) |#
 
 #| Q: With which of the three alternatives do you feel most comfortable? |#
 #| A: [choose one] Correct! Now you should use that one. |#
+
+;;; CONTINUE!!!
 
 #| Q: What is (insertR new old lat) where new is topping old is fudge
       and lat is (ice cream with fudge for dessert) |#

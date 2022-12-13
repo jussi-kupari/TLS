@@ -26,15 +26,13 @@
 #| Q: True or false: (lat ? l) where l is () |#
 #| A: True, because it does not contain a list. |#
 
-;Note: It is not entirely obvious to me why an empty list is considered a list of atoms.
+; Note: It is not entirely obvious to me why an empty list is considered a list of atoms.
 
 #| Q: True or false: a lat is a list of atoms. |#
 #| A: True! Every lat is a list of atoms! |#
 
-;Note: An empty/null list is also a list of atoms,
-
 #| Q: Write the function lat? using some, but not necessarily all, of the
-     following functions: car cdr cons null? atom? and eq? |#
+      following functions: car cdr cons null? atom? and eq? |#
 #| A: From the book:
       "You were not expected to be able to do this 
       yet, because you are still missing some 
