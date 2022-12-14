@@ -1,6 +1,15 @@
 #lang racket
 
-(provide rember firsts insertR insertL subst subst2)
+(provide rember
+         firsts
+         insertR
+         insertL
+         subst
+         subst2
+         multirember
+         multiinsertR
+         multiinsertL
+         multisubst)
 
 (require
   (only-in "Atom.scm" atom?)
@@ -725,7 +734,6 @@ In any case, what is the value of (firsts l) |#
    (insertR 'e 'd '(a b c d f g d h))
    '(a b c d e f g d h)))
 
-;; CONTINUE!!!
 
 #| Q: Which argument changes when we recur with insertR |#
 #| A: lat, because we can only look at one of its atoms at a time. |#
@@ -996,13 +1004,11 @@ define subst2
 #|          If you got the last function, go and repeat the cake-consing.          |#
 
 
-;; CONTINUE!!!!
-
 
 #| Q: Do you recall what rember does? |#
 #| A: The function rember looks at each atom of a lat to see if it is the same as
       the atom a. If it is not, rember saves the atom and proceeds. When it finds
-      the first occurrence of a, it stops and gives the value ( cdr lat), or the 
+      the first occurrence of a, it stops and gives the value (cdr lat), or the 
       rest of the lat, so that the value returned is the original lat, with only
       that occurrence of a removed. |#
 
@@ -1010,7 +1016,7 @@ define subst2
       with all occurrences of a removed.
 
       Hint: What do we want as the value when (eq? (car lat) a) is true? Consider the example 
-      where a is cup and lat is (coffee cup tea cup and hick cup).
+      where a is 'cup and lat is (coffee cup tea cup and hick cup).
 
 (define multirember
   (λ (a lat)
@@ -1024,18 +1030,20 @@ define subst2
 #| A: Ok. See below. |#
 
 ;; multirember : Atom LAT -> LAT
-;; Given atom and lat, produces the lat with all occurrences of the atom removed.
+;; Produces the lat with all occurrences of the atom removed.
 (define multirember.v1
   (λ (a lat)
     (cond
-      ((null? lat)
-       '())
+      ((null? lat) '())
       ((eq? (car lat) a)
        (multirember.v1 a (cdr lat)))
       (else
        (cons (car lat) (multirember.v1 a (cdr lat)))))))
 
-(multirember.v1 'cup '(coffee cup tea cup and hick cup)) ; ==> '(coffee tea and hick)
+(module+ test
+  (check-equal?
+   (multirember.v1 'cup '(coffee cup tea cup and hick cup))
+   '(coffee tea and hick)))
 
 #| After the first occurrence of a, we now recur with (multirember a (cdr lat)), in 
    order to remove the other occurrences. |#
@@ -1044,12 +1052,12 @@ define subst2
 #| A: Possibly not, so we will go through the steps necessary to arrive at the value 
       (coffee tea and hick). |#
 
-#| Note that my version is streamlined and without the extra else and cond,
+#| Note that my version is less verbose and without the extra else and cond,
    but I follow the book verbose version below. |#
 (define multirember 
   (λ (a lat) 
     (cond 
-      ((null? lat) (quote ())) 
+      ((null? lat) '()) 
       (else 
        (cond 
          ((eq? (car lat) a) 
@@ -1072,7 +1080,7 @@ define subst2
       the result from recurring multirember with the remaining list.
 
       per book:
-      Save (car lat) - coffee - to be consed onto the value of (multirember a (cdr lat)) later. 
+      Save (car lat) -- coffee -- to be consed onto the value of (multirember a (cdr lat)) later. 
       Now determine (multirember a (cdr lat)). |#
 
 #| Q: (null? lat) |#
@@ -1084,7 +1092,7 @@ define subst2
 #| Q: (eq? (car lat) a) |#
 #| A: Yes, so forget (car lat), and determine (multirember a (cdr lat)). |#
 
-#| Q: (null ? lat) |#
+#| Q: (null? lat) |#
 #| A: No, so move to the next line. |#
 
 #| Q: else |#
@@ -1098,7 +1106,7 @@ define subst2
       the result from recurring multirember with the remaining list.
 
       per book:
-      Save (car lat) - tea - to be consed onto the value of (multirember a (cdr lat)) later. 
+      Save (car lat) -- tea -- to be consed onto the value of (multirember a (cdr lat)) later. 
       Now determine (multirember a (cdr lat)). |#
 
 #| Q: (null? lat) |#
@@ -1117,7 +1125,7 @@ define subst2
 #| A: No, so move to the next line. |#
 
 #| Q: What is the meaning of (cons (car lat) (multirember a (cdr lat))) |#
-#| A: Save (car lat) -and- to be consed onto the value of (multirember a (cdr lat)) later. 
+#| A: Save (car lat) -- and -- to be consed onto the value of (multirember a (cdr lat)) later. 
       Now determine (multirember a (cdr lat)). |#
 
 #| Q: (null? lat) |#
@@ -1127,7 +1135,7 @@ define subst2
 #| A: No, so move to the next line. |#
 
 #| Q: What is the meaning of (cons (car lat) (multirember a (cdr lat))) |#
-#| A: Save (car lat) -hick- to be consed onto the value of
+#| A: Save (car lat) -- hick -- to be consed onto the value of
       (multirember a (cdr lat)) later. Now determine (multirember a (cdr lat)). |#
 
 #| Q: (null? lat) |#
@@ -1143,16 +1151,16 @@ define subst2
 #| A: No, we still have several conses to pick up. |#
 
 #| Q: What do we do next? |#
-#| A: We cons the most recent (car lat) we have -hick- onto (). |#
+#| A: We cons the most recent (car lat) we have -- hick -- onto (). |#
 
 #| Q: What do we do next? |#
-#| A: We cons and onto (hick). |#
+#| A: We cons 'and onto (hick). |#
 
 #| Q: What do we do next? |#
-#| A: We cons tea onto (and hick). |#
+#| A: We cons 'tea onto (and hick). |#
 
 #| Q: What do we do next? |#
-#| A: We cons coffee onto (tea and hick). |#
+#| A: We cons 'coffee onto (tea and hick). |#
 
 #| Q: Are we finished now? |#
 #| A: Yes. |#
@@ -1169,8 +1177,7 @@ define subst2
 #| A: Ok. See below. |#
 
 ;; multiinsertR.v1 : Atom Atom LAT -> LAT 
-;; Given two atoms and a lat, inserts the first atom on the right of all occurrences
-;; of the second atom in the lat.
+;; Inserts the first atom on the right of all occurrences of the second atom
 (define multiinsertR.v1
   (λ (new old lat)
     (cond
@@ -1182,12 +1189,14 @@ define subst2
       (else
        (cons (car lat) (multiinsertR.v1 new old (cdr lat)))))))
 
-(multiinsertR.v1 'fried 'fish '(chips and fish or fish and fried))
-; ==> '(chips and fish fried or fish fired and fried)
+(module+ test
+  (check-equal?
+   (multiinsertR.v1 'fried 'fish '(chips and fish or fish and fried))
+   '(chips and fish fried or fish fried and fried)))
 
 ; from the book:
 (define multiinsertR 
-  (lambda (new old lat) 
+  (λ (new old lat) 
     (cond 
       ((null? lat) '()) 
       (else 
@@ -1201,8 +1210,10 @@ define subst2
 #| It would also be correct to use old in place of (car lat) because we know that 
    (eq? (car lat) old). |#
 
-(multiinsertR 'fried 'fish '(chips and fish or fish and fried))
-; ==> '(chips and fish fried or fish fired and fried)
+(module+ test
+  (check-equal?
+   (multiinsertR 'fried 'fish '(chips and fish or fish and fried))
+   '(chips and fish fried or fish fried and fried)))
 
 #| Q: Is this function defined correctly? |#
 (define multiinsertL.v1 
@@ -1214,7 +1225,7 @@ define subst2
          ((eq? (car lat) old) 
           (cons new 
                 (cons old 
-                      (multiinsertL.v1 new old lat)))) 
+                      (multiinsertL.v1 new old lat))))
          (else (cons (car lat) 
                      (multiinsertL.v1 new old (cdr lat)))))))))
 
@@ -1238,9 +1249,8 @@ define subst2
 
 #| A: Ok, here it is |#
 
-;;  multiinsertL : Atom Atom LAT -> LAT 
-;; Given two atoms and a lat, inserts the first atom on the left of all occurrences
-;; of the second atom in the lat.
+;; multiinsertL : Atom Atom LAT -> LAT 
+;; Inserts the first atom on the left of all occurrences of the second atom
 (define multiinsertL 
   (λ (new old lat) 
     (cond 
@@ -1254,23 +1264,28 @@ define subst2
          (else (cons (car lat) 
                      (multiinsertL new old (cdr lat)))))))))
 
-(multiinsertL 'fried 'fish '(chips and fish or fish and fried))
-; ==> '(chips and fried fish or fried fish and fried)
+(module+ test
+  (check-equal?
+   (multiinsertL 'fried 'fish '(chips and fish or fish and fried))
+   '(chips and fried fish or fried fish and fried)))
 
-;; A sleek version without extra conds and elses
-(define multiinsertL-sleek
+;; A sleeker version without extra conds and elses
+(define multiinsertL.v2
   (λ (new old lat)
     (cond
       ((null? lat) '())
       ((eq? (car lat) old)
        (cons new
              (cons old
-                   (multiinsertL-sleek new old (cdr lat)))))
+                   (multiinsertL.v2 new old (cdr lat)))))
       (else
-       (cons (car lat) (multiinsertL-sleek new old (cdr lat)))))))
+       (cons (car lat) (multiinsertL.v2 new old (cdr lat)))))))
 
-(multiinsertL-sleek 'fried 'fish '(chips and fish or fish and fried))
-; ==> '(chips and fried fish or fried fish and fried)
+(module+ test
+  (check-equal?
+   (multiinsertL.v2 'fried 'fish '(chips and fish or fish and fried))
+   '(chips and fried fish or fried fish and fried)))
+ 
 
 
 
@@ -1286,20 +1301,22 @@ define subst2
 #| Q: Now write the function multisubst |#
 #| A: Ok, I will. |#
 
-;; multisubst-sleek : Atom Atom LAT -> LAT 
-;; Given two atoms and a lat, substitutes the first atom for all occurrences
-;; of the second atom in the lat.
-(define multisubst-sleek
+;; multisubst : Atom Atom LAT -> LAT 
+;; Substitutes the first atom for all occurrences of the second atom in the lat.
+(define multisubst.v1
   (λ (new old lat)
     (cond
       ((null? lat) '())
       ((eq? (car lat) old)
-       (cons new (multisubst-sleek new old (cdr lat))))
+       (cons new (multisubst.v1 new old (cdr lat))))
       (else
-       (cons (car lat) (multisubst-sleek new old (cdr lat)))))))
+       (cons (car lat) (multisubst.v1 new old (cdr lat)))))))
 
-(multisubst-sleek 'fried 'fish '(chips and fish or fish and fried))
-; ==> '(chips and fried or fried and fried)
+(module+ test
+  (check-equal?
+   (multisubst.v1 'fried 'fish '(chips and fish or fish and fried))
+   '(chips and fried or fried and fried)))
+
 
 ;; book version
 (define multisubst 
@@ -1312,5 +1329,7 @@ define subst2
           (cons new (multisubst new old  (cdr lat)))) 
          (else (cons (car lat) (multisubst new old (cdr lat)))))))))
 
-(multisubst 'fried 'fish '(chips and fish or fish and fried))
-; ==> '(chips and fried or fried and fried)
+(module+ test
+  (check-equal?
+   (multisubst 'fried 'fish '(chips and fish or fish and fried))
+   '(chips and fried or fried and fried)))
