@@ -1,6 +1,6 @@
 #lang racket
 
-(provide rember firsts insertR insertL)
+(provide rember firsts insertR insertL subst subst2)
 
 (require
   (only-in "Atom.scm" atom?)
@@ -677,21 +677,19 @@ In any case, what is the value of (firsts l) |#
 #| Q: With which of the three alternatives do you feel most comfortable? |#
 #| A: [choose one] Correct! Now you should use that one. |#
 
-;;; CONTINUE!!!
-
-#| Q: What is (insertR new old lat) where new is topping old is fudge
+#| Q: What is (insertR new old lat) where new is 'topping, old is 'fudge
       and lat is (ice cream with fudge for dessert) |#
 #| A: (ice cream with fudge topping for dessert). |#
 
-#| Q: (insertR new old lat) where new is jalapeno old is and and lat is (tacos tamales and salsa) |#
+#| Q: (insertR new old lat) where new is 'jalapeno, old is 'and and lat is (tacos tamales and salsa) |#
 #| A: (tacos tamales and jalapeno salsa). |#
 
-#| Q: (insertR new old lat) where new is e old is d and lat is (a b c d f g d h) |#
+#| Q: (insertR new old lat) where new is 'e, old is 'd and lat is (a b c d f g d h) |#
 #| A: (a b c d e f g d h). |#
 
-#| Q: In your own words, what does (insertR new old lat) do?|#
-#| A: It takes three arguments: two atoms, new and old, and a list of atoms and
-      builds a new list where the new atom has been inserted after the old atom.
+#| Q: In your own words, what does (insertR new old lat) do? |#
+#| A: It takes three arguments: two atoms --new and old-- and a list of atoms and
+      builds a new list where the new atom has been inserted right after the (first) old atom.
 
       In our words: 
       "It takes three arguments: the atoms new 
@@ -706,8 +704,7 @@ In any case, what is the value of (firsts l) |#
 #| A: I'm gonna try to write the whole function |#
 
 ;; insertR : Atom Atom LAT -> LAT
-;; Given two atoms and a lat, inserts the first atom to the right of
-;; the first occurrence of the second atom.
+;; Inserts the first atom to the right of the first occurrence of the second atom
 (define insertR
   (λ (new old lat)
     (cond
@@ -717,15 +714,24 @@ In any case, what is the value of (firsts l) |#
       (else
        (cons (car lat) (insertR new old (cdr lat)))))))
 
-(insertR 'topping 'fudge '(ice cream with fudge for dessert)) ; ==> '(ice cream with fudge topping for dessert)
-(insertR 'jalapeno 'and '(tacos tamales and salsa)) ; == > '(tacos tamales and jalapeno salsa)
-(insertR 'e 'd '(a b c d f g d h)) ; ==> '(a b c d e f g d h)
+(module+ test
+  (check-equal?
+   (insertR 'topping 'fudge '(ice cream with fudge for dessert))
+   '(ice cream with fudge topping for dessert)) 
+  (check-equal?
+   (insertR 'jalapeno 'and '(tacos tamales and salsa))
+   '(tacos tamales and jalapeno salsa))
+  (check-equal?
+   (insertR 'e 'd '(a b c d f g d h))
+   '(a b c d e f g d h)))
+
+;; CONTINUE!!!
 
 #| Q: Which argument changes when we recur with insertR |#
 #| A: lat, because we can only look at one of its atoms at a time. |#
   
 #| Q: How many questions can we ask about the lat? |#
-#| A: Two. A lat is either the null list or a non-empty list of atoms.|#
+#| A: Two. A lat is either the null list or a non-empty list of atoms. |#
 
 #| Q: Which questions do we ask? |#
 #| A: First, we ask (null? lat). Second, we ask else,
@@ -734,11 +740,8 @@ In any case, what is the value of (firsts l) |#
 #| Q: What do we know if (null? lat) is not true? |#
 #| A: We know that lat has at least one element. |#
 
-#| Q: What do we know if (null? lat) is not true? |#
-#| A: We know that lat has at least one element. |#
-
 #| Q: Which questions do we ask about the first element? |#
-#| A: First, we ask ( eq? ( car lat) old). Then we ask else,
+#| A: First, we ask (eq? (car lat) old). Then we ask else,
       because there are no other interesting cases. |#
 
 #| Q: Now see if you can write the whole function insertR
@@ -766,17 +769,19 @@ In any case, what is the value of (firsts l) |#
                      (insertR.v2 new old 
                                  (cdr lat))))))))) 
 
-#| Q: What is the value of the application (insertR new old lat) that we just determined 
-      where new is topping old is fudge and lat is (ice cream with fudge for dessert) |#
+#| Q: What is the value of the application (insertR.v2 new old lat) that we just determined 
+      where new is 'topping old is 'fudge and lat is (ice cream with fudge for dessert) |#
 #| A: (ice cream with for dessert). |#
-(insertR.v2 'topping 'fudge '(ice cream with fudge for dessert))
-; ==> '(ice cream with for dessert)
+(module+ test
+  (check-equal?
+   (insertR.v2 'topping 'fudge '(ice cream with fudge for dessert))
+   '(ice cream with for dessert)))
 
-#| Q: So far this is the same as rember. What do we do in insertR when (eq? (car lat) old) is true? |#
+#| Q: So far this is the same as rember. What do we do in insertR.v2 when (eq? (car lat) old) is true? |#
 #| A: When (car lat) is the same as old, we want to insert new to the right. |#
 
 #| Q: How is this done? |#
-#| A: Let's try consing new onto ( cdr lat). |#
+#| A: Let's try consing new onto (cdr lat). |#
 
 #| Q: Now we have |#
 
@@ -793,10 +798,13 @@ In any case, what is the value of (firsts l) |#
 
 #| A: Yes. |#
 
-#| Q: So what is (insertR new old lat) now where new is topping old is fudge
+#| Q: So what is (insertR.v3 new old lat) now where new is 'topping old is 'fudge
       and lat is (ice cream with fudge for dessert) |#
 #| A: (ice cream with topping for dessert). |#
-(insertR.v3 'topping 'fudge '(ice cream with fudge for dessert)) ; ==> '(ice cream with topping for dessert)
+(module+ test
+  (check-equal?
+   (insertR.v3 'topping 'fudge '(ice cream with fudge for dessert))
+   '(ice cream with topping for dessert)))
 
 #| Q: Is this the list we wanted? |#
 #| A: No, we have only replaced fudge with topping. |#
@@ -807,7 +815,9 @@ In any case, what is the value of (firsts l) |#
 #| Q: How can we include old before new |#
 #| A: Try consing old onto (cons new (cdr lat)). |#
 
-#| Q: Now let's write the rest of the function insertR |#
+#| Q: Now let's write the rest of the function insertR.v4 |#
+
+; Note: This produces an identical function to my original one (insertR), but in a more verbose way
 
 (define insertR.v4 
   (λ (new old lat) 
@@ -820,22 +830,21 @@ In any case, what is the value of (firsts l) |#
          (else
           (cons (car lat) (insertR.v4 new old (cdr lat)))))))))
 
-#| When new is topping, old is fudge, and lat is (ice cream with fudge for dessert), the value of 
+#| When new is 'topping, old is 'fudge, and lat is (ice cream with fudge for dessert), the value of 
    the application, (insertR new old lat), is (ice cream with fudge topping for dessert). 
    If you got this right, have one. |#
 
-(insertR.v4 'topping 'fudge '(ice cream with fudge for dessert))
-; ==> '(ice cream with fudge topping for dessert)
-(insertR.v4 'topping 'fudge '(ice cream with fudge for dessert))
-; ==> '(ice cream with fudge topping for dessert)
+(module+ test
+  (check-equal?
+   (insertR.v4 'topping 'fudge '(ice cream with fudge for dessert))
+   '(ice cream with fudge topping for dessert)))
 
 #| Q: Now try insertL 
       Hint: insertL inserts the atom new to the left of the first occurrence of the atom old in lat |#
 #| A: This much is easy, right? |#
 
 ;; insertL : Atom Atom LAT -> LAT
-;; Given two atoms and a list of atoms, inserts the first atom to the left of
-;; the first occurrence of the second atom in the list
+;; Inserts the first atom to the left of first occurrence of the second atom
 (define insertL
   (λ (new old lat)
     (cond
@@ -845,8 +854,10 @@ In any case, what is the value of (firsts l) |#
       (else
        (cons (car lat) (insertL new old (cdr lat)))))))
 
-(insertL 'topping 'fudge '(ice cream with fudge for dessert))
-; ==> '(ice cream with topping fudge for dessert)
+(module+ test
+  (check-equal?
+   (insertL 'topping 'fudge '(ice cream with fudge for dessert))
+   '(ice cream with topping fudge for dessert)))
 
 #| Q: Did you think of a different way to do it? |#
 
@@ -872,19 +883,20 @@ In any case, what is the value of (firsts l) |#
       (else
        (cons (car lat) (insertL.v2 new old (cdr lat)))))))
 
-(insertL.v2 'topping 'fudge '(ice cream with fudge for dessert))
-; ==> '(ice cream with topping fudge for dessert)
+(module+ test
+  (check-equal?
+   (insertL.v2 'topping 'fudge '(ice cream with fudge for dessert))
+   '(ice cream with topping fudge for dessert)))
 
 #| Q: Now try subst 
       Hint: (subst new old lat) replaces the first occurrence of old in the lat with new 
-      For example, where new is topping old is fudge and lat is (ice cream with fudge for dessert) 
+      For example, where new is 'topping old is 'fudge and lat is (ice cream with fudge for dessert) 
       the value is (ice cream with topping for dessert). Now you have the idea. |#
 
 #| A: Ok. |#
 
 ;; subst : Atom Atom LAT -> LAT
-;; Given two atoms and a list of atoms, substitutes the first occurrence
-;; of the second atom in the list with the first atom 
+;; Substitutes the first occurrence of the second atom in the list with the first atom 
 (define subst
   (λ (new old lat)
     (cond
@@ -894,8 +906,10 @@ In any case, what is the value of (firsts l) |#
       (else
        (cons (car lat) (subst new old (cdr lat)))))))
 
-(subst 'topping 'fudge '(ice cream with fudge for dessert))
-; ==> '(ice cream with topping for dessert)
+(module+ test
+  (check-equal?
+   (subst 'topping 'fudge '(ice cream with fudge for dessert))
+   '(ice cream with topping for dessert)))
 
 #| This is the same as one of our incorrect attempts at insertR.
 
@@ -922,9 +936,8 @@ In any case, what is the value of (firsts l) |#
 
 #| A: Ok. |#
 
-;; subst2.v1 : Atom Atom LAT -> LAT
-;; Given three atoms and a list of atoms, substitutes the first occurrence
-;; of either the second or third atom in the list with the first atom
+;; subst2.v1 : Atom Atom Atom LAT -> LAT
+;; Substitutes the first occurrence of either the second or third atom (which ever comes first) with the first atom
 (define subst2.v1
   (λ (new o1 o2 lat)
     (cond
@@ -936,8 +949,10 @@ In any case, what is the value of (firsts l) |#
       (else
        (cons (car lat) (subst2.v1 new o1 o2 (cdr lat)))))))
 
-(subst2.v1 'vanilla 'chocolate 'banana '(banana ice cream with chocolate topping))
-; ==> '(vanilla ice cream with chocolate topping)
+(module+ test
+  (check-equal?
+   (subst2.v1 'vanilla 'chocolate 'banana '(banana ice cream with chocolate topping))
+   '(vanilla ice cream with chocolate topping)))
 
 #|
 
@@ -958,10 +973,9 @@ define subst2
 #| A: Replace the two eq? lines about the (car lat) by 
       ((or (eq? (car lat) o1) (eq? (car lat) o2)) (cons new (cdr lat))). |#
 
-;; subst2.v2 : Atom Atom LAT -> LAT
-;; Given three atoms and a list of atoms, substitutes the first occurrence
-;; of either the second or third atom in the list with the first atom
-(define subst2.v2
+;; subst2 : Atom Atom LAT -> LAT
+;; Substitutes the first occurrence of either the second or third atom (which ever comes first) with the first atomm
+(define subst2
   (λ (new o1 o2 lat)
     (cond
       ((null? lat) '())
@@ -970,15 +984,19 @@ define subst2
         (eq? (car lat) o2))
        (cons new (cdr lat)))
       (else
-       (cons (car lat) (subst2.v2 new o1 o2 (cdr lat)))))))
+       (cons (car lat) (subst2 new o1 o2 (cdr lat)))))))
 
-(subst2.v2 'vanilla 'chocolate 'banana '(banana ice cream with chocolate topping))
-; ==> '(vanilla ice cream with chocolate topping)
+(module+ test
+  (check-equal?
+   (subst2 'vanilla 'chocolate 'banana '(banana ice cream with chocolate topping))
+   '(vanilla ice cream with chocolate topping)))
 
 
 
 #|          If you got the last function, go and repeat the cake-consing.          |#
 
+
+;; CONTINUE!!!!
 
 
 #| Q: Do you recall what rember does? |#
