@@ -11,10 +11,6 @@
          multiinsertL
          multisubst)
 
-(require
-  (only-in "Atom.scm" atom?)
-  (only-in "2_Doitdoitagainandagainandagain.scm" lat? member?))
-
 (module+ test
   (require rackunit))
 
