@@ -1,11 +1,15 @@
 #lang racket
 
-(provide (all-defined-out))
+(provide plus
+         minus
+         addtup
+         x
+         tup+)
 
-(require "Atom.scm"
-         "1_Toys.scm"
-         "2_Doitdoitagainandagainandagain.scm"
-         "3_ConsTheMagnificent.scm")
+(require (only-in "Atom.scm" atom?))
+
+(module+ test
+  (require rackunit))
 
 
 
@@ -18,7 +22,9 @@
 
 #| Q: Is (atom? n) true or false where n is 14 |#
 #| A: True, because 14 is an atom. |#
-(atom? 14) ; ==> #t
+(module+ test
+  (define n 14)
+  (check-true (atom? n)))
 
 #| Q: Is -3 a number? |#
 #| A: Yes, but we do not consider negative numbers. |#
@@ -30,16 +36,22 @@
 #| A: Yes, but the only numbers we use are the 
        nonnegative integers (i.e. , 0, 1, 2, 3, 4, ...). |#
 
-#| Q: What is (add1 n), where n is 67? |#
+#| Q: What is (add1 N), where n is 67? |#
 #| A: 68. |#
-(add1 67) ; ==> 68
+(module+ test
+  (define N 67)
+  (check-equal? (add1 N) 68))
 
 #| Q: What is (add1 67)? |#
-#| A: Also 68, because we don't need to say "where n is 67" when the argument is a number. |#
+#| A: Also 68, because we don't need to say "where N is 67" when the argument is a number. |#
+(module+ test
+  (check-equal? (add1 67) 68))
 
-#| Q: What is (sub1 n) where n is 5? |#
+#| Q: What is (sub1 m) where m is 5? |#
 #| A: 4. |#
-(sub1 5) ; ==> 4
+(module+ test
+  (define m 5)
+  (check-equal? (sub1 m) 4))
 
 #| Q: What is (sub1 0) |#
 #| A: No answer.
@@ -47,21 +59,24 @@
 
 #| Q: Is (zero? 0) true or false? |#
 #| A: True. |#
-(zero? 0) ; ==> #t
+(module+ test
+  (check-true (zero? 0)))
 
 #| Q: Is (zero? 1492) true or false? |#
 #| A: False. |#
-(zero? 1492) ; ==> #f
+(module+ test
+  (check-false (zero? 1492)))
 
 #| Q: What is (+ 46 12) |#
 #| A: 58. |#
-(+ 46 12) ;  ==> 58
+(module+ test
+  (check-equal? (+ 46 12) 58))
 
 #| Q: Try to write the function plus Hint: It uses zero? add1 and sub1 |#
 #| A: Ok. |#
 
 ;; plus : WN WN -> WN
-;; Given two whole numbers (nonnegative integers), produces their sum
+;; Produces the sum of the two numbers
 (define plus
   (λ (n m)
     (cond
@@ -71,9 +86,10 @@
 
 ; Wasn't that easy?
 
-(plus 5 5) ; ==> 10
-(plus 5 0) ; ==> 5
-(plus 0 5) ; ==> 5
+(module+ test
+  (check-equal? (plus 5 5) 10)
+  (check-equal? (plus 5 0) 5)
+  (check-equal? (plus 0 7) 7))
 
 #| Q: But didn't we just violate The First Commandment? |#
 #| A: Yes, but we can treat zero? like null? since zero? asks if a number is empty and null? 
@@ -84,48 +100,53 @@
 
 #| Q: What is (- 14 3) |#
 #| A: 11. |#
-(- 14 3) ; ==> 11
+(module+ test
+  (check-equal? (- 14 3) 11))
 
 #| Q: What is (- 17 9) |#
 #| A: 8. |#
-(- 17 9) ; ==> 8
+(module+ test
+  (check-equal? (- 17 9) 8))
 
 #| Q:  What is (- 18 25)|#
 #| A: No answer. There are no negative numbers. |#
-
+      
 #| Q: Try to write the function minus Hint: Use sub1 |#
 #| A: Ok. |#
 
-;; minus : WN WN -> WN
-;; Given two whole numbers (nonnegative integers), subtracts the second from the first
-(define minus
+;; Minus : WN WN -> WN
+;; Subtracts the second number from the first
+(define Minus
   (λ (n m)
     (cond
       ((zero? m) n)
-      (else (minus (sub1 n) (sub1 m))))))
+      (else (Minus (sub1 n) (sub1 m))))))
 
-(minus 6 5) ; ==> 1
-(minus 5 5) ; ==> 0
-(minus 26 5) ; ==> 21
+(module+ test
+  (check-equal? (Minus 6 5) 1)
+  (check-equal? (Minus 5 5) 0)
+  (check-equal? (Minus 26 5) 21))
 
 ; How about this:
-(define minuS  
+(define minus  
   (λ (n m) 
     (cond 
       ((zero? m) n) 
-      (else (sub1 (minuS n (sub1 m)))))))
+      (else (sub1 (minus n (sub1 m))))))) ; To me, this is harder to understand than my versions (Minus)
 
-(minuS 6 5) ; ==> 1
-(minuS 5 5) ; ==> 0
-(minuS 26 5) ; ==> 21
+(module+ test
+  (check-equal? (minus 6 5) 1)
+  (check-equal? (minus 5 5) 0)
+  (check-equal? (minus 26 5) 21))
 
-#| Q: Can you describe how (minuS n m) works? |#
+#| Q: Can you describe how (minus n m) works? |#
 #| A: It takes two numbers as arguments, and reduces the second until it hits zero.
       It subtracts one from the result as many times as it did to cause the second
       one to reach zero.
 
-      minus takes two numbers as arguments, and reduces both one at a time.
-      The difference between the numbers is what remains from the first numbers when the
+      This is how Minus works:
+      Minus takes two numbers as arguments, and reduces both one at a time.
+      The results is what remains from the first number when the
       second hits zero. |#
 
 #| Q: Is this a tup? (2 11 3 79 47 6) |#
@@ -215,7 +236,7 @@
                When recurring on a list of atoms, lat,
          ask two questions about it: (null? lat) and else. 
       When recurring on a number, n, ask two questions about it:
-                       (zero ? n) and else.                            |#
+                       (zero? n) and else.                            |#
 
 
 
@@ -243,8 +264,8 @@
 
 #| A: Ok. |#
 
-;; addtup : Tuple -> Whole Number
-;; Given tuple, adds up all the numbers in the tuple
+;; addtup : Tuple -> WN
+;; Adds up all the numbers in the tuple
 (define addtup 
   (λ (tup) 
     (cond 
@@ -252,7 +273,8 @@
       (else
        (plus (car tup) (addtup (cdr tup)))))))
 
-(addtup '(5 5 5 5 5)) ; ==> 25
+(module+ test
+  (check-equal? (addtup '(5 6 5 6 8)) 30))
 
 #| Here is what we filled in: 
    (plus (car tup) (addtup (cdr tup))). 
@@ -295,17 +317,19 @@
 #| A: Ok. |#
 
 ;; x : WN WN -> WN
-;; Given two whole numbers, adds up the first times the second
+;; Adds up the first number times the second number
 (define x
   (λ (n m)
     (cond
       ((zero? m) 0)
       (else (plus n (x n (sub1 m)))))))
 
-(x 7 5) ; ==> 35
+(module+ test
+  (check-equal? (x 7 5) 35))
 
 #| Q: What is (x 12 3) |#
-#| A: (plus 12 (plus 12 (plus 12 0)), or 36, but let's follow through the function one 
+#| A: 36 OR (plus 12 (plus 12 (plus 12 0)),
+      but let's follow through the function one 
       time to see how we get this value. |#
 
 #| Q: (zero? m) |#
@@ -314,7 +338,8 @@
 #| Q: What is the meaning of (plus n (x n (sub1 m)))? |#
 #| A: It adds n (where n = 12) to the natural recursion. If x is correct then 
       (x 12 (sub1 3)) should be 24. |#
-(x 12 (sub1 3)) ; ==> 24
+(module+ test
+  (check-equal? (x 12 (sub1 3)) 24))
 
 #| Q: What are the new arguments of (x n m) |#
 #| A: n is 12, and m is 2. |#
@@ -324,7 +349,6 @@
 
 #| Q: What is the meaning of (plus n (x n (sub1 m)))? |#
 #| A: It adds n (where n = 12) to (x n (sub1 m)). |#
-(x 12 (sub1 2)) ; ==> 12
 
 #| Q: What are the new arguments of (x n m) |#
 #| A: n is 12 and m is 1 |#
@@ -334,9 +358,8 @@
 
 #| Q: What is the meaning of (plus n (times n (sub1 m)))? |#
 #| A: It adds n (where n = 12) to (x n (sub1 m)). |#
-(x 12 (sub1 1)) ; ==> 0
 
-#| Q: What is the value of the line ((zero? m) 0)  |#
+#| Q: What is the value of the line ((zero? m) 0) |#
 #| A: 0, because (zero? m) is now true. |#
 
 #| Q: Are we finished yet? |#
@@ -366,7 +389,7 @@
 
 
 #|                          *** The Fifth Commandment *** 
-            When building a value with plus , always use 0 for the value of the 
+            When building a value with plus, always use 0 for the value of the 
           terminating line, for adding 0 does not change the value of an addition.
        When building a value with x, always use 1 for the value of the terminating line,
             for multiplying by 1 does not change the value of a multiplication.
@@ -396,7 +419,7 @@
 #| A: Four: if the first tup is empty or non-empty, and if the second tup is empty or non-empty. |#
 
 #| Q: Do you mean the questions 
-      (and (null'? tup1 ) (null'? tup2)) 
+      (and (null? tup1) (null? tup2)) 
       (null? tup1 ) 
       (null? tup2) 
       and else |#
@@ -405,26 +428,29 @@
 #| Q: Can the first tup be () at the same time as the second is other than () |#
 #| A: No, because the tups must have the same length. |#
 
-#| Q: Does this mean (and (null? tup1 ) (null? tup2)) and 
+#| Q: Does this mean (and (null? tup1) (null? tup2)) and 
       else are the only questions we need to ask? |#
 #| A: Yes, because (null? tup1) is true exactly when (null? tup2) is true.
+
       Note: Why can't we just ask (null? tup1) and else? |#
 
 #| Q: Write the function tup+ |#
 #| A: Will do. |#
 
-;; tup+ : Tup Tup -> Tup
-;; Given two tups of equal length, produces a tup of their element-wise sums.
-(define tup+
+;; tup+.v1 : Tup Tup -> Tup
+;; Produces a tuple of the element-wise sums of the two equal-length tuples.
+(define tup+.v1
   (λ (tup1 tup2)
     (cond
       ((and (null? tup1) (null? tup2))
        '())
       (else
        (cons (plus (car tup1) (car tup2))
-             (tup+ (cdr tup1) (cdr tup2)))))))
+             (tup+.v1 (cdr tup1) (cdr tup2)))))))
 
-(tup+ '(5 7 9) '(2 2 3)) ; ==> '(7 9 12)
+(module+ test
+  (check-equal? (tup+.v1 '(5 7 9) '(2 2 3)) '(7 9 12))
+  (check-equal? (tup+.v1 '(5 5 5) '(1 2 3)) '(6 7 8)))
 
 ; book solution is the same as mine
 
@@ -432,19 +458,20 @@
 #| A: (car tup1) (car tup2) |#
 
 #| Q: What are the arguments of cons in the last line? |#
-#| A: (plus (car tup1) (car tup2)) and (tup+ (cdr tup1) (cdr tup2)). |#
+#| A: (plus (car tup1) (car tup2)) and (tup+.v1 (cdr tup1) (cdr tup2)). |#
 
-#| Q: What is (tup+ tup1 tup2) where tup1 is (3 7) and tup2 is (4 6) |#
+#| Q: What is (tup+.v1 tup1 tup2) where tup1 is (3 7) and tup2 is (4 6) |#
 #| A: (7 13). But let's see how it works. |#
-(tup+ '(3 7) '(4 6)) ; ==> '(7 13)
+(module+ test
+  (check-equal? (tup+.v1 '(3 7) '(4 6)) '(7 13)))
 
 #| Q: (null? tup1 ) |#
 #| A: No. |#
 
 #| Q: (cons
         (plus (car tup1 ) (car tup2))
-        (tup+ (cdr tup1 ) (cdr tup2))) |#
-#| A: cons 7 onto the natural recursion: (tup+ (cdr tup1) (cdr tup2)). |#
+        (tup+.v1 (cdr tup1 ) (cdr tup2))) |#
+#| A: cons 7 onto the natural recursion: (tup+.v1 (cdr tup1) (cdr tup2)). |#
 
 #| Q: Why does the natural recursion include the cdr of both arguments? |#
 #| A: Because the typical element of the final value uses the car of both tups,
@@ -455,8 +482,8 @@
 
 #| Q: (cons 
         (plus (car tup1) (car tup2)) 
-        (tup+ (cdr tup1 ) (cdr tup2))) |#
-#| A: 13 onto the natural recursion. |#
+        (tup+.v1 (cdr tup1 ) (cdr tup2))) |#
+#| A: cons 13 onto the natural recursion. |#
 
 #| Q: (null? tup1 ) |#
 #| A: Yes. |#
@@ -467,7 +494,7 @@
 #| Q: What is the value of the application? |#
 #| A: (7 13). That is, the cons of 7 onto the cons of 13 onto (). |#
 
-#| Q: What problem arises when we want (tup+ tup1 tup2) where 
+#| Q: What problem arises when we want (tup+.v1 tup1 tup2) where 
       tup1 is (3 7) and tup2 is (4 6 8 1) |#
 #| A: No answer, since tup1 will become null before tup2. 
       See The First Commandment: We did not ask all the necessary questions! 
@@ -479,7 +506,7 @@
 #| Q: What new terminal condition line can we add to get the correct final value? |#
 #| A: Add ((null? tup1) tup2). |#
 
-#| Q: What is (tup+ tup1 tup2) where tup1 is (3 7 8 1) and tup2 is (4 6) |#
+#| Q: What is (tup+.v1 tup1 tup2) where tup1 is (3 7 8 1) and tup2 is (4 6) |#
 #| A: No answer, since tup2 will become null before tup1. 
       See The First Commandment: We did not ask all the necessary questions! |#
 
@@ -493,7 +520,7 @@
       Can you simplify it? |#
 
 ;; tup+.v2 : Tup Tup -> Tup
-;; Given two tups of equal length, produces a tup of their element-wise sums.
+;; Produces a tup of the element-wise sums.
 (define tup+.v2 
   (λ (tup1 tup2) 
     (cond 
@@ -506,25 +533,29 @@
              (tup+.v2 
               (cdr tup1) (cdr tup2)))))))
 
-(tup+.v2 '(3 7 8 1) '(4 6)) ; ==> '(7 13 8 1)
+(module+ test
+  (check-equal? (tup+.v2 '(3 7 8 1) '(4 6)) '(7 13 8 1)))
 
 #| A: You can remove the ((and (null? tup1) (null? tup2)) '())
       This is because if the tups are the same length you will be
-      consing a null tup at the and as is correct |#
+      consing a null tup at the end as is correct |#
 
-;; tup+.v3 : Tup Tup -> Tup
+;; tup+ : Tup Tup -> Tup
 ;; Given two tups of equal length, produces a tup of their element-wise sums.
-(define tup+.v3 
+(define tup+ 
   (λ (tup1 tup2) 
     (cond 
       ((null? tup1) tup2) 
       ((null? tup2) tup1) 
       (else 
        (cons (+ (car tup1) (car tup2)) 
-             (tup+.v3 
+             (tup+ 
               (cdr tup1) (cdr tup2))))))) 
 
-(tup+.v3 '(3 7 8 1) '(4 6)) ; ==> '(7 13 8 1)
+(module+ test
+  (check-equal? (tup+ '(3 7 8 1) '(4 6)) '(7 13 8 1)))
+
+;;; CONTINUE!!!!
 
 #| Q: Does the order of the two terminal conditions matter? |#
 #| A: No. |#
