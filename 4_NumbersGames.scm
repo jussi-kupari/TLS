@@ -1117,4 +1117,4 @@
    (rempick.v2 3 '(lemon meringue salty pie)) '(lemon meringue pie))) 
 
 ; Book version is identical
-; Note: rempick in the book version fails on empty lists. First Commandment. Just sayin'.
+; Note: rempick in the book version fails on empty lists. First Commandment?
