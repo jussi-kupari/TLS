@@ -4,7 +4,20 @@
          minus
          addtup
          x
-         tup+)
+         tup+
+         >?
+         <?
+         =?
+         **
+         divide
+         length
+         pick
+         rempick
+         no-nums
+         all-nums
+         eqan?
+         occur
+         one?)
 
 (require (only-in "Atom.scm" atom?))
 
@@ -555,8 +568,6 @@
 (module+ test
   (check-equal? (tup+ '(3 7 8 1) '(4 6)) '(7 13 8 1)))
 
-;;; CONTINUE!!!!
-
 #| Q: Does the order of the two terminal conditions matter? |#
 #| A: No. |#
 
@@ -565,10 +576,10 @@
       not contain at least one number. |#
 
 #| Q: What is (>? 12 133) |#
-#| A: #f-false.|#
+#| A: #f -- false.|#
 
 #| Q: What is (>? 120 11) |#
-#| A: #t-true. |#
+#| A: #t -- true. |#
 
 #| Q: On how many numbers do we have to recur? |#
 #| A: Two, n and m. |#
@@ -582,26 +593,28 @@
 #| Q: How many questions do we have to ask about n and m? |#
 #| A: Three: (zero? m), (zero? n), and else. |#
 
-#| Q: Can you write the function >?? now using zero? and sub1 |#
+#| Q: Can you write the function >? now using zero? and sub1 |#
 #| A: Sure. |#
 
-;; >?? : WN WN -> Boolean
-;; Given two whole numbers, produces true if the first is greater than the second.
-(define >??
+;; >?.v1 : WN WN -> Boolean
+;; Produces true if the first is greater than the second.
+(define >?.v1
   (λ (n m)
     (cond
       ((zero? m) #t)
       ((zero? n) #f)
-      (else (>?? (sub1 n) (sub1 m))))))
+      (else (>?.v1 (sub1 n) (sub1 m))))))
 
-(>?? 5 4) ; ==> #t
-(>?? 4 5) ; ==> #f
+(module+ test
+  (check-true (>?.v1 5 4)) 
+  (check-false (>?.v1 4 5))) 
 
 ; Book version is the same as mine.
 
-#| Q: Is the way we wrote (>?? n m) correct? |#
+#| Q: Is the way we wrote (>?.v1 n m) correct? |#
 #| A: No, try it for the case where n and m are the same number. Let n and m be 3. |#
-(>?? 3 3) ; ==> #t
+(module+ test
+  (check-true (>?.v1 3 3))) ; returns #true for equal numbers
 
 #| Q: (zero? 3) |#
 #| A: No, so move forwards to the next question. |#
@@ -609,7 +622,7 @@
 #| Q: (zero? 3) |#
 #| A:  No, so move forwards to the next question. |#
 
-#| Q: What is the meaning of (>?? (sub1 n) (sub1 m)) |#
+#| Q: What is the meaning of (>?.v1 (sub1 n) (sub1 m)) |#
 #| A: Recur, but with both arguments reduced by one. |#
 
 #| Q: (zero? 2) |#
@@ -618,7 +631,7 @@
 #| Q: (zero? 2) |#
 #| A: No, so move forwards to the next question. |#
 
-#| Q: What is the meaning of (>?? (sub1 n) (sub1 m)) |#
+#| Q: What is the meaning of (>?.v1 (sub1 n) (sub1 m)) |#
 #| A: Recur, but with both arguments reduced by one. |#
 
 #| Q: (zero? 1) |#
@@ -627,11 +640,11 @@
 #| Q: (zero? 1) |#
 #| A: No, so move forwards to the next question. |#
 
-#| Q: What is the meaning of (>?? (sub1 n) (sub1 m)) |#
+#| Q: What is the meaning of (>?.v1 (sub1 n) (sub1 m)) |#
 #| A: Natural recursion with both arguments reduced with one. |#
 
 #| Q: (zero? 0) |#
-#| A: Yes, so the value of (>?? n m) becomes #t. |#
+#| A: Yes, so the value of (>?.v1 n m) becomes #t. |#
 
 #| Q: Is this correct? |#
 #| A: No, because 3 is not greater than 3. |#
@@ -640,12 +653,15 @@
 #| A: Think about it. |#
 
 #| Q: Does the order of the two terminal conditions matter. |#
+#| A: Try it out! |#
+
+#| Q: Does the order of the two previous answers matter? |#
 #| A: Yes. Think first then try.
 
       If (zero? n) is first and is true, the value becomes #f, but
       if (zero? m) is first and true, the value becomes #t |#
 
-#| Q: How can we change the function >?? to take care of this subtle problem? |#
+#| Q: How can we change the function >?.v1 to take care of this subtle problem? |#
 #| A: Switch the zero? lines: |#
 
 ;; >? : WN WN -> Boolean
@@ -657,7 +673,8 @@
       ((zero? m) #t)
       (else (>? (sub1 n) (sub1 m))))))
 
-(>? 3 3) ; ==> #f
+(module+ test
+  (check-false (>? 3 3)))
  
 #| Q: What is (<? 4 6) |#
 #| A: #t. |#
@@ -672,7 +689,7 @@
 #| A: Ok. |#
 
 ;; <? : WN WN -> Boolean
-;; Given two whole numbers, produces true if the first is smaller than the second.
+;; Produces true if the first is smaller than the second.
 (define <? 
   (λ (n m) 
     (cond 
@@ -680,23 +697,25 @@
       ((zero? n) #t ) 
       (else (<? (sub1 n) (sub1 m)))))) 
 
-(<? 5 4) ; ==> #f
-(<? 4 5) ; ==> #t
-(<? 4 4) ; ==> #f
+(module+ test
+  (check-false (<? 5 4))
+  (check-true (<? 4 5)) 
+  (check-false(<? 4 4))) 
 
-; or, using bigger-than?
+; or, using >?
 (define <??
   (λ (n m )
     (>? m n)))
 
-(<?? 5 4) ; ==> #f
-(<?? 4 5) ; ==> #t
-(<?? 4 4) ; ==> #f
+(module+ test
+  (check-false (<?? 5 4))
+  (check-true (<?? 4 5)) 
+  (check-false(<?? 4 4))) 
 
 #| Q: Here is the definition of =? |#
 
 ;; =? : WN WN -> Boolean
-;; Given two whole numbers, produces true if the numbers are the same.
+;; Produces true if the numbers are the same.
 (define =?
   (λ (n m)
     (cond
@@ -707,9 +726,9 @@
 
 #| Q: Rewrite =? using <? and >? |#
 
-;; =?? : WN WN -> Boolean
-;; Given two whole numbers, produces true if the numbers are the same.
-(define =??
+;; =?.v1 : WN WN -> Boolean
+;; Produces true if the numbers are the same.
+(define =?.v1
   (λ (n m)
     (cond
       ((or (<? n m)
@@ -717,9 +736,9 @@
       (else #t))))
 
 ;; Note: The book version doesn't use the or.
-;; =??? : WN WN -> Boolean
+;; =?.v2 : WN WN -> Boolean
 ;; Given two whole numbers, produces true if the numbers are the same.
-(define =???
+(define =?.v2
   (λ (n m)
     (cond
       ((>? n m) #f)
@@ -744,17 +763,18 @@
 #| A: Ok. |#
 
 ;; ** : WN WN -> WN
-;; Given two whole numbers, raises the first to the power of the second-
+;; Raises the first number to the power of the second number
 (define **
   (λ (n m)
     (cond
       ((zero? m) 1)
       (else (* n (** n (sub1 m)))))))
 
-(** 1 1) ; ==> 1
-(** 2 3) ; ==> 8
-(** 5 3) ; ==> 125
-(** 4 4) ; ==> 256
+(module+ test
+  (check-equal? (** 1 1) 1) 
+  (check-equal? (** 2 3) 8) 
+  (check-equal? (** 5 3) 125) 
+  (check-equal? (** 4 4) 256))
 
 #| Q: What is a good name for this function? 
 (define ??? 
@@ -781,20 +801,23 @@
 #| A: Division. |#
 
 ;; divide : WN WN -> WN
-;; Given two whole numbers, produces the number of times the second fits into the first.
+;; Produces the number of times the second number fits into the first.
 (define divide 
   (λ (n m) 
     (cond 
       ((< n m) 0) 
       (else (add1 (divide (minus n m) m))))))
 
-(divide 10 5) ; ==> 2
-(divide 15 5) ; ==> 3
-(divide 36 5) ; ==> 7
+(module+ test
+  (check-equal? (divide 10 5) 2)
+  (check-equal? (divide 15 5) 3)
+  (check-equal? (divide 36 5) 7))
 ; Note: this is like the function quotient in Scheme.
 
 #| Q: What is (divide 15 4) |#
 #| A: Easy, it is 3. |#
+(module+ test
+  (check-equal? (divide 15 4) 3))
 
 #| Q: How do we get there? |#
 #| A: Easy, too:
@@ -823,18 +846,19 @@
 #| Q: Now try to write the function length. |#
 #| A: Ok. |#
 
-;; len : LAT -> WN
-;; Given LAT, produces the length of the list
-(define len
+;; length : LAT -> WN
+;; Produces the length of the given list
+(define length
   (λ (lat)
     (cond
       ((null? lat) 0)
-      (else (add1 (len (cdr lat)))))))
+      (else (add1 (length (cdr lat)))))))
 
 ; Book has the same solution
 
-(len '(1 2 3 4 5)) ; ==> 5
-(len '()) ; ==> 0
+(module+ test
+  (check-equal? (length '(1 2 3 4 5)) 5) 
+  (check-equal? (length '()) 0))
 
 #| Q: What is (pick n lat) where n is 4 and lat is
       (lasagna spaghetti ravioli macaroni meatball) |#
@@ -847,14 +871,16 @@
 #| A: Ok. |#
 
 ;; pick : LAT -> WN Atom
-;; Given whole number and LAT, produces the the atom at the position of the number.
+;; Produces the the atom at the position of the number.
 (define pick
   (λ (n lat)
     (cond
       ((zero? (sub1 n)) (car lat))
       (else (pick (sub1 n) (cdr lat))))))
 
-(pick 4 '(lasagna spaghetti ravioli macaroni meatball)) ; ==> 'macaroni
+(module+ test
+  (check-equal?
+   (pick 4 '(lasagna spaghetti ravioli macaroni meatball)) 'macaroni))
 
 ; Book has the same solution
 
@@ -865,7 +891,7 @@
 #| A: Ok. |#
 
 ;; rempick : WN LAT -> LAT
-;; Given whole number and LAT, produces the LAT without the atom at the position of the number.
+;; Removes the atom at the position of the number from the lat.
 (define rempick
   (λ (n lat)
     (cond
@@ -875,7 +901,10 @@
 
 ; Book has the same solution
 
-(rempick 3 '(hotdogs with hot mustard)) ; ==> '(hotdogs with mustard)
+(module+ test
+  (check-equal?
+   (rempick 3 '(hotdogs with hot mustard))
+   '(hotdogs with mustard)))
 
 #| Q: Is (number? a) true or false where a is tomato? |#
 #| A: False. |#
@@ -895,7 +924,7 @@
 #| A: Ok. |#
 
 ;; no-nums : LAT -> LAT
-;; Given LAT, produces a new LAT by removing all the numbers from the given LAT.
+;; Removing all numbers from the given lat.
 (define no-nums
   (λ (lat)
     (cond
@@ -905,9 +934,12 @@
       (else
        (cons (car lat) (no-nums (cdr lat)))))))
 
-(no-nums '(5 pears 6 prunes 9 dates)) ; ==> '(pears prunes dates)
+(module+ test
+  (check-equal?
+   (no-nums '(5 pears 6 prunes 9 dates))
+   '(pears prunes dates)))
 
-#| Book version is more verbose
+#| Book version is more verbose using several cond-else structures
 (define no-nums 
     (λ (lat) 
       (cond 
@@ -922,8 +954,8 @@
 #| Q: Now write all-nums which extracts a tup from a lat using all the numbers in the lat. |#
 #| A: Ok, I got this. |#
 
-;; all-nums : LAT -> LAT
-;; Given LAT, produces a new LAT by extracting all the numbers from the LAT.
+;; all-nums : LAT -> TUP
+;; Produces a new tuple by extracting all the numbers from the lat.
 (define all-nums
   (λ (lat)
     (cond
@@ -932,9 +964,10 @@
        (cons (car lat) (all-nums (cdr lat))))
       (else (all-nums (cdr lat))))))
 
-(all-nums '(5 pears 6 prunes 9 dates)) ; ==> '(5 6 9)
+(module+ test
+  (check-equal? (all-nums '(5 pears 6 prunes 9 dates)) '(5 6 9)))
 
-#| Book version is again a more verbose version
+#| Book version is again a more verbose with several cond-elses
 (define all-nums 
     (λ ( lat) 
       (cond 
@@ -951,25 +984,34 @@
       and eq? for all other atoms. |#
 #| A: Ok. Let's try this. |#
 
-;; egan? : Atom Atom  -> Boolean
-;; Given two atoms, produces true if they are the same.
+;; eqan? : Atom Atom  -> Boolean
+;; Produces true if atoms are the same.
 (define eqan?
   (λ (a1 a2)
     (cond
-      ((and (number? a1)
-            (number? a2)
-            (=? a1 a2)) #t)
-      ((or (number? a1)
-           (number? a2)) #f)
+      ((and (number? a1) (number? a2)) (=? a1 a2))
+      ((or (number? a1) (number? a2)) #f)
       (else (eq? a1 a2)))))
 
-(eqan? 'a 1) ; ==> #f
-(eqan? 'a 'b) ; ==> #f
-(eqan? 5 4) ; ==> #f
-(eqan? 7 7) ; ==> #t
-(eqan? 'a 'a) ; ==> #t
+(module+ test
+  (check-false (eqan? 'a 1))
+  (check-false (eqan? 'a 'b))
+  (check-false (eqan? 5 4))
+  (check-true (eqan? 7 7))
+  (check-true (eqan? 'a 'a)))
 
-; Book solution is identical. 
+#| Book solution is identical.
+   So, why didn't they use the full version (that I wrote below) this time?
+
+(define eqan?
+  (λ (a1 a2)
+    (cond
+      ((and (number? a1) (number? a2)) (= a1 a2))
+      (else
+       (cond
+         ((or (number? a1) (number? a2)) #f)
+         (else
+          (eq? a1 a2))))))) |# 
 
 #| Q: Can we assume that all functions written using eq? can be
       generalized by replacing eq? by eqan? |#
@@ -980,7 +1022,7 @@
 #| A: Ok. |#
 
 ;; occur : Atom LAT -> WN
-;; Given atom and LAT, produces the number of times the atom appears in the list.
+;; Produces the number of times the atom appears in the list.
 (define occur
   (λ (a lat)
     (cond
@@ -989,12 +1031,13 @@
        (add1 (occur a (cdr lat))))
       (else (occur a (cdr lat))))))
 
-(occur 'a '()) ; ==> 0
-(occur 'a '(a b c d e)) ; ==> 1
-(occur 'a '(a b c d a e)) ; ==> 2
-(occur 'a '(a b c a d a e a a d a)) ; ==> 6
+(module+ test
+  (check-equal? (occur 'a '()) 0)
+  (check-equal? (occur 'a '(a b c d e)) 1)
+  (check-equal? (occur 'a '(a b c d a e)) 2)
+  (check-equal? (occur 'a '(a b c a d a e a a d a)) 6))
 
-#| Book version is verbose as always and uses eq? instead of eqan?.
+#| Book version again uses many conds and also eq? instead of eqan?.
 (define occur 
     (λ (a lat) 
       (cond 
@@ -1010,7 +1053,7 @@
 #| A: Ok, will do. |#
 
 ;; one? : WN -> Boolean
-;; Given a whole number, produces true if it is one.
+;; Produces true if number is one.
 (define one?
   (λ (n)
     (zero? (sub1 n))))
@@ -1020,15 +1063,18 @@
   (λ (n)
     (=? n 1)))
 
-(one? 2) ; ==> #f
-(one? 0) ; ==> #f
-(one? 5466734) ; ==> #f
-(one? 1) ; ==> #t
+(module+ test
+  (check-false (one? 2))
+  (check-false (one? 0))
+  (check-false (one? 39845))
+  (check-true (one? 1))
+  (check-true (one? (sub1 2)))
 
-(one?.v2 2) ; ==> #f
-(one?.v2 0) ; ==> #f
-(one?.v2 5466734) ; ==> #f
-(one?.v2 1) ; ==> #t
+  (check-false (one?.v2 2))
+  (check-false (one?.v2 0))
+  (check-false (one?.v2 39845))
+  (check-true (one?.v2 1))
+  (check-true (one?.v2 (sub1 2))))
 
 #| Book gives many verbose versions
 (define one? 
@@ -1066,6 +1112,9 @@
       (else
        (cons (car lat) (rempick.v2 (sub1 n) (cdr lat)))))))
 
-(rempick.v2 3 '(lemon meringue salty pie)) ; ==> '(lemon meringue pie)
+(module+ test
+  (check-equal?
+   (rempick.v2 3 '(lemon meringue salty pie)) '(lemon meringue pie))) 
 
-#| Book version is identical to mine. |#
+; Book version is identical
+; Note: rempick in the book version fails on empty lists. First Commandment. Just sayin'.
