@@ -1,12 +1,13 @@
 #lang racket
 
-(provide (all-defined-out))
+;(provide (all-defined-out))
 
-(require "Atom.scm"
-         "1_Toys.scm"
-         "2_Doitdoitagainandagainandagain.scm"
-         "3_ConsTheMagnificent.scm"
-         "4_NumbersGames.scm")
+(require (only-in "Atom.scm" atom?)
+         (only-in "2_Doitdoitagainandagainandagain.scm" lat?)
+         (only-in "4_NumbersGames.scm" plus eqan?))
+
+(module+ test
+  (require rackunit))
 
 
 
@@ -33,7 +34,7 @@
 #| A: Ok. |#
 
 ;; rember* : Atom List -> List
-;; Given atom and a list, removes all occurrences of the atom from the list
+;; Removes all occurrences of the atom from the list
 (define rember*
   (λ (a l)
     (cond
@@ -48,10 +49,13 @@
       (else (cons (rember* a (car l))        ; cons result of (rember* a (car l)) 
                   (rember* a (cdr l)))))))   ; on the result of (rember* a (cdr l))
 
-(rember* 'cup '((coffee) cup ((tea) cup) (and (hick)) cup))
-; ==> '((coffee) ((tea)) (and (hick)))
-(rember* 'sauce '(((tomato sauce)) ((bean) sauce) (and ((flying)) sauce)))
-;==> '(((tomato)) ((bean)) (and ((flying))))
+(module+ test
+  (check-equal?
+   (rember* 'cup '((coffee) cup ((tea) cup) (and (hick)) cup))
+   '((coffee) ((tea)) (and (hick))))
+  (check-equal?
+   (rember* 'sauce '(((tomato sauce)) ((bean) sauce) (and ((flying)) sauce)))
+   '(((tomato)) ((bean)) (and ((flying))))))
 
 #| Book version of rember* is identical to mine. |#
 
@@ -61,11 +65,15 @@
 
 #| Q: (lat? l) where l is (((tomato sauce)) ((bean) sauce) (and ((flying)) sauce)) |#
 #| A: #f. |#
-(lat? '(((tomato sauce)) ((bean) sauce) (and ((flying)) sauce))) ; ==> #f
+(module+ test
+  (check-false
+   (lat? '(((tomato sauce)) ((bean) sauce) (and ((flying)) sauce))))) 
 
 #| Q: Is (car l) an atom where l is (((tomato sauce)) ((bean) sauce) (and ((flying)) sauce)) |#
 #| A: No. |#
-(atom? (car '(((tomato sauce)) ((bean) sauce) (and ((flying)) sauce)))) ; ==> #f
+(module+ test
+  (check-false
+   (atom? (car '(((tomato sauce)) ((bean) sauce) (and ((flying)) sauce)))))) 
 
 #| Q: What is (insertR* new old l) where new is roast old is chuck and l is
       ((how much (wood)) could ((a (wood) chuck)) (((chuck))) (if (a) ((wood chuck))) could chuck wood) |#
@@ -106,19 +114,26 @@
                      (insertR* new old
                                (cdr l))))))
       (else                                  ; if (car l) is a list 
-       (cons (insertR* new old               ; run insertR* on it 
+       (cons (insertR* new old               ; run insertR* on it first 
                        (car l))
-             (insertR* new old               ; and cons in to the natural recursion with (cdr l)
+             (insertR* new old               ; and then cons result to the result of natural recursion with (cdr l)
                        (cdr l)))))))
 
-(insertR* 'roast 'chuck
-          '((how much (wood)) could ((a (wood) chuck)) (((chuck))) (if (a) ((wood chuck))) could chuck wood))
-#| ==> '((how much (wood))
-          could
-          ((a (wood) chuck roast))
-          (((chuck roast)))
-          (if (a) ((wood chuck roast)))
-          could chuck roast wood) |#
+(module+ test
+  (check-equal?
+   (insertR* 'roast 'chuck
+             '((how much (wood))
+               could
+               ((a (wood) chuck))
+               (((chuck)))
+               (if (a) ((wood chuck)))
+               could chuck wood))
+   '((how much (wood))
+     could
+     ((a (wood) chuck roast))
+     (((chuck roast)))
+     (if (a) ((wood chuck roast)))
+     could chuck roast wood)))
 
 #| Book version of insertR* is identical to mine. |#
 
@@ -203,7 +218,7 @@
 #| A: Ok. |#
 
 ;; occur* : Atom List -> WN
-;; Given atom and list, produces the sum of atom's occurrences in the list.
+;; Produces the sum ofgiven atom's occurrences in the list.
 (define occur*
   (λ (a l)
     (cond
@@ -218,13 +233,19 @@
              (occur* a (cdr l)))))))                 ; add count of aotm in (car l) to recursion with (cdr l)
 
 
-(occur* 'banana '((banana)
-                  (split ((((banana ice))) 
-                          (cream (banana)) 
-                          sherbet)) 
-                  (banana) 
-                  (bread) 
-                  (banana brandy))) ; ==> 5
+(module+ test
+  (check-equal?
+   (occur* 'banana
+           '((banana)
+             (split ((((banana ice))) 
+                     (cream (banana)) 
+                     sherbet)) 
+             (banana) 
+             (bread) 
+             (banana brandy)))
+   5))
+
+;; CONTINUE!!!
 
 #| Book solution is identical to mine. |#
 
