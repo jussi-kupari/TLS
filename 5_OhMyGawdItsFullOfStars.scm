@@ -1,6 +1,15 @@
 #lang racket
 
-;(provide (all-defined-out))
+(provide rember*
+         insertR*
+         occur*
+         subst*
+         insertL*
+         member*
+         leftmost
+         eqlist?
+         equal?
+         rember)
 
 (require (only-in "Atom.scm" atom?)
          (only-in "2_Doitdoitagainandagainandagain.scm" lat?)
@@ -555,8 +564,6 @@
 
 #| Q: How many questions will eqlist? have to ask about its arguments? |#
 #| A: Nine. |#
-
-;; CONTINUE!!
 
 #| Q: Can you explain why there are nine questions? |#
 #| A: Here are our words: 
