@@ -1,15 +1,18 @@
 #lang racket
 
-(provide (all-defined-out))
+(provide numbered?
+         value
+         sero?
+         edd1
+         zub1
+         Plus)
 
-(require "Atom.scm"
-         "1_Toys.scm"
-         "2_Doitdoitagainandagainandagain.scm"
-         "3_ConsTheMagnificent.scm"
-         "4_NumbersGames.scm"
-         "5_OhMyGawdItsFullOfStars.scm")
+(require (only-in "Atom.scm" atom?)
+         (only-in "4_NumbersGames.scm" plus **))
 
 
+(module+ test
+  (require rackunit))
 
 #|                    Shadows                    |#
 
@@ -37,7 +40,7 @@
 #| A: In ours: "For the purpose of this chapter, an arithmetic expression is either an atom 
       (including numbers), or two arithmetic expressions combined by +, *, or **." |#
 
-#| Q: What is (quote a) |#
+#| Q: What is (quote a) NOTE: this is the same as 'a |#
 #| A: a. |#
 
 #| Q: What is (quote +) |#
@@ -48,6 +51,9 @@
 
 #| Q: Is (eq? (quote a) y) true or false where y is a? |#
 #| A: True. |#
+(module+ test
+  (define y 'a)
+  (check-true (eq? (quote a) y)))
 
 #| Q: Is (eq? x y) true or false where x is a and y is a? |#
 #| A: That's the same question again. And the answer is still true. |#
@@ -87,7 +93,9 @@
       and **. |#
 
 #| Q: Now can you write a skeleton for numbered? |#
-#| A: Not so sure. |#
+#| A: Me: Not so sure. |#
+
+;; CONTINUE!!!
 
 #|
 (define numbered?
@@ -107,8 +115,7 @@
 #| A: It is the second question. |#
 
 #| Q: Can you guess the third one? |#
-#| A: No, but the book says:
-      (eq? (car (cdr aexp)) (quote * )) is perfect. |#
+#| A: (eq? (car (cdr aexp)) (quote * )) is perfect. |#
 
 #| Q: And you must know the fourth one. |#
 #| A: (eq? (car (cdr aexp)) (quote **)), of course. |#
@@ -151,7 +158,7 @@
 #| A: It is the car of the cdr of the cdr of aexp. (car (cdr (cdr aexp))) |#
 
 #| Q: So what do we need to ask? |#
-#| A: (numbered? (car aexp)) and (numbered ? (car (cdr (cdr aexp)))). 
+#| A: (numbered? (car aexp)) and (numbered? (car (cdr (cdr aexp)))). 
       Both must be true. |#
 
 #| Q: What is the second answer? |#
@@ -163,60 +170,64 @@
 #| Q: Try numbered? again. |#
 #| A: Ok. |#
 
-;; numbered? : Aexp -> Boolean
-;; Given aexp, produces true if it is numbered. 
-(define numbered? 
+;; numbered?.v1 : Aexp -> Boolean
+;; Produces true if aexp is numbered. 
+(define numbered?.v1 
   (λ (aexp) 
     (cond
       ((atom? aexp) (number? aexp))
       ((eq? (car (cdr aexp)) '+)
        (and
-        (numbered? (car aexp))
-        (numbered? (car (cdr (cdr aexp))))))        ; * See below
+        (numbered?.v1 (car aexp))
+        (numbered?.v1 (car (cdr (cdr aexp))))))        ; % See below
       ((eq? (car (cdr aexp)) '*)
        (and
-        (numbered? (car aexp))
-        (numbered? (car (cdr (cdr aexp)))))) 
+        (numbered?.v1 (car aexp))
+        (numbered?.v1 (car (cdr (cdr aexp)))))) 
       ((eq? (car (cdr aexp)) '**)                   ;This could be replaced with else
        (and
-        (numbered? (car aexp))
-        (numbered? (car (cdr (cdr aexp)))))))))
+        (numbered?.v1 (car aexp))
+        (numbered?.v1 (car (cdr (cdr aexp)))))))))
 
-#| *
+#| %
 (car (cdr (cdr aexp))) because
+(cdr (cdr '((5 + 5) + 2)))) ==> '(2) 
+(car (cdr (cdr '((5 + 5) + 2)))) ==> 2
 (cdr (cdr '((5 + 5) + (2 + 2)))) ==> '((2 + 2))
 (car (cdr (cdr '((5 + 5) + (2 + 2))))) ==> '(2 + 2) |#
 
-(numbered? 12) ; ==> #t
-(numbered? 'twelve) ; ==> #f
-(numbered? '(1 + 1)) ; ==> #t
-(numbered? '(3 ** 5)) ; ==> #t
-(numbered? '(6 * 2)) ; ==> #t
-(numbered? '(6 * two)) ; ==> #f
-(numbered? '((5 + 5) + (2 + 2))) ; ==> #t
+(module+ test
+  (check-true (numbered?.v1 12))
+  (check-false (numbered?.v1 'twelve))
+  (check-true (numbered?.v1 '(1 + 1)))
+  (check-true (numbered?.v1 '(3 ** 5)))
+  (check-true (numbered?.v1 '(6 * 2)))
+  (check-false (numbered?.v1 '(6 * two)))
+  (check-true (numbered?.v1 '((5 + 5) + (2 + 2)))))
 
 #| Q: Since aexp was already understood to be an arithmetic expression, could we have written 
       numbered? in a simpler way? |#
 #| A: Yes. |#
 
-;; numbered?? : Aexp -> Boolean
-;; Given aexp, produces true if it is numbered.
-(define numbered??
+;; numbered? : Aexp -> Boolean
+;; Produces true if aexp is numbered.
+(define numbered?
   (λ (aexp)
     (cond
       ((atom? aexp) (number? aexp))
       (else                                  
-       (and (numbered?? (car aexp))
-            (numbered??
+       (and (numbered? (car aexp))
+            (numbered?
              (car (cdr (cdr aexp)))))))))
 
-(numbered?? 12) ; ==> #t
-(numbered?? 'twelve) ; ==> #f
-(numbered?? '(1 + 1)) ; ==> #t
-(numbered?? '(3 ** 5)) ; ==> #t
-(numbered?? '(6 * 2)) ; ==> #t
-(numbered?? '(6 * two)) ; ==> #f
-(numbered?? '((5 + 5) + (2 + 2))) ; ==> #t
+(module+ test
+  (check-true (numbered? 12))
+  (check-false (numbered? 'twelve))
+  (check-true (numbered? '(1 + 1)))
+  (check-true (numbered? '(3 ** 5)))
+  (check-true (numbered? '(6 * 2)))
+  (check-false (numbered? '(6 * two)))
+  (check-true (numbered? '((5 + 5) + (2 + 2)))))
 
 #| Q: Why can we simplify? |#
 #| A: Because we know we've got the function right. |#
@@ -280,29 +291,30 @@
 #| Q: Give value another try. |#
 #| A: Ok. |#
 
-;; value : Nexp -> WN
-;; Given nexp, produces its value
-(define value
+;; value.v1 : Nexp -> WN
+;; Produces the value of given nexp
+(define value.v1
   (λ (nexp)
     (cond
       ((atom? nexp) nexp)
       ((eq? (car (cdr nexp)) '+)
-       (plus (value (car nexp))
-             (value (car (cdr (cdr nexp))))))                     
+       (plus (value.v1 (car nexp))
+             (value.v1 (car (cdr (cdr nexp))))))                     
       ((eq? (car (cdr nexp)) '*)
-       (* (value (car nexp))
-          (value (car (cdr (cdr nexp))))))
+       (* (value.v1 (car nexp))
+          (value.v1 (car (cdr (cdr nexp))))))
       (else                                    
-       (** (value (car nexp))
-           (value (car (cdr (cdr nexp)))))))))
+       (** (value.v1 (car nexp))
+           (value.v1 (car (cdr (cdr nexp)))))))))
 
-(value 10) ; ==> 10
-(value 999) ; ==> 999
-(value '(999 + 1)) ; ==> 1000
-(value '(999 * 1)) ; ==> 999
-(value '(999 ** 1)) ; ==> 1000
-(value '(999 ** 2)) ; ==> 998001
-(value '(999 ** 0)) ; ==> 1
+(module+ test
+  (check-equal? (value.v1 10) 10)
+  (check-equal? (value.v1 999) 999)
+  (check-equal? (value.v1 '(999 * 1)) 999)
+  (check-equal? (value.v1 '(999 + 1)) 1000)
+  (check-equal? (value.v1 '(999 ** 1)) 999)
+  (check-equal? (value.v1 '(999 ** 2)) 998001)
+  (check-equal? (value.v1 '(999 ** 0)) 1))
 
 #| Q: Can you think of a different representation of arithmetic expressions? |#
 #| A: There are several of them. |#
@@ -350,7 +362,7 @@
 ;; Note: My version below doesn't work either (produces no output)
 
 ;; value.v2 : Nexp -> WN
-;; Given nexp, produces its value
+;; Produces the value of given nexp
 (define value.v2
   (λ nexp
     (cond
@@ -375,7 +387,7 @@
 #| Q: (atom? nexp) where nexp is (+ 1 3) |#
 #| A: No. |#
 
-#| Q: (eq? (car nexp) (quote +)) where nexp is (+ 1 3) |#
+#| Q: (eq? (car nexp) '+) where nexp is (+ 1 3) |#
 #| A: Yes. |#
 
 #| Q: And now recur. |#
@@ -406,53 +418,58 @@
 #| Q: Let's write a function 1st-sub-exp for arithmetic expressions. |#
 #| A: Ok. |#
 
-;; 1st-sub-exp : Nexp -> Nexp
-;; Given nexp, produces the first sub-expression.
-(define 1st-sub-exp
+;; 1st-sub-exp.v1 : Nexp -> Nexp
+;; Produces the first sub-expression of given nexp.
+(define 1st-sub-exp.v1
   (λ (nexp)
     (cond
       (else (car (cdr nexp))))))
 
-(1st-sub-exp '(+ 4 7)) ; ==> 4
+(module+ test
+  (check-equal? (1st-sub-exp.v1 '(+ 4 7)) 4))
 
 #| Q: Why do we ask else |#
 #| A: Because the first question is also the last question. |#
 
 #| Q: Can we get by without (cond ...) if we don't need to ask questions? |#
-#| A: Yes, remember one-liners from chapter 4.
-
+#| A: Yes, remember one-liners from chapter 4. |#
 (define 1st-sub-exp 
   (λ (aexp) 
-    (car (cdr aexp)))) |#
+    (car (cdr aexp))))
+
+(module+ test
+  (check-equal? (1st-sub-exp '(+ 4 7)) 4))
  
 #| Q: Write 2nd-sub-exp for arithmetic expressions. |#
 #| A: Ok. |#
 
 ;; 2st-sub-exp : Nexp -> Nexp
-;; Given nexp, produces the second sub-expression.
+;; Produces the second sub-expression of given nexp.
 (define 2st-sub-exp 
   (λ (aexp) 
     (car (cdr (cdr aexp)))))
 
-(2st-sub-exp '(+ 4 7)) ; ==> 7
+(module+ test
+  (check-equal? (2st-sub-exp '(+ 4 7)) 7))
 
 #| Q: Finally, let's replace (car nexp) by (operator nexp) |#
 #| A: Ok. |#
 
 ;; operator : Aexp -> Atom
-;; Given aexp, produces the operator between the sub-expressions.
+;; Produces the operator between the sub-expressions of given nexp.
 (define operator
-  (λ (nexp)
-    (car nexp)))
+  (λ (aexp)
+    (car aexp)))
 
-(operator '(+ 4 7)) ; ==> '+
+(module+ test
+  (check-equal? (operator '(+ 4 7)) '+))
 
 #| Q: Now write value again. |#
 #| A: Ok. |#
 
-;; value.v3 : Nexp -> WN
-;; Given nexp, produces its value
-(define value.v3
+;; value : Nexp -> WN
+;; Produces the value of given nexp
+(define value
   (λ (nexp)
     (cond
       ((atom? nexp) nexp)
@@ -468,8 +485,8 @@
 
 ;; Book solution is identical.
 
-(value.v3 '(* 5 6)) ; ==> 30
-
+(module+ test
+  (check-equal? (value '(* 5 6)) 30))
 
 #| Q: Can we use this value function for the first representation of arithmetic expressions in 
       this chapter? |# 
@@ -528,53 +545,56 @@
 #| A: Ok. |#
 
 ;; Zero? : Numb -> Boolean
-;; Given Numb, produces true if it is Zero 
+;; Produces true if given Numb is Zero 
 (define Zero?
   (λ (n)
     (eq? n '())))
 
-(Zero? '()) ; ==> #t
-(Zero? '(())) ; ==> #f
+(module+ test
+  (check-true (Zero? '()))
+  (check-false (Zero? '(()))))
 
 ; Book version is below
 
 ;; sero? : Numb -> Boolean
-;; Given Numb, produces true if it is Zero
+;; Produces true if given Numb is Zero
 (define sero?
   (λ (n)
     (null? n)))
 
-(sero? '()) ; ==> #t
-(sero? '(())) ; ==> #f
-
+(module+ test
+  (check-true (sero? '()))
+  (check-false (sero? '(()))))
 
 #| Q: Can you write a function that is like add1 |#
 #| A: Ok. |#
 
 ;; edd1 : Numb -> Numb
-;; Given Numb, produces a Numb that is one greater.
+;; Produces a Numb that is one greater.
 (define edd1
   (λ (n)
     (cons '() n)))
 
-(edd1 '()) ; ==> '(())
-(edd1 '(())) ; ==> '(() ())
+(module+ test
+  (check-equal? (edd1 '()) '(()))
+  (check-equal? (edd1 '(())) '(() ())))
 
-; Book solution is identical (I called mine originally Add1)
+; Book solution is identical
 
 #| Q: What about sub1 |#
 #| A: Ok. |#
 
 ;; zub1 : Numb -> Numb
-;; Given Numb, produces a Numb that is one smaller.
+;; Produces a Numb that is one smaller.
 (define zub1
   (λ (n)
     (cdr n)))
 
-(zub1 '(())) ; ==> '()
-(zub1 '(() ())) ; ==> '(())
+(module+ test
+  (check-equal? (zub1 '(())) '())
+  (check-equal? (zub1 '(() ())) '(())))
 
-; Book solution is identical (I called mine originally Sub1)
+; Book solution is identical
 
 #| Q: Is this correct? |#
 #| A: Let's see. |#
@@ -586,29 +606,31 @@
 #| Q: Rewrite + using this representation. |#
 #| A: Ok. |#
 
-;; Plus ; Numb Numb -> Numb
-;; Given two numbs, produces their sum.
-(define Plus
-  (λ (n m)
-    (cond
-      ((sero? m) n)
-      (else (Plus (edd1 n) (zub1 m))))))
-
-(Plus '(() ()) '()) ; ==> '(() ())
-(Plus '(() ()) '(())) ; ==> '(() () ())
-
-; Book version differs from like (as did the original plus function)
-
-;; Plus ; Numb Numb -> Numb
-;; Given two numbs, produces their sum.
+;; Pluz ; Numb Numb -> Numb
+;; Produces the sum of given numbs.
 (define Pluz
   (λ (n m)
     (cond
       ((sero? m) n)
-      (else (edd1 (Pluz n (zub1 m)))))))
+      (else (Pluz (edd1 n) (zub1 m))))))
 
-(Pluz '(() ()) '()) ; ==> '(() ())
-(Pluz '(() ()) '(())) ; ==> '(() () ())
+(module+ test
+  (check-equal? (Pluz '(() ()) '()) '(() ()))
+  (check-equal? (Pluz '(() ()) '(())) '(() () ())))
+
+; Book version differs from like (as did the original plus function)
+
+;; Plus ; Numb Numb -> Numb
+;; Produces the sum of given numbs.
+(define Plus
+  (λ (n m)
+    (cond
+      ((sero? m) n)
+      (else (edd1 (Plus n (zub1 m)))))))
+
+(module+ test
+  (check-equal? (Plus '(() ()) '()) '(() ()))
+  (check-equal? (Plus '(() ()) '(())) '(() () ())))
 
 
 #| Q: Has the definition of Plus changed? |#
@@ -618,7 +640,7 @@
 #| A: Easy:
 
 ;; lat? : List-of-Anything -> Boolean
-;; Given list, produces true if it only contains atoms
+;; Produces true if LAT only contains atoms
 (define lat? 
   (λ (l) 
     (cond 
