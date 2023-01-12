@@ -2,6 +2,9 @@
 
 (provide numbered?
          value
+         1st-sub-exp
+         2nd-sub-exp
+         operator
          sero?
          edd1
          zub1
@@ -441,14 +444,14 @@
 #| Q: Write 2nd-sub-exp for arithmetic expressions. |#
 #| A: Ok. |#
 
-;; 2st-sub-exp : Aexp -> Aexp
+;; 2nd-sub-exp : Aexp -> Aexp
 ;; Produces the second sub-expression of given nexp.
-(define 2st-sub-exp 
+(define 2nd-sub-exp 
   (λ (aexp) 
     (car (cdr (cdr aexp)))))
 
 (module+ test
-  (check-equal? (2st-sub-exp '(+ 4 7)) 7))
+  (check-equal? (2nd-sub-exp '(+ 4 7)) 7))
 
 #| Q: Finally, let's replace (car nexp) by (operator nexp) |#
 #| A: Ok. |#
@@ -473,13 +476,13 @@
       ((atom? nexp) nexp)
       ((eq? (operator nexp) '+)
        (+ (value (1st-sub-exp nexp))
-          (value (2st-sub-exp nexp))))
+          (value (2nd-sub-exp nexp))))
       ((eq? (operator nexp) '*)
        (* (value (1st-sub-exp nexp))
-          (value (2st-sub-exp nexp))))
+          (value (2nd-sub-exp nexp))))
       (else
        (** (value (1st-sub-exp nexp))
-           (value (2st-sub-exp nexp)))))))
+           (value (2nd-sub-exp nexp)))))))
 
 ;; Book solution is identical.
 
