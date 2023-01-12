@@ -14,6 +14,8 @@
 (module+ test
   (require rackunit))
 
+
+
 #|                    Shadows                    |#
 
 
@@ -94,8 +96,6 @@
 
 #| Q: Now can you write a skeleton for numbered? |#
 #| A: Me: Not so sure. |#
-
-;; CONTINUE!!!
 
 #|
 (define numbered?
@@ -292,7 +292,7 @@
 #| A: Ok. |#
 
 ;; value.v1 : Nexp -> WN
-;; Produces the value of given nexp
+;; Produces the value of the given nexp
 (define value.v1
   (λ (nexp)
     (cond
@@ -377,8 +377,6 @@
        (** (value.v2 (car (cdr nexp)))
            (value.v2 (car (cdr (cdr nexp)))))))))
 
-
-
 (value.v2 '(* 5 6)) ; ==> no output
 
 #| Q: Let's try an example. |#
@@ -418,12 +416,12 @@
 #| Q: Let's write a function 1st-sub-exp for arithmetic expressions. |#
 #| A: Ok. |#
 
-;; 1st-sub-exp.v1 : Nexp -> Nexp
+;; 1st-sub-exp.v1 : Aexp -> Aexp
 ;; Produces the first sub-expression of given nexp.
 (define 1st-sub-exp.v1
-  (λ (nexp)
+  (λ (aexp)
     (cond
-      (else (car (cdr nexp))))))
+      (else (car (cdr aexp))))))
 
 (module+ test
   (check-equal? (1st-sub-exp.v1 '(+ 4 7)) 4))
@@ -443,7 +441,7 @@
 #| Q: Write 2nd-sub-exp for arithmetic expressions. |#
 #| A: Ok. |#
 
-;; 2st-sub-exp : Nexp -> Nexp
+;; 2st-sub-exp : Aexp -> Aexp
 ;; Produces the second sub-expression of given nexp.
 (define 2st-sub-exp 
   (λ (aexp) 
