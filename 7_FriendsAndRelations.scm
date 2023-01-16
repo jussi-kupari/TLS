@@ -29,7 +29,7 @@
 #| A: Ok. |#
 
 ;; set.v1? : LAT -> Boolean
-;; Given lat, produces true if no atom appears more than once.
+;; Produces true if no atom appears more than once.
 (define set.v1?
   (λ (lat)
     (cond
@@ -52,7 +52,7 @@
 #| A: Ok. Let's remove the redundant cond. I will also use 'and' and 'not' |#
 
 ;; set.v2? : LAT -> Boolean
-;; Given lat, produces true if no atom appears more than once.
+;; Produces true if no atom appears more than once.
 (define set.v2?
   (λ (lat)
     (cond
@@ -69,7 +69,7 @@
 ; Book version (below) just removes the redundant cond.
 
 ;; set? : LAT -> Boolean
-;; Given lat, produces true if no atom appears more than once.
+;; Produces true if no atom appears more than once.
 (define set?
   (λ (lat)
     (cond
@@ -100,7 +100,7 @@
 #| A: Ok. |#
 
 ;; makeset.v1 : LAT -> SET
-;; Produces a set from given list.
+;; Produces a set from the given list.
 (define makeset.v1
   (λ (l)
     (cond
@@ -132,7 +132,7 @@
 ; This version is identical to the one in the book.
 
 ;; makeset : LAT -> SET
-;; Produces a set from given list.
+;; Produces a set from the given list.
 (define makeset
   (λ (l)
     (cond
@@ -229,25 +229,30 @@
 #| Q: Try to write subset ? with (and ...) |#
 #| A: This is my original version of subset. |#
 
-;; CONTINUE!!!!!!!!
 
 #| Q: What is (eqset? set1 set2) where set1 is (6 large chickens with wings) and 
       set2 is (6 chickens with large wings) |#
 #| A: #t. |#
 
+#| Q: Write eqset? |#
+#| A: Ok. |#
+
 ;; eqset? : Set Set -> Boolean
-;; Given two sets, produces true if they are the same.
+;; Produces true if the sets contain the same atoms
 (define eqset.v1?
   (λ (set1 set2)
     (cond
-      ((and (null? set1) (null? set2) #t))
+      ((null? set1) (null? set2))
       ((and
         (member? (car set1) set2)
         (eqset.v1? (cdr set1) (rember (car set1) set2)))))))
 
-(eqset.v1? '(6 large chickens with wings) '(6 chickens with large wings)) ; ==> #t
+(module+ test
+  (check-true
+   (eqset.v1? '(6 large chickens with wings)
+              '(6 chickens with large wings))))
 
-; Book just uses subset? and i forgot to use it...
+; Book nicely just uses subset? both ways
 
 (define eqset.v2?
   (λ (set1 set2)
@@ -256,7 +261,10 @@
        (subset? set2 set1))
       (else #f))))
 
-(eqset.v2? '(6 large chickens with wings) '(6 chickens with large wings)) ; ==> #t
+(module+ test
+  (check-true
+   (eqset.v2? '(6 large chickens with wings)
+              '(6 chickens with large wings))))
 
 #| Q: Can you write eqset? with only one cond-line? |#
 #| A: Ok. |#
@@ -268,19 +276,26 @@
        (and (subset? set1 set2)
             (subset? set2 set1))))))
 
-(eqset.v3? '(6 large chickens with wings) '(6 chickens with large wings)) ; ==> #t
+(module+ test
+  (check-true
+   (eqset.v3? '(6 large chickens with wings)
+              '(6 chickens with large wings))))
+
 
 #| Q: Write the one-liner. |#
 #| A: Ok. |#
 
 ;; eqset? : Set Set -> Boolean
-;; Given two sets, produces true if they are the same.
+;; Produces true if the sets contain the same atoms
 (define eqset?
   (λ (set1 set2)
     (and (subset? set1 set2)
          (subset? set2 set1))))
 
-(eqset? '(6 large chickens with wings) '(6 chickens with large wings)) ; ==> #t
+(module+ test
+  (check-true
+   (eqset? '(6 large chickens with wings)
+           '(6 chickens with large wings))))
 
 #| Q: What is (intersect? set1 set2) where set1 is (stewed tomatoes and macaroni) and 
       set2 is (macaroni and cheese) |#
@@ -290,7 +305,7 @@
 #| A: Ok. |#
 
 ;; intersect? : Set1 Set2 -> Boolean
-;; Given two sets, produces true if at least one from first is in second.
+;; Produces true if at least one atom is shared among the sets.
 (define intersect?
   (λ (set1 set2)
     (cond
@@ -299,8 +314,11 @@
        (or (member? (car set1) set2)
            (intersect? (cdr set1) set2))))))
 
-(intersect? '(stewed tomatoes and macaroni) '(macaroni and cheese)) ; ==> #t
-(intersect? '(stewed tomatoes but no chicken) '(macaroni and cheese)) ; ==> #f
+(module+ test
+  (check-true
+   (intersect? '(stewed tomatoes and macaroni) '(macaroni and cheese)))
+  (check-false
+   (intersect? '(stewed tomatoes but no chicken) '(macaroni and cheese))))
 
 ;First book version
 
@@ -310,12 +328,15 @@
       ((null? set1) #f ) 
       (else 
        (cond 
-         ((member? (car set1) set2) #t ) 
+         ((member? (car set1) set2) #t) 
          (else (intersect.v2? 
                 (cdr set1 ) set2))))))) 
 
-(intersect.v2? '(stewed tomatoes and macaroni) '(macaroni and cheese)) ; ==> #t
-(intersect.v2? '(stewed tomatoes but no chicken) '(macaroni and cheese)) ; ==> #f
+(module+ test
+  (check-true
+   (intersect.v2? '(stewed tomatoes and macaroni) '(macaroni and cheese)))
+  (check-false
+   (intersect.v2? '(stewed tomatoes but no chicken) '(macaroni and cheese))))
 
 #| Q: Write the shorter version. |#
 #| A: Ok. |#
@@ -327,11 +348,14 @@
       ((member? (car set1) set2) #t ) 
       (else (intersect.v3? (cdr set1) set2)))))
 
-(intersect.v3? '(stewed tomatoes and macaroni) '(macaroni and cheese)) ; ==> #t
-(intersect.v3? '(stewed tomatoes but no chicken) '(macaroni and cheese)) ; ==> #f
+(module+ test
+  (check-true
+   (intersect.v3? '(stewed tomatoes and macaroni) '(macaroni and cheese)))
+  (check-false
+   (intersect.v3? '(stewed tomatoes but no chicken) '(macaroni and cheese))))
 
 #| Q: Try writing intersect? with (or ...) |#
-#| A: My own version was written with (or ...)|#
+#| A: See my original version above. It is written with (or ...) |#
 
 #| Q: What is (intersect set1 set2) where set1 is (stewed tomatoes and macaroni)
       and set2 is (macaroni and cheese) |#
@@ -341,7 +365,7 @@
 #| A: Ok. |#
 
 ;; intersect : Set1 Set2 -> Boolean
-;; Given two sets, produces the intersect of the two sets.
+;; Produces the intersection of the two sets.
 (define intersect 
   (λ (set1 set2) 
     (cond 
@@ -351,9 +375,14 @@
              (intersect (cdr set1) set2))) 
       (else (intersect (cdr set1) set2)))))
 
-(intersect '(stewed tomatoes and macaroni) '(macaroni and cheese)) ; ==> '(and macaroni)
+(module+ test
+  (check-equal?
+   (intersect '(stewed tomatoes and macaroni) '(macaroni and cheese))
+   '(and macaroni)))
 
-; Book solution is identical to mine.
+; Book solution identical
+; Note that this does not work with lists (that have several same atoms). For that add in multirember.
+
 
 #| Q: What is (union set1 set2) where set1 is (stewed tomatoes and macaroni casserole) 
       and set2 is (macaroni and cheese) |#
@@ -363,33 +392,22 @@
 #| A: Ok. |#
 
 ;; union : Set Set -> Set
-;; Given two sets, produces their union.
-(define union.v1
+;; Produces the union of given sets.
+(define union
   (λ (set1 set2)
     (cond
       ((null? set1) set2)
       ((member? (car set1) set2)
-       (cons (car set1)           ; this would be easier the other way around
-             (union.v1 (cdr set1) (rember (car set1) set2))))
-      (else (cons (car set1)
-                  (union.v1 (cdr set1) set2))))))
+       (union (cdr set1) set2))
+      (else (cons (car set1) (union (cdr set1) set2))))))
 
-(union.v1 '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
-; ==> '(stewed tomatoes and macaroni casserole cheese)
 
-; Book solution is below. I'm tired and thought the other way around overcomplicating my solution...
+(module+ test
+  (check-equal?
+   (union '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
+   '(stewed tomatoes casserole macaroni and cheese)))
 
-(define union
-  (lambda (set1 set2) 
-    (cond 
-      ((null? set1) set2) 
-      ((member? (car set1) set2) 
-       (union (cdr set1) set2)) 
-      (else (cons (car set1) 
-                  (union (cdr set1) set2)))))) 
-
-(union '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
-; ==> '(stewed tomatoes and macaroni casserole cheese)
+; Book solution is identical to mine.
 
 #| Q: What is this function? |#
 
@@ -404,12 +422,13 @@
                   (xxx (cdr set1) set2)))))) |#
 
 #| A: Note: Looks like it keeps the atoms that are unique for set1, set-diff.
+
       In our words: 
       "It is a function that returns all the atoms in set1 that are not in set2." 
       That is, xxx is the (set) difference function. |#
 
 ;; set-diff : Set Set -> Set
-;; Given two sets, produces the set of atoms that is unique to the first set
+;; Produces the set of atoms that is unique to the first set
 (define set-diff 
   (λ (set1 set2) 
     (cond 
@@ -419,15 +438,17 @@
       (else (cons (car set1) 
                   (set-diff (cdr set1) set2))))))
 
-(set-diff '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
-; ==> '(stewed tomatoes casserole)
+(module+ test
+  (check-equal?
+   (set-diff '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
+   '(stewed tomatoes casserole)))
 
-#| Q: What is (intersect all l-set) where l-set is
+#| Q: What is (intersectall l-set) where l-set is
       ((a b c) (c a d e) (e f g h a b)) |#
 
 #| A: (a). |#
 
-#| Q: What is (intersect all l-set) where l-set is
+#| Q: What is (intersectall l-set) where l-set is
       ((6 pears and) 
        (3 peaches and 6 peppers) 
        (8 pears and 6 plums) 
@@ -441,7 +462,7 @@
 #| A: Ok. |#
 
 ;; intersectall : L-Set -> Set
-;; Given l-set, produces the intersection of atoms in the sets
+;; Produces the intersection of all the sets in the l-set
 (define intersectall
   (λ (l-set)
     (cond
@@ -450,19 +471,21 @@
        (intersect (car l-set)
                   (intersectall (cdr l-set)))))))
 
-#| Note: I wanted to do this recursively with intersect but it
-         took me some time to realize that the terminal line has to be
-         (null? (cdr l-set) (car l-set)).
+; Book solution is identical.
 
-         The book solution is of course the same. |#
-
-(intersectall '((a b c) (c a d e) (e f g h a b))) ; ==> '(a)
-
-(intersectall '((6 pears and) 
+(module+ test
+  (check-equal?
+   (intersectall '((a b c) (c a d e) (e f g h a b)))
+   '(a))
+  (check-equal?
+   (intersectall '((6 pears and) 
                 (3 peaches and 6 peppers) 
                 (8 pears and 6 plums) 
-                (and 6 prunes with some apples))) ; ==> '(6 and)
+                (and 6 prunes with some apples)))
+   '(6 and)))
 
+
+;;; CONTINUE !!!!!!!!
 
 #| Q: Is this a pair? (pear pear) |#
 #| A: Yes, because it is a list with only two atoms. |#
