@@ -1,6 +1,25 @@
 #lang racket
 
-(provide set?)
+(provide set?
+         makeset
+         subset?
+         eqset?
+         intersect?
+         intersect
+         union
+         set-diff
+         intersectall
+         a-pair?
+         first
+         second
+         third
+         build
+         fun?
+         revrel
+         revpair
+         seconds
+         fullfun?
+         one-to-one?)
 
 (require
   (only-in "Atom.scm" atom?)
@@ -479,13 +498,11 @@
    '(a))
   (check-equal?
    (intersectall '((6 pears and) 
-                (3 peaches and 6 peppers) 
-                (8 pears and 6 plums) 
-                (and 6 prunes with some apples)))
+                   (3 peaches and 6 peppers) 
+                   (8 pears and 6 plums) 
+                   (and 6 prunes with some apples)))
    '(6 and)))
 
-
-;;; CONTINUE !!!!!!!!
 
 #| Q: Is this a pair? (pear pear) |#
 #| A: Yes, because it is a list with only two atoms. |#
@@ -502,43 +519,35 @@
 #| Q: Define a-pair? |#
 #| A: Ok. |#
 
-;; a-pair.v1? : Sexp -> Boolean
-;; Given S-expression, produces true if it is a list of exactly two S-expressions.
-(define a-pair.v1?
+;; a-pair? : Sexp -> Boolean
+;; Produces true if it is a list of exactly two S-expressions.
+(define a-pair?
   (λ (sexp)
     (cond
       ((atom? sexp) #f)
+      ((null? sexp) #f)
       ((null? (cdr sexp)) #f)
       ((null? (cdr (cdr sexp))) #t)
       (else #f))))
 
-(a-pair.v1? 'pear)                 ; ==> #f
-(a-pair.v1? '(pear))               ; ==> #f
-(a-pair.v1? '(pear pear))          ; ==> #t
-(a-pair.v1? '(3 7))                ; ==> #t
-(a-pair.v1? '((2) (pair)))         ; ==> #t
-(a-pair.v1? '(full (house)))       ; ==> #t
-(a-pair.v1? '(full (house) again)) ; ==> #f
 
+(module+ test
+  (check-false
+   (a-pair? 'pear))
+  (check-false
+   (a-pair? '()))
+  (check-false
+   (a-pair? '(pear)))
+  (check-true
+   (a-pair? '(pear pear)))
+  (check-true
+   (a-pair? '(3 7)))
+  (check-true
+   (a-pair? '((2) (pair))))
+  (check-false
+   (a-pair? '(full (house) again))))
 
-; Book solution below. I ended with the same after thinking I had come up with something better...
-
-(define a-pair? 
-  (λ (x) 
-    (cond 
-      ((atom? x) #f) 
-      ((null? x) #f) 
-      ((null? (cdr x)) #f) 
-      ((null? (cdr (cdr x))) #t) 
-      (else #f)))) 
-
-(a-pair? 'pear)                 ; ==> #f
-(a-pair? '(pear))               ; ==> #f
-(a-pair? '(pear pear))          ; ==> #t
-(a-pair? '(3 7))                ; ==> #t
-(a-pair? '((2) (pair)))         ; ==> #t
-(a-pair? '(full (house)))       ; ==> #t
-(a-pair? '(full (house) again)) ; ==> #f
+; Book solution is identical.
 
 #| Q: How can you refer to the first S-expression of a pair? |#
 #| A: By taking the car of the pair. |#
@@ -580,29 +589,29 @@
       Redefine first, second, and build as one-liners. |#
 
 ;; first : Pair -> Sexp
-;; Given pair, produces the first element
+;; Produces the first element of the pair
 (define first
   (λ (p) 
     (car p)))
 
 ;; second : Pair -> Sexp
-;; Given pair, produces, the second element
+;; Produces the second element of the pair
 (define second 
   (λ (p) 
     (car (cdr p))))
 
 ;; build : Sexp Sexp -> Pair
-;; Given two S-expressions, produces a pair
+;; Produces a pair from the s-expressions
 (define build
-  (λ (sl s2) 
-    (cons sl 
+  (λ (s1 s2) 
+    (cons s1 
           (cons s2 '()))))
 
 #| Q: Can you write third as a one-liner? |#
 #| A: Yes. |#
 
 ;; third : List -> Sexp
-;; Given list, produces the third S-expression in it.
+;; Produces the third S-expression in the list.
 (define third
   (λ (l)
     (car (cdr (cdr l)))))
@@ -623,28 +632,31 @@
 #| A: No. We use fun to stand for function. |#
 
 #| Q: What is (fun? rel) where rel is ((8 3) (4 2) (7 6) (6 2) (3 4)) |#
-#| A: #t, because (firsts rel) is a set -See chapter 3. |#
+#| A: #t, because (firsts rel) is a set -- See chapter 3. |#
 
 #| Q: What is (fun? rel) where rel is ((d 4) (b 0) (b 9) (e 5) (g 4)) |#
 #| A: #f, because b is repeated.|#
-
-
 
 #| Q: Write fun? with set? and firsts |#
 #| A: Ok. |#
 
 ;; fun? : Rel -> Boolean
-;; Given rel, produces true if the first elements produce a set.
+;; Produces true if the first elements of the rel produce a set.
 (define fun?
   (λ (rel)
     (set? (firsts rel))))
 
-(fun? '((4 3) (4 2) (7 6) (6 2) (3 4)))                   ; ==> #f
-(fun? '((apples peaches) (pumpkin pie) (apples peaches))) ; ==> #f
-(fun? '((apples peaches) (pumpkin pie)))                  ; ==> #t
-(fun? '((8 3) (4 2) (7 6) (6 2) (3 4)))                   ; ==> #t
-(fun? '((d 4) (b 0) (b 9) (e 5) (g 4)))                   ; ==> #f
-
+(module+ test
+  (check-true
+   (fun? '((apples peaches) (pumpkin pie))))
+  (check-true
+   (fun? '((8 3) (4 2) (7 6) (6 2) (3 4))))
+  (check-false
+   (fun? '((4 3) (4 2) (7 6) (6 2) (3 4))))
+  (check-false
+   (fun? '((apples peaches) (pumpkin pie) (apples peaches))))
+  (check-false
+   (fun? '((d 4) (b 0) (b 9) (e 5) (g 4)))))
 
 #| Q: Is fun? a simple one-liner? |#
 #| A: It sure is. |#
@@ -660,7 +672,7 @@
 #| A: Ok. |#
 
 ;; revrel : Rel -> Rel
-;; Given rel, reverses the order of each pair in the rel.
+;; Reverses the order of each pair in given the rel.
 (define revrel
   (λ (rel)
     (cond
@@ -670,7 +682,10 @@
                     (first (car rel)))
              (revrel (cdr rel)))))))
 
-(revrel '((8 a) (pumpkin pie) (got sick))) ; ==> '((a 8) (pie pumpkin) (sick got))
+(module+ test
+  (check-equal?
+   (revrel '((8 a) (pumpkin pie) (got sick)))
+   '((a 8) (pie pumpkin) (sick got))))
 
 ; Book solution is identical.
 
@@ -685,7 +700,10 @@
                          '())) 
                   (revrel.v2 (cdr rel)))))))
 
-(revrel.v2 '((8 a) (pumpkin pie) (got sick))) ; ==> '((a 8) (pie pumpkin) (sick got))
+(module+ test
+  (check-equal?
+   (revrel.v2 '((8 a) (pumpkin pie) (got sick)))
+   '((a 8) (pie pumpkin) (sick got))))
 
 #| A: Yes, but now do you see how representation aids readability?
       Note: Yes, I do see. |#
@@ -695,7 +713,7 @@
       this help function? |#
 
 ;; revpair : Pair -> Pair
-;; Given pair, reverses the order of the S-expressions
+;; Reverses the order S-expressions in the given pair
 (define revpair 
   (λ (pair) 
     (build (second pair) (first pair)))) 
@@ -709,10 +727,13 @@
       (else (cons (revpair (car rel))
                   (revrel.v3 (cdr rel)))))))
 
+(module+ test
+  (check-equal?
+   (revrel.v3 '((8 a) (pumpkin pie) (got sick)))
+   '((a 8) (pie pumpkin) (sick got))))
+
 ; No problem, and it is even easier to read: 
 ; Book solution is exactly the same.
-
-(revrel.v3 '((8 a) (pumpkin pie) (got sick))) ; ==> '((a 8) (pie pumpkin) (sick got))
 
 #| Q: Can you guess why fun is not a fullfun where fun is
       ((8 3) (4 2) (7 6) (6 2) (3 4)) |#
@@ -737,19 +758,19 @@
 #| Q: Define fullfun? |#
 #| A: Ok. But first I will create a helper. |#
 
-; Note: My fullfun? below is the same as in the book (no helper in the book yet).
-
 ;; seconds : Fun -> List
-;; Given fun, produces a list composed of the second expressions of each sublist.
+;; Produces a list composed of the second expressions of each sublist.
 (define seconds
   (λ (fun)
-    (cond
-      ((null? fun) '())
-      ((null? (car fun)) (seconds (cdr fun)))
-      (else
-       (cons (car (cdr (car fun))) (seconds (cdr fun)))))))
+    (firsts (revrel fun))))
 
-(seconds '((8 3) (4 8) (7 6) (6 2) (3 4))) ; ==> '(3 8 6 2 4)
+(module+ test
+  (check-equal?
+   (seconds '((8 3) (4 8) (7 6) (6 2) (3 4)))
+   '(3 8 6 2 4)))
+
+
+; Note: My fullfun? below is the same as in the book (no helper in the book yet).
 
 ;; fullfun? : Fun -> Boolean
 ;; Given fun, produces true if the second elements in fun create a set.
@@ -757,25 +778,39 @@
   (λ (fun)
     (set? (seconds fun))))
 
-(fullfun? '((8 3) (4 8) (7 6) (6 2) (3 4))) ; ==> #t
+(module+ test
+  (check-true
+   (fullfun? '((8 3) (4 8) (7 6) (6 2) (3 4))))
+  (check-false
+   (fullfun? '((8 3) (4 2) (7 6) (6 2) (3 4)))))
 
 #| Q: Can you define seconds |#
-#| A: It is just like firsts. Note: I defined it above. |#
+#| A: It is just like firsts. Note: I defined it above using firsts and revrel. |#
 
 #| Q: What is another name for fullfun? |#
 #| A: one-to-one?. |#
 
 #| Q: Can you think of a second way to write one-to-one? |#
-#| A: Not of the top of my head, no. |#
+#| A: Yes, using revrel. |#
 
+;; one-to-one? : Fun -> Boolean
+;; Produces true if the second elements in fun also create a set (fun is fullfun).
 (define one-to-one? 
   (λ (fun) 
-    (fun? (revrel fun)))) 
+    (fun? (revrel fun))))
 
-; Note: Didn't remember we had revrel
+(module+ test
+  (check-true
+   (one-to-one? '((8 3) (4 8) (7 6) (6 2) (3 4))))
+  (check-false
+   (one-to-one? '((8 3) (4 2) (7 6) (6 2) (3 4)))))
 
 #| Q: Is ((chocolate chip) (doughy cookie)) a one-to-one function? |#
 #| A: Yes, and you deserve one now! |#
+
+(module+ test
+  (check-true
+   (one-to-one? '((chocolate chip) (doughy cookie)))))
 
 
 
