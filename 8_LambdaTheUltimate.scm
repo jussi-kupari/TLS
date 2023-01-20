@@ -1,15 +1,15 @@
 #lang racket
 
-(provide (all-defined-out))
+;(provide (all-defined-out))
 
-(require "Atom.scm"
-         "1_Toys.scm"
-         "2_Doitdoitagainandagainandagain.scm"
-         "3_ConsTheMagnificent.scm"
-         "4_NumbersGames.scm"
-         "5_OhMyGawdItsFullOfStars.scm"
-         "6_Shadows.scm"
-         "7_FriendsAndRelations.scm")
+(require
+  (only-in "Atom.scm" atom?)
+  (only-in "3_ConsTheMagnificent.scm" insertL insertR)
+  (only-in "4_NumbersGames.scm" plus x **)
+  (only-in "6_Shadows.scm" operator))
+
+(module+ test
+  (require rackunit))
 
 
 
@@ -17,7 +17,7 @@
 
 
                                                                 
-#| Q: Remember what we did in rember and inserlL at the end of chapter 5? |#
+#| Q: Remember what we did in rember and insertL at the end of chapter 5? |#
 #| A: We replaced eq? with equal? |#
 
 #| Q: Can you write a function rember-f that would use either eq? or equal? |#
@@ -39,7 +39,7 @@
 
 #| A: (6 2 3). |#
 
-#| Q: What is (rember-f test? a l) where test? is eq? a is jelly and
+#| Q: What is (rember-f test? a l) where test? is eq?, a is jelly and
       l is (jelly beans are good) |#
 #| A: (beans are good). |#
 
@@ -51,7 +51,7 @@
 #| A: Ok. |#
 
 ;; rember-f : Sexp Predicate List -> List
-;; Given sexp, function and list, produces a list with the sexp removed
+;; Removes the sexp from the list using given predicate
 
 (define rember-f.v1
   (λ (test? a l)
@@ -63,11 +63,19 @@
        (cons (car l)
              (rember-f.v1 test? a (cdr l)))))))
 
-(rember-f.v1 = 5 '(6 2 5 3)) ; ==> '(6 2 3)
-(rember-f.v1 eq? 'jelly '(jelly beans are good)) ; ==> '(beans are good)
-(rember-f.v1 equal? '(pop corn) '(lemonade (pop corn) and (cake))) ; ==> '(lemonade and (cake))
 
-; The first book solution is more verbose and returns (cdr l) when the first match is found.
+(module+ test
+  (check-equal?
+   (rember-f.v1 = 5 '(6 2 5 3)) '(6 2 3))
+  (check-equal?
+   (rember-f.v1 eq? 'jelly '(jelly beans are good)) '(beans are good))
+  (check-equal?
+   (rember-f.v1 eq? 'jelly '(jelly beans are good)) '(beans are good))
+  (check-equal?
+   (rember-f.v1 equal? '(pop corn) '(lemonade (pop corn) and (cake))) '(lemonade and (cake))))
+
+; The first book solution is verbose with extra conds and
+; returns (cdr l) on first match (does not remove multiple matches).
 
 (define rember-f.v2 
   (λ (test? a l) 
@@ -79,15 +87,20 @@
          (else (cons (car l) 
                      (rember-f.v2 test? a 
                                   (cdr l)))))))))
-
-(rember-f.v2 = 5 '(6 2 5 3)) ; ==> '(6 2 3)
-(rember-f.v2 eq? 'jelly '(jelly beans are good)) ; ==> '(beans are good)
-(rember-f.v2 equal? '(pop corn) '(lemonade (pop corn) and (cake))) ; ==> '(lemonade and (cake))
+(module+ test
+  (check-equal?
+   (rember-f.v2 = 5 '(6 2 5 3)) '(6 2 3))
+  (check-equal?
+   (rember-f.v2 eq? 'jelly '(jelly beans are good)) '(beans are good))
+  (check-equal?
+   (rember-f.v2 eq? 'jelly '(jelly beans are good)) '(beans are good))
+  (check-equal?
+   (rember-f.v2 equal? '(pop corn) '(lemonade (pop corn) and (cake))) '(lemonade and (cake))))
 
 ; This is good! 
 
 #| Q: What about the short version? |#
-#| A: Note: Looks like my version above but returns (cdr l) after first match. |#
+#| A: Note: Looks like my version above but still returns (cdr l) after first match. |#
 
 (define rember-f.v3
   (λ (test? a l)
@@ -99,9 +112,15 @@
              (rember-f.v3 test? a
                           (cdr l)))))))
 
-(rember-f.v3 = 5 '(6 2 5 3)) ; ==> '(6 2 3)
-(rember-f.v3 eq? 'jelly '(jelly beans are good)) ; ==> '(beans are good)
-(rember-f.v3 equal? '(pop corn) '(lemonade (pop corn) and (cake))) ; ==> '(lemonade and (cake))
+(module+ test
+  (check-equal?
+   (rember-f.v3 = 5 '(6 2 5 3)) '(6 2 3))
+  (check-equal?
+   (rember-f.v3 eq? 'jelly '(jelly beans are good)) '(beans are good))
+  (check-equal?
+   (rember-f.v3 eq? 'jelly '(jelly beans are good)) '(beans are good))
+  (check-equal?
+   (rember-f.v3 equal? '(pop corn) '(lemonade (pop corn) and (cake))) '(lemonade and (cake))))
 
 #| Q: How does (rember-f test? a l) act where test? is eq? |#
 #| A: (rember-f test? a l) where test? is eq?, acts like rember. |#
@@ -130,6 +149,8 @@
 #| Q: Can you say what (λ (a l) ...) is? |#
 #| A: (λ (a l) ...) is a function of two arguments, a and l. |#
 
+;(λ (a l) 'value) ==> #<procedure>
+
 #| Q: Now what is
  
 (λ (a) 
@@ -149,7 +170,7 @@
 #| A: This is our choice. |#
 
 ;; eq?-c : Sexp -> Predicate
-;; Given sexp, produces a predicate to check similarity against that sexp
+;; Produces a predicate to check similarity against given sexp
 (define eq?-c
   (λ (a)
     (λ (x)
@@ -164,17 +185,23 @@
 
 ;(define eq?-salad (eq?-c k)), where k is salad
 
+;; eq?-salad : Sexp -> Boolean
+;; Produces true if given sexp is equal to the atom salad
 (define eq?-salad (eq?-c 'salad))
 
 #| Q: What is (eq?-salad y) where y is salad |#
 #| A: #t. |#
 
-(eq?-salad 'salad) ; ==> #t
+(module+ test
+  (check-true
+   (eq?-salad 'salad)))
 
 #| Q: What is (eq?-salad y) where y is tuna |#
 #| A: #f. |#
 
-(eq?-salad 'tuna) ; ==> #f
+(module+ test
+  (check-false
+   (eq?-salad 'tuna)))
 
 #| Q: Do we need to give a name to eq?-salad |#
 #| A: No, we may just as well ask
@@ -184,12 +211,17 @@
       and 
        y is tuna. |#
 
+(module+ test
+  (check-false
+   ((eq?-c 'salad) 'tuna)))
+
 #| Q: Now rewrite rember-f as a function of one argument test?
       that returns an argument like rember with eq? replaced by test? |#
-
 #| A: 
+
 ;; rember-f : Predicate -> Function
-;; Given a predicate, produces a function that removes elements from a list.
+;; Produces a function that removes a sexp from a list using the given predicate.
+
 (define rember-f
   (λ (test?)
     (λ (a l)
@@ -201,7 +233,7 @@
 
          is a good start |#
  
-#| Q: Describe in your own words the result of (rember-f test ?) where test? is eq? |#
+#| Q: Describe in your own words the result of (rember-f test?) where test? is eq? |#
 #| A: It is a function that takes two arguments, a and l. It compares the elements of the list 
       with a, and the first one that is eq? to a is removed. |#
 
@@ -213,14 +245,16 @@
 
 #| Q: Did we need to give the name rember-eq? to the function (rember-f test?) 
       where test? is eq? |#
-#| A: No, we could have written ((rember-f test?) a l) where test? is eq? a is
+#| A: No, we could have written ((rember-f test?) a l) where test? is eq?, a is
       tuna and l is (tuna salad is good). ((rember-f eq?) 'tuna '(tuna salad is good)). |#
 
 #| Q: Now, complete the line (cons (car l) ...) in rember-f so that rember-f works. |#
 #| A: Ok. |#
 
+;;; CONTINUE!!!!!!!!!!
+
 ;; rember-f : Predicate -> Function
-;; Given a predicate, produces a function that removes elements from a list.
+;; Produces a function that removes an element from a list using the predicate.
 (define rember-f
   (λ (test?)
     (λ (a l)
@@ -231,20 +265,31 @@
          (cons (car l)
                ((rember-f test?) a (cdr l))))))))
 
-; This is identical to the book solution.
+; It is a bit mind-bending to try and understand how the recursion works here.
+
+(module+ test
+  (check-equal?
+   ((rember-f eq?) 'tuna '(tuna salad is good))
+   '(salad is good)))
 
 #| Q: What is ((rember-f eq?) a l) where a is tuna and 
       l is (shrimp salad and tuna salad) |#
 #| A: (shrimp salad and salad). |#
 
-((rember-f eq?) 'tuna '(shrimp salad and tuna salad)) ; ==> '(shrimp salad and salad)
+(module+ test
+  (check-equal?
+   ((rember-f eq?) 'tuna '(shrimp salad and tuna salad))
+   '(shrimp salad and salad)))
 
 #| Q: What is ((rember-f eq?) a l) where a is 'eq? and l is (equal? eq? eqan? eqlist? eqpair?)
       Did you notice the difference between 'eq? and eq? Remember that the former is the atom
       and the latter is the function. |#
 #| A: (equal? eqan? eqlist? eqpair?). |#
 
-((rember-f eq?) 'eq? '(equal? eq? eqan? eqlist? eqpair?)) ; ==> '(equal? eqan? eqlist? eqpair?)
+(module+ test
+  (check-equal?
+   ((rember-f eq?) 'eq? '(equal? eq? eqan? eqlist? eqpair?))
+   '(equal? eqan? eqlist? eqpair?)))
 
 #| Q: And now transform insertL to insertL-f the same way we have transformed
       rember into rember-f |#

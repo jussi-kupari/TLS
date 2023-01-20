@@ -769,7 +769,6 @@
    (seconds '((8 3) (4 8) (7 6) (6 2) (3 4)))
    '(3 8 6 2 4)))
 
-
 ; Note: My fullfun? below is the same as in the book (no helper in the book yet).
 
 ;; fullfun? : Fun -> Boolean
