@@ -1,4 +1,4 @@
-#lang racket
+#lang racket/base
 
 ;(provide (all-defined-out))
 
@@ -51,7 +51,7 @@
 #| A: Ok. |#
 
 ;; rember-f : Sexp Predicate List -> List
-;; Removes the sexp from the list using given predicate
+;; Removes the sexp from the list using the predicate
 
 (define rember-f.v1
   (λ (test? a l)
@@ -220,7 +220,7 @@
 #| A: 
 
 ;; rember-f : Predicate -> Function
-;; Produces a function that removes a sexp from a list using the given predicate.
+;; Produces a function that removes a sexp from a list using the predicate.
 
 (define rember-f
   (λ (test?)
@@ -235,7 +235,7 @@
  
 #| Q: Describe in your own words the result of (rember-f test?) where test? is eq? |#
 #| A: It is a function that takes two arguments, a and l. It compares the elements of the list 
-      with a, and the first one that is eq? to a is removed. |#
+      with a using eq?, and removes the first that results in #true. |#
 
 #| Q: Give a name to the function returned by (rember-f test?) where test? is eq? |#
 #| A: (define rember-eq? (rember-f test?)) where test? is eq?. |#
@@ -251,10 +251,10 @@
 #| Q: Now, complete the line (cons (car l) ...) in rember-f so that rember-f works. |#
 #| A: Ok. |#
 
-;;; CONTINUE!!!!!!!!!!
-
 ;; rember-f : Predicate -> Function
 ;; Produces a function that removes an element from a list using the predicate.
+
+
 (define rember-f
   (λ (test?)
     (λ (a l)
@@ -291,13 +291,12 @@
    ((rember-f eq?) 'eq? '(equal? eq? eqan? eqlist? eqpair?))
    '(equal? eqan? eqlist? eqpair?)))
 
-#| Q: And now transform insertL to insertL-f the same way we have transformed
-      rember into rember-f |#
+#| Q: And now transform insertL to insertL-f the same way we have transformed rember into rember-f |#
 #| A: Ok. |#
 
 ;; insertL-f : Predicate -> Function
-;; Given predicate, produces a function that inserts an atom to the left of
-;; the first occurrence of a second atom in a list
+;; Produces a function that uses the predicate to match atoms in InsertL
+
 (define insertL-f
   (λ (test?)
     (λ (new old l)
@@ -315,8 +314,7 @@
 #| A: Ok. |#
 
 ;; insertR-f : Predicate -> Function
-;; Given predicate, produces a function that inserts an atom to the right of
-;; the first occurrence of a second atom in a list.
+;; Produces a function that inserts an atom to the right of the first occurrence of a second atom.
 (define insertR-f
   (λ (test?)
     (λ (new old l)
@@ -336,11 +334,11 @@
 #| Q: Can you write a function insert-g that would insert either at the left or at the right?
       If you can, get yourself some coffee cake and relax! Otherwise, don't give up. You'll see it 
       in a minute. |#
-#| A: Ok. My clumsy attempt is below, but it seems to work. |#
+#| A: Ok. My verbose attempt is below, but it seems to work. |#
 
-;; insert-G-verbose : Predicate Atom -> Function
-;; Given predicate and position, produces a function to insert atoms in a list.
-(define insert-G-verbose
+;; insert-G-full : Predicate Atom -> Function
+;; Produces a function to insert atoms in a specific position in a list using predicate and atom ('left | 'right).
+(define insert-G-full
   (λ (test? pos)
     (cond
       ((eq? pos 'right)
@@ -351,7 +349,7 @@
             (cons old (cons new (cdr l))))
            (else
             (cons (car l)
-                  ((insertR-f test?) new old (cdr l)))))))
+                  ((insert-G-full test? pos) new old (cdr l)))))))
       (else
        (λ (new old l)
          (cond
@@ -360,16 +358,19 @@
             (cons new (cons old (cdr l))))
            (else
             (cons (car l)
-                  ((insertL-f test?) new old (cdr l))))))))))
+                  ((insert-G-full test? pos) new old (cdr l))))))))))
 
-((insert-G-verbose eq? 'right) 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good tuna chicken salad!) Correct.
-((insert-G-verbose eq? 'left) 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good chicken tuna salad!) Correct.
-((insert-G-verbose eq? 'xxx) 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good chicken tuna salad!) Left is default so this is also correct.
+(module+ test
+  (check-equal?
+   ((insert-G-full eq? 'right) 'chicken 'tuna '(This is a very good tuna salad!))
+   '(This is a very good tuna chicken salad!))
+  
+  (check-equal?
+   ((insert-G-full eq? 'left) 'chicken 'tuna '(This is a very good tuna salad!))
+   '(This is a very good chicken tuna salad!)))
 
-; This can be written with the predefined insertR-f and insertL-f functions in shorter format.
+; This can also be written with the predefined insertR-f and insertL-f functions in shorter format.
+; but this function is dependent on those two predefined functions
 
 (define insert-G
   (λ (test? pos)
@@ -379,12 +380,14 @@
       (else
        (insertL-f test?)))))
 
-((insert-G eq? 'right) 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good tuna chicken salad!) Correct.
-((insert-G eq? 'left) 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good chicken tuna salad!) Correct.
-((insert-G eq? 'xxx) 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good chicken tuna salad!) Left is default so this is also correct.
+(module+ test
+  (check-equal?
+   ((insert-G eq? 'right) 'chicken 'tuna '(This is a very good tuna salad!))
+   '(This is a very good tuna chicken salad!))
+  
+  (check-equal?
+   ((insert-G eq? 'left) 'chicken 'tuna '(This is a very good tuna salad!))
+   '(This is a very good chicken tuna salad!)))
 
 #| Q: Which pieces differ? |#
 #| A: The second lines differ from each other. In insertL it is: 
@@ -411,22 +414,19 @@
          the second argument onto the third argument. |#
 #| A: Ok. |#
 
-;; define seqL.v1 : Sexp Sexp Sexp -> List
-;; Given three s-expressions, produces a list from first sexp to last.
-(define seqL.v1
-  (λ (first second third)
-    (cons first
-          (cons second
-                (cons third '())))))
 
-(seqL.v1 'a 'b 'c) ; ==> '(a b c)
-(seqL.v1 'a 'b '(c)) ; ==> '(a b (c))
+; Note: In this case the third argument is a list
 
-; The book function is not quite that.
+
+;; define seqL.v1 : Sexp Sexp List -> List
+;; Produces a list by consing first sexp to the result of consing second and third.
 (define seqL 
   (λ (new old l) 
     (cons new (cons old l))))
 
+(module+ test
+  (check-equal?
+   (seqL 'a 'b '(c)) '(a b c)))
 
 #| Q: What is: |#
 
@@ -462,11 +462,14 @@
       ((equal? seq seqR)
        insertR))))
 
-((insert-g.v1 seqR) 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good tuna chicken salad!)
+(module+ test
+  (check-equal?
+   ((insert-g.v1 seqR) 'chicken 'tuna '(This is a very good tuna salad!))
+   '(This is a very good tuna chicken salad!))
 
-((insert-g.v1 seqL) 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good chicken tuna salad!)
+  (check-equal?
+   ((insert-g.v1 seqL) 'chicken 'tuna '(This is a very good tuna salad!))
+   '(This is a very good chicken tuna salad!)))
 
 
 ; The book solution is obviously not using the predefined functions.
@@ -482,11 +485,17 @@
                     ((insert-g seq) new old 
                                     (cdr l)))))))) 
 
-((insert-g seqR) 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good tuna chicken salad!)
+(module+ test
+  (check-equal?
+   ((insert-g seqR) 'chicken 'tuna '(This is a very good tuna salad!))
+   '(This is a very good tuna chicken salad!))
 
-((insert-g seqL) 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good chicken tuna salad!)
+  (check-equal?
+   ((insert-g seqL) 'chicken 'tuna '(This is a very good tuna salad!))
+   '(This is a very good chicken tuna salad!)))
+
+
+;;; CONTINUE!!!!
 
 
 #| Q: Now define insertL with insert-g |#
