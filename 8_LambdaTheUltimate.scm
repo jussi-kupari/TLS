@@ -6,7 +6,7 @@
   (only-in "Atom.scm" atom?)
   (only-in "3_ConsTheMagnificent.scm" insertL insertR)
   (only-in "4_NumbersGames.scm" plus x **)
-  (only-in "6_Shadows.scm" operator))
+  (only-in "6_Shadows.scm" operator 1st-sub-exp 2nd-sub-exp))
 
 (module+ test
   (require rackunit))
@@ -217,7 +217,7 @@
 
 #| Q: Now rewrite rember-f as a function of one argument test?
       that returns an argument like rember with eq? replaced by test? |#
-#| A: 
+#| A: Ok.
 
 ;; rember-f : Predicate -> Function
 ;; Produces a function that removes a sexp from a list using the predicate.
@@ -254,7 +254,6 @@
 ;; rember-f : Predicate -> Function
 ;; Produces a function that removes an element from a list using the predicate.
 
-
 (define rember-f
   (λ (test?)
     (λ (a l)
@@ -265,7 +264,8 @@
          (cons (car l)
                ((rember-f test?) a (cdr l))))))))
 
-; It is a bit mind-bending to try and understand how the recursion works here.
+; It is mind-bending to try and understand how the recursion works here.
+; The fact that the function recurs from the top (rember-f) melts my brain.
 
 (module+ test
   (check-equal?
@@ -295,7 +295,7 @@
 #| A: Ok. |#
 
 ;; insertL-f : Predicate -> Function
-;; Produces a function that uses the predicate to match atoms in InsertL
+;; Produces a version of insertL that uses the predicate to match atoms
 
 (define insertL-f
   (λ (test?)
@@ -334,10 +334,10 @@
 #| Q: Can you write a function insert-g that would insert either at the left or at the right?
       If you can, get yourself some coffee cake and relax! Otherwise, don't give up. You'll see it 
       in a minute. |#
-#| A: Ok. My verbose attempt is below, but it seems to work. |#
+#| A: Ok. My attempt is below. It seems to work. |#
 
 ;; insert-G-full : Predicate Atom -> Function
-;; Produces a function to insert atoms in a specific position in a list using predicate and atom ('left | 'right).
+;; Produces a function to insert atoms in a specific position in a list using predicate and atom ('left or 'right).
 (define insert-G-full
   (λ (test? pos)
     (cond
@@ -418,7 +418,7 @@
 ; Note: In this case the third argument is a list
 
 
-;; define seqL.v1 : Sexp Sexp List -> List
+;; define seqL : Sexp Sexp List -> List
 ;; Produces a list by consing first sexp to the result of consing second and third.
 (define seqL 
   (λ (new old l) 
@@ -495,22 +495,21 @@
    '(This is a very good chicken tuna salad!)))
 
 
-;;; CONTINUE!!!!
-
-
 #| Q: Now define insertL with insert-g |#
 #| A: Ok. |#
 (define insertl (insert-g seqL)) 
 
-#| Q: And insert. |#
+#| Q: And insertR. |#
 #| A: Sure. |#
 (define insertr (insert-g seqR))
 
-(insertr 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good tuna chicken salad!)
-
-(insertl 'chicken 'tuna '(This is a very good tuna salad!))
-; ==> '(This is a very good chicken tuna salad!)
+(module+ test
+  (check-equal?
+   (insertr 'chicken 'tuna '(This is a very good tuna salad!))
+   '(This is a very good tuna chicken salad!))
+  (check-equal?
+   (insertl 'chicken 'tuna '(This is a very good tuna salad!))
+   '(This is a very good chicken tuna salad!)))
 
 #| Q: Is there something unusual about these two definitions? |#
 #| A: Yes. Earlier we would probably have written 
@@ -529,10 +528,9 @@
 
 #| Q: Define insertL again with insert-g 
       Do not pass in seqL this time. |#
+#| A: Ok. |#
 
-#| A: Ok .|#
-
-(define insert-l
+(define insert-L
   (insert-g
    (λ (new old l) 
      (cons new (cons old l)))))
@@ -569,7 +567,9 @@
 
 (define subst (insert-g seqS))
 
-(subst 'xx 'b '(a b c)) ; ==> '(a xx c)
+(module+ test
+  (check-equal?
+   (subst 'xx 'b '(a b c)) '(a xx c)))
 
 #| Q: And what do you think yyy is |#
 
@@ -611,7 +611,7 @@ Step-by-step:
 
 5. yyy is just rember.
 
-6. It appears that #f in the inner function allows us to bypass the unused argument
+6. It appears that #f [false] in the inner function allows us to bypass the unused argument
    See further down.
 
 
@@ -626,23 +626,34 @@ Surprise! It is our old friend rember
  and 
    l is (pizza with sausage and bacon). |#
 
-;; What role does #f play?
+
+;; What role does #f play?!
 
 ;; Let's try something ==>
 
-;; Function that takes three arguments but doesn't use one of them.
+;; inner : Number Number Number -> Number
+;; Produces the sum of the first two numbers and ignores the third
 (define inner
-  (λ (x y z)
-    (+ x y)))
+  (λ (a b c)
+    (+ a b)))
 
-;; Function that takes only two arguments but uses the other fn that takes three arguments.
+(module+ test
+  (check-equal?
+   (inner 5 7 3) 12))
+
+;; outer : Number Number -> Number
+;; Produces the sum of the two arguments
 (define outer
-  (λ (x y)
-    (inner x y #f)))
+  (λ (a b)
+    (inner a b #f)))
 
-(outer 15 62) ; ==> 77
+(module+ test
+  (check-equal?
+   (outer 15 62) 77))
 
 ;; Using #f we can bypass the unused argument.
+
+((insert-g seqrem) #f 'sausage '(pizza with sausage and bacon))
 
 
 
@@ -651,8 +662,10 @@ Surprise! It is our old friend rember
 
 
 
+
 #|                        ** The Ninth Commandment **
                   Abstract common patterns with a new function.               |#
+
 
 
 
@@ -690,7 +703,8 @@ Surprise! It is our old friend rember
       if (eq? x '*) and 
          returns the function ** 
          otherwise? |#
-#| A: Let me try. |#
+#| A: Let me try. I will use functions that we defined in Chapter 4.
+      I will use a as the argument instead of x, bcause I use x as the function *. |#
 
 ;; atom-to-function : Atom -> Function
 ;; Given atom, produces the appropriate function
@@ -699,8 +713,10 @@ Surprise! It is our old friend rember
     (cond
       ((eq? a '+) plus) 
       ((eq? a ' *) x)   
-      (else **))))      
+      (else **))))
 
+
+;; I don't know how to test for functions that return functions
 (atom-to-function '+)  ; ==> #<procedure:plus>
 (atom-to-function '*)  ; ==> #<procedure:x>
 (atom-to-function '**) ; ==> #<procedure:**>
@@ -741,26 +757,37 @@ Here is the original function btw
        (** (value (car nexp))
            (value (car (cdr (cdr nexp))))))))) |#
 
+
 ;; value : Nexp -> WN
-;; Given nexp, produces its value
-(define value
+;; Produces the value of the nexp
+(define value.v1
   (λ (nexp)
     (cond
       ((atom? nexp) nexp)
       (else
        ((atom-to-function (car (cdr nexp))) ; operator
-        (value (car nexp))                  ; 1st-sub-exp
-        (value (car (cdr (cdr nexp))))))))) ; 2nd-sub-exp
+        (value.v1 (car nexp))                  ; 1st-sub-exp
+        (value.v1 (car (cdr (cdr nexp))))))))) ; 2nd-sub-exp
 
-; Book uses operator, 1st-sub-exp and 2nd-sub-exp here
 
-(value 10) ; ==> 10
-(value 999) ; ==> 999
-(value '(999 + 1)) ; ==> 1000
-(value '(999 * 1)) ; ==> 999
-(value '(999 ** 1)) ; ==> 1000
-(value '(999 ** 2)) ; ==> 998001
-(value '(999 ** 0)) ; ==> 1
+; Book also uses 1st-sub-exp and 2nd-sub-exp
+(define value
+  (λ (nexp)
+    (cond
+      ((atom? nexp) nexp)
+      (else
+       ((atom-to-function (operator nexp))
+        (value (1st-sub-exp nexp))
+        (value (2nd-sub-exp)))))))
+
+(module+ test
+  (check-equal? (value.v1 (+ 5 3)) 8)
+  (check-equal? (value.v1 (* 5 3)) 15)
+  (check-equal? (value.v1 (** 5 3)) 125)
+  (check-equal? (value (+ 5 3)) 8)
+  (check-equal? (value (* 5 3)) 15)
+  (check-equal? (value (** 5 3)) 125))
+
 
 #| Q: Is this quite a bit shorter than the first version? |#
 #| A: Yes, but that's okay. We haven't changed its meaning. |#
@@ -785,7 +812,7 @@ Here is the original function btw
 #| A: No problem. |#
 
 ;; multirember-f : Predicate -> Function
-;; Given predicate, produces a function to remove atoms from a list
+;;Produces a function to remove atoms from a list using a predicate
 (define multirember-f
   (λ (test?)
     (λ (a lat) 
@@ -805,8 +832,14 @@ Here is the original function btw
       and 
         lat is (shrimp salad tuna salad and tuna) |#
 #| A: (shrimp salad salad and). |#
-((multirember-f eq?) 'tuna '(shrimp salad tuna salad and tuna))
-; ==> ,(shrimp salad salad and)
+
+(module+ test
+  (check-equal?
+   ((multirember-f eq?) 'tuna '(shrimp salad tuna salad and tuna))
+   '(shrimp salad salad and)))
+
+
+;;; CONTINUE!!!
 
 #| Q: Wasn't that easy? |#
 #| A: Yes. |#
