@@ -812,7 +812,7 @@ Here is the original function btw
 #| A: No problem. |#
 
 ;; multirember-f : Predicate -> Function
-;;Produces a function to remove atoms from a list using a predicate
+;; Produces a function to remove atoms from a list using a predicate
 (define multirember-f
   (λ (test?)
     (λ (a lat) 
