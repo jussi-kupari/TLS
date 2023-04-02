@@ -838,20 +838,19 @@ Here is the original function btw
    ((multirember-f eq?) 'tuna '(shrimp salad tuna salad and tuna))
    '(shrimp salad salad and)))
 
-
-;;; CONTINUE!!!
-
 #| Q: Wasn't that easy? |#
 #| A: Yes. |#
 
-#| Q: Define multirember-eq ? using multirember-f |#
-#| A: Ok.
-      (define multirember-eq? (multirember-f test?))
-      where test? is eq?. |#
+#| Q: Define multirember-eq? using multirember-f |#
+#| A: Ok. |#
       
 (define multirember-eq? (multirember-f eq?))
-(multirember-eq? 'tuna '(shrimp salad tuna salad and tuna))
-; ==> '(shrimp salad salad and)
+
+(module+ test
+  (check-equal?
+   (multirember-eq? 'tuna '(shrimp salad tuna salad and tuna))
+   '(shrimp salad salad and)))
+
 
 #| Q: Do we really need to tell multirember-f about tuna |#
 #| A: As multirember-f visits all the elements in lat, it always looks for tuna.
@@ -884,6 +883,14 @@ Here is the original function btw
 (define eq?-tuna 
   (eq?-c 'tuna))
 
+(module+ test
+  (check-true
+   (eq?-tuna 'tuna))
+  (check-false
+   (eq?-tuna 'tunaaa)))
+
+; Note: Isn't this exactly the same as above??
+
 #| Q: Have you ever seen definitions that contain atoms? |#
 #| A: Yes, 0, 'x, '+, and many more. |#
 
@@ -893,7 +900,8 @@ Here is the original function btw
 #| A: This is not really difficult. |#
 
 ;; multiremberT : Predicate LAT -> LAT
-;; Given predicate and lat, removes all wanted atoms from lat
+;; Removes all wanted atoms from lat using predicate
+
 (define multiremberT
   (λ (test? lat) 
     (cond 
@@ -911,8 +919,9 @@ Here is the original function btw
         lat is (shrimp salad tuna salad and tuna) |#
 #| A: (shrimp salad salad and). |#
 
-(multiremberT eq?-tuna '(shrimp salad tuna salad and tuna))
-; ==> '(shrimp salad salad and)
+(module+ test
+  (multiremberT eq?-tuna '(shrimp salad tuna salad and tuna))
+  '(shrimp salad salad and))
 
 #| Q: Is this easy? |#
 #| A: It's not bad. |#
@@ -941,6 +950,8 @@ Here is the original function btw
 
 #| Q: Here is something simpler: |#
 
+;; a-friend : List List -> Boolean
+;; Produces true it the second list is empty.
 (define a-friend
   (λ (x y)
     (null? y)))
@@ -994,6 +1005,8 @@ Here is the original function btw
 ; http://www.michaelharrison.ws/weblog/2007/08/unpacking-multiremberco-from-tls/
 ; https://stackoverflow.com/questions/7004636/explain-the-continuation-example-on-p-137-of-the-little-schemer/7005024#7005024
 ; https://stackoverflow.com/questions/2018008/help-understanding-continuations-in-scheme?rq=1
+; https://davidgorski.ca/posts/collectors-in-scheme/
+; http://debasishg.blogspot.com/2007/08/collector-idiom-in-scheme-is-this.html
 
 #| Q: Here is the new collector:
 
@@ -1064,13 +1077,13 @@ Here is the original function btw
         ls2 is (tuna) 
       is #f. |#
 
-#| Q: What does (multirember&co a lat f) do?|#
+#| Q: What does (multirember&co a lat f) do? |#
 #| A: It looks at every atom of the lat to see whether it is eq? to a.
       Those atoms that are not are collected in one list ls1; the others 
       for which the answer is true are collected in a second list ls2.
       Finally, it determines the value of (f ls1 ls2). |#
 
-#| Q: Final question: What is the value of (multirember&co (quote tuna) ls col) 
+#| Q: Final question: What is the value of (multirember&co 'tuna ls col) 
       where 
         ls is (strawberries tuna and swordfish) 
       and 
@@ -1079,7 +1092,6 @@ Here is the original function btw
 (define last-friend 
   (λ (x y) 
     (length x))) |#
-
 
 #| A: 3, because ls contains three things that are not tuna, and therefore last-friend is used on 
       (strawberries and swordfish) and (tuna). |#
@@ -1091,161 +1103,403 @@ Here is the original function btw
 
 
 
-#| Q: |#
-#| A: |#
+#| Q: Here is an old friend.
 
-#| Q: |#
-#| A: |#
+(define multiinsertL 
+  (λ (new old lat) 
+    (cond 
+      ((null? lat) '()) 
+      ((eq? (car lat) old) 
+       (cons new 
+             (cons old 
+                   (multiinsertL new old 
+                                 (cdr lat))))) 
+      (else (cons (car lat) 
+                  (multiinsertL new old 
+                                (cdr lat)))))))
 
-#| Q: |#
-#| A: |#
+Do you also remember multiinsertR? |#
 
-#| Q: |#
-#| A: |#
+#| A: No Problem.
 
-#| Q: |#
-#| A: |#
+(define multiinsertR 
+  (λ (new old lat) 
+    (cond 
+      ((null ? lat) '()) 
+      ((eq? (car lat) old) 
+       (cons old 
+             (cons new 
+                   (multiinsertR new old 
+                                 (cdr lat))))) 
+      (else (cons (car lat) 
+                  (multiinsertR new old 
+                                (cdr lat))))))) |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#| Q: Now try multiinsertLR
 
-#| Q: |#
-#| A: |#
+      Hint: multiinsertLR inserts new to the left of oldL and to the right of oldR in lat if 
+      oldL are oldR are different. |#
 
-#| Q: |#
-#| A: |#
+#| A: Ok. This is not difficult but I had to peak the answer because I
+      could not figure out what the function was supposed to do. |#
 
-#| Q: |#
-#| A: |#
+;; multiinsertLR : Atom Atom Atom LAT -> LAT
+;; inserts atom to both sides of matched atom in list
+(define multiinsertLR
+  (λ (new oldL oldR lat)
+    (cond
+      ((null? lat) '())
+      ((eq? (car lat) oldL)
+       (cons new
+             (cons oldL (multiinsertLR new oldL oldR (cdr lat)))))
+      ((eq? (car lat) oldR)
+       (cons oldR
+             (cons new (multiinsertLR new oldL oldR (cdr lat)))))
+      (else (cons
+             (car lat) (multiinsertLR new oldL oldR (cdr lat)))))))
 
-#| Q: |#
-#| A: |#
+(module+ test
+  (check-equal?
+   (multiinsertLR 'milk 'chocolate 'coffee '(water tea chocolate coffee beer))
+   '(water tea milk chocolate coffee milk beer)))
 
-#| Q: |#
-#| A: |#
+#| Q: The function multiinsertLR&co is to multiinsertLR what multirember&co is to multirember |#
+#| A: Does this mean that multiinsertLR&co takes one more argument than multiinsertLR? |#
 
-#| Q: |#
-#| A: |#
+#| Q: Yes, and what kind of argument is it? |#
+#| A: It is a collector function. |#
 
-#| Q: |#
-#| A: |#
+#| Q: When multiinsertLR&co is done, it will use col on the new lat, on the number of left 
+      insertions, and the number of right insertions. Can you write an outline of 
+      multiinsertLR&co |#
+#| A: Sure, it is just like multiinsertLR. |#
 
-#| Q: |#
-#| A: |#
+(define multiinsertLR&co-proto 
+  (λ (new oldL oldR lat col) 
+    (cond 
+      ((null? lat) 
+       (col '() 0 0)) 
+      ((eq? (car lat) oldL) 
+       (multiinsertLR&co-proto new oldL oldR 
+                               (cdr lat) 
+                               (λ (newlat L R) 
+                                 '...))) 
+      ((eq? (car lat) oldR) 
+       (multiinsertLR&co-proto new oldL oldR 
+                               (cdr lat) 
+                               (λ (newlat L R) 
+                                 '...))) 
+      (else 
+       (multiinsertLR&co-proto new oldL oldR 
+                               (cdr lat) 
+                               (λ (newlat L R) 
+                                 '...)))))) 
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#| Q: Why is col used on '() 0 and 0 when (null? lat) is true? |#
+#| A: The empty lat contains neither oldL nor oldR. And this means that 0 occurrences of oldL
+      and 0 occurrences of oldR are found and that multiinsertLR will return () when lat is empty. |#
 
-#| Q: |#
-#| A: |#
+#| Q: So what is the value of 
+      (multiinsertLR&co 
+       'cranberries 'fish 'chips '() col) |#
+#| A: It is the value of (col '() 0 0), which we cannot determine because we don't know what col is. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is it true that multiinsertLR&co will use the new collector on three arguments when 
+      (car lat) is equal to neither oldL nor oldR |#
+#| A: Yes, the first is the lat that multiinsertLR would have produced for (cdr lat), oldL, and 
+      oldR. The second and third are the number of insertions that occurred to the left and 
+      right of oldL and oldR, respectively. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is it true that multiinsertLR&co then uses the function col on (cons (car lat) newlat) 
+      because it copies the list unless an oldL or an oldR appears? |#
+#| A: Yes, it is true, so we know what the new collector for the last case is: 
+      (λ (newlat L R) 
+      (col (cons (car lat) newlat) L R)).|#
 
-#| Q: |#
-#| A: |#
+#| Q: Why are col's second and third arguments just L and R |#
+#| A: If (car lat) is neither oldL nor oldR, we do not need to insert any new elements. So, L 
+      and R are the correct results for both (cdr lat) and all of lat. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Here is what we have so far. And we have even thrown in an extra collector: |#
 
-#| Q: |#
-#| A: |#
+(define multiinsertLR&co-proto2 
+  (λ (new oldL oldR lat col) 
+    (cond 
+      ((null? lat) 
+       (col '() 0 0)) 
+      ((eq? (car lat) oldL) 
+       (multiinsertLR&co-proto2 new oldL oldR 
+                                (cdr lat) 
+                                (λ (newlat L R) 
+                                  (col (cons new 
+                                             (cons oldL newlat)) 
+                                       (add1 L) R)))) 
+      ((eq? (car lat) oldR) 
+       (multiinsertLR&co-proto2 new oldL oldR 
+                                (cdr lat) 
+                                (λ (newlat L R) 
+                                  '... ))) 
+      (else 
+       (multiinsertLR&co-proto2 new oldL oldR 
+                                (cdr lat) 
+                                (λ (newlat L R) 
+                                  (col (cons (car lat) newlat) 
+                                       L R)))))))
+ 
 
-#| Q: |#
-#| A: |#
+#| A: The incomplete collector is similar to the extra collector. Instead of adding one to L, it 
+      adds one to R, and instead of consing new onto consing oldL onto newlat, it conses oldR 
+      onto the result of consing new onto newlat. |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#| Q: Can you fill in the dots? |#
 
-#| Q: |#
-#| A: |#
+;; This is my attempt
+(define multiinsertLR&co 
+  (λ (new oldL oldR lat col) 
+    (cond 
+      ((null? lat) 
+       (col '() 0 0)) 
+      ((eq? (car lat) oldL) 
+       (multiinsertLR&co new oldL oldR 
+                         (cdr lat) 
+                         (λ (newlat L R) 
+                           (col (cons new 
+                                      (cons oldL newlat)) 
+                                (add1 L) R)))) 
+      ((eq? (car lat) oldR) 
+       (multiinsertLR&co new oldL oldR 
+                         (cdr lat) 
+                         (λ (newlat L R) 
+                           (col (cons oldR (cons new newlat))
+                                L (add1 R))))) 
+      (else 
+       (multiinsertLR&co new oldL oldR 
+                         (cdr lat) 
+                         (λ (newlat L R) 
+                           (col (cons (car lat) newlat) 
+                                L R)))))))
 
-#| Q: |#
-#| A: |#
+#| A: Yes, the final collector is
 
-#| Q: |#
-#| A: |#
+      (λ (newlat L R) 
+        (col (cons oldR (cons new newlat))
+              L (add1 R))) |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the value of
+       (multiinsertLR&co new oldL oldR lat col) 
+      where 
+       new is salty 
+       oldL is fish 
+       oldR is chips 
+      and 
+       lat is (chips and fish or fish and chips) |#
+#| A: It is the value of (col newlat 2 2) 
+      where 
+       newlat is (chips salty and salty fish or salty fish and chips salty). |#
 
-#| Q: |#
-#| A: |#
+#| Q: Is this healthy? |#
+#| A: Looks like lots of salt. Perhaps dessert is sweeter. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Do you remember what *-functions are? |#
+#| A: Yes, all *-functions work on lists that are either 
+      - empty, 
+      - an atom consed onto a list, or 
+      - a list consed onto a list. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Now write the function evens-only* which removes all odd numbers from a list of nested 
+      lists. Here is even?
 
-#| Q: |#
-#| A: |#
+      (define even? 
+        (lambda (n) 
+          (= (* (/ n 2) 2) n)))      
 
-#| Q: |#
-#| A: |#
+      NOTE! I can't understand how that function should work?? It always return true. The number after
+      the first division must be an integer for this to work.
+      Luckily racket has the function even?
+|#
 
-#| Q: |#
-#| A: |#
+#| A: Now that we have practiced this way of writing functions, evens-only* is just an exercise: |#
 
-#| Q: |#
-#| A: |#
+;; The book is did not disclose that the list can contain both atoms and lists and not just lists
 
-#| Q: |#
-#| A: |#
+;; evens-only* : List-of-tuples-and-atoms -> List-of-tuples-and-atoms
+;; Removes all odd numbers in the list 
+(define evens-only*
+  (λ (l)
+    (cond
+      ((null? l) '())
+      ((atom? (car l))
+       (cond
+         ((even? (car l))
+          (cons (car l) (evens-only* (cdr l))))
+         (else (evens-only* (cdr l)))))
+      (else (cons (evens-only* (car l))
+                  (evens-only* (cdr l)))))))
 
-#| Q: |#
-#| A: |#
+; This solution is identical to the one in the book.
 
-#| Q: |#
-#| A: |#
+#| Q: What is the value of
+       (evens-only* l) 
+      where 
+       l is ((9 1 2 8) 3 10 ((9 9) 7 6) 2) |#
+#| A: '((2 8) 10 (() 6) 2) |#
 
-#| Q: |#
-#| A: |#
+(module+ test
+  (check-equal?
+   (evens-only* '((9 1 2 8) 3 10 ((9 9) 7 6) 2))
+   '((2 8) 10 (() 6) 2)))
 
-#| Q: |#
-#| A: |#
+#| Q: What is the sum of the odd numbers in l 
+      where 
+       l is ((9 1 2 8) 3 10 ((9 9) 7 6) 2) |#
+#| A: 9 + 1 + 3 + 9 + 9 + 7 = 38. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What is the product of the even numbers in l 
+      where 
+       l is ((9 1 2 8) 3 10 ((9 9) 7 6) 2) |#
+#| A: 2 x 8 x 10 x 6 x 2 = 1920. |#
 
-#| Q: |#
-#| A: |#
+#| Q: Can you write the function evens-only*&co
+      It builds a nested list of even numbers by removing the odd ones from its argument 
+      and simultaneously multiplies the even numbers and sums up the odd numbers that 
+      occur in its argument. |#
+#| A: This is full of stars! |#
 
-#| Q: |#
-#| A: |#
+#| Q: Here is an outline. Can you explain what 
+      (evens-only*&co (car l) ... ) accomplishes? |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+(define evens-only*&co-proto 
+  (λ (l col) 
+    (cond 
+      ((null? l) 
+       (col '() 1 0)) 
+      ((atom? (car l)) 
+       (cond 
+         ((even? (car l)) 
+          (evens-only*&co-proto (cdr l) 
+                                (λ (newl p s) 
+                                  (col (cons (car l) newl) 
+                                       (* (car l) p) s)))) 
+         (else (evens-only*&co-proto (cdr l) 
+                                     (λ (newl p s) 
+                                       (col newl 
+                                            p (+ (car l) s))))))) 
+      (else (evens-only*&co-proto (car l) 
+                                  '...)))))
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
 
-#| Q: |#
-#| A: |#
+#| A: It visits every number in the car of l and collects the list without odd numbers, the 
+      product of the even numbers, and the sum of the odd numbers. |#
 
-#| Q: |#
-#| A: |#
+#| Q: What does the function evens-only*&co do after visiting all the numbers in (car l) |#
+#| A: It uses the collector, which we haven't defined yet. |#
+
+#| Q: And what does the collector do? |#
+#| A: It uses evens-only*&co to visit the cdr of l and to collect the list that is like (cdr l), 
+      without the odd numbers of course, as well as the product of the even numbers and the 
+      sum of the odd numbers. |#
+
+#| Q: Does this mean the unknown collector looks roughly like this: 
+      (λ (al ap as) 
+        (evens-only*&co (cdr l) 
+                        ...)) |#
+#| A: Yes. |#
+
+#| Q: And when (evens-only*&co (cdr l) ... ) is done with its job, what happens then? |#
+#| A: The yet-to-be-determined collector is used, just as before. |#
+
+#| Q: What does the collector for (evens-only*&co (cdr l) ...) do? |#
+#| A: It conses together the results for the lists in 
+the car and the cdr and multiplies and adds 
+the respective products and sums. Then it 
+passes these values to the old collector:
+(λ (al ap as) 
+  (evens-only*&co (cdr l) 
+                  (λ (dl dp ds) 
+                    (col (cons al dl) 
+                         (x ap dp) 
+                         (+ as ds))))). |#
+
+
+(define evens-only*&co 
+  (λ (l col) 
+    (cond 
+      ((null? l) 
+       (col '() 1 0)) 
+      ((atom? (car l)) 
+       (cond 
+         ((even? (car l)) 
+          (evens-only*&co (cdr l) 
+                                (λ (newl p s) 
+                                  (col (cons (car l) newl) 
+                                       (* (car l) p) s)))) 
+         (else (evens-only*&co (cdr l) 
+                                     (λ (newl p s) 
+                                       (col newl 
+                                            p (+ (car l) s))))))) 
+      (else (evens-only*&co (car l) 
+                                  (λ (al ap as) 
+                                    (evens-only*&co (cdr l) 
+                                                    (λ (dl dp ds) 
+                                                      (col (cons al dl) 
+                                                           (x ap dp) 
+                                                           (+ as ds))))))))))
+
+; https://stackoverflow.com/questions/10692449/the-little-schemer-evens-onlyco
+
+#| Q: Does this all make sense now? |#
+#| A: Perfect. |#
+
+#| Q: What is the value of (evens-only*&co l the-last-friend) 
+      where 
+       l is ((9 1 2 8) 3 10 ((9 9) 7 6) 2)
+      and 
+       the-last-friend is defined as follows: |#
+
+(define the-last-friend 
+  (λ (newl product sum) 
+    (cons sum 
+          (cons product 
+                newl)))) 
+#| A: (38 1920 (2 8) 10 (() 6) 2) |#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#|                    Whew! Is your brain twisted up now?                    |#
+
+
+#|                Go eat a pretzel; don't forget the mustard.                |#
+
+
+
+
+
+
+
+
+
+
+
+
+
+

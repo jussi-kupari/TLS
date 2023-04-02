@@ -32,14 +32,16 @@
                          (co (cons (car lat) newlat) 
                               seen)))))))
 
-;(multirember&co 'tuna '() second-list-empty?)
-;(multirember&co 'tuna '(tuna) second-list-empty?)
-;(multirember&co 'tuna '(and tuna) second-list-empty?)
-;(multirember&co 'tuna '(strawberries tuna and swordfish) second-list-empty?)
-;(multirember&co 'tuna '(strawberries tuna and swordfish) length-first?)
+; (multirember&co 'tuna '() second-list-empty?)
+; (multirember&co 'tuna '(tuna) second-list-empty?)
+; (multirember&co 'tuna '(and tuna) second-list-empty?)
+; (multirember&co 'tuna '(strawberries tuna and swordfish) second-list-empty?)
+; (multirember&co 'tuna '(strawberries tuna and swordfish) length-first?)
+; (multirember&co 'foo '(foo bar) list)
 
 ;; Run the stepper in ISL+
-;; or use #lang racket and point at the arguments to see which match
+;; Below is the final collector for multirember&co
+
 
 ((lambda (newlat seen)
    ((lambda (newlat seen)
