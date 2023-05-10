@@ -1,4 +1,4 @@
-#lang racket/base
+#lang racket
 
 (provide numbered?
          value
@@ -316,7 +316,7 @@
   (check-equal? (value.v1 '(999 * 1)) 999)
   (check-equal? (value.v1 '(999 + 1)) 1000)
   (check-equal? (value.v1 '(999 ** 1)) 999)
-  (check-equal? (value.v1 '(999 ** 2)) 998001)
+  (check-equal? (value.v1 '(99 ** 2)) 9801)
   (check-equal? (value.v1 '(999 ** 0)) 1))
 
 #| Q: Can you think of a different representation of arithmetic expressions? |#

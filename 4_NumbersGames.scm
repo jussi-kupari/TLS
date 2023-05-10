@@ -1,4 +1,4 @@
-#lang racket/base
+#lang racket
 
 (provide plus
          minus
@@ -201,7 +201,7 @@
 
 #| Q: When we build a number from a list of numbers, what should the terminal condition 
       line look like? |#
-#| A: ((null ? tup) 0), just as ((null? l) '()) 
+#| A: ((null? tup) 0), just as ((null? l) '()) 
       is often the terminal condition line for lists. |#
 
 #| Q: What is the terminal condition line of addtup? |#
@@ -746,7 +746,7 @@
       (else #t))))
 
 #| Q: Does this mean we have two different 
-      functions for testing equality of atoms?|#
+      functions for testing equality of atoms? |#
 #| A: Yes, they are =? for atoms that are numbers and eq? for the others. |#
 
 #| Q: (** 1 1) |#
@@ -768,7 +768,7 @@
   (λ (n m)
     (cond
       ((zero? m) 1)
-      (else (* n (** n (sub1 m)))))))
+      (else (x n (** n (sub1 m)))))))
 
 (module+ test
   (check-equal? (** 1 1) 1) 
@@ -812,7 +812,8 @@
   (check-equal? (divide 10 5) 2)
   (check-equal? (divide 15 5) 3)
   (check-equal? (divide 36 5) 7))
-; Note: this is like the function quotient in Scheme.
+
+; Note: this is like the function 'quotient' in Scheme.
 
 #| Q: What is (divide 15 4) |#
 #| A: Easy, it is 3. |#
@@ -939,7 +940,7 @@
    (no-nums '(5 pears 6 prunes 9 dates))
    '(pears prunes dates)))
 
-#| Book version is more verbose using several cond-else structures
+#| Book version a verbose version using several cond-else's
 (define no-nums 
     (λ (lat) 
       (cond 
@@ -969,7 +970,7 @@
 
 #| Book version is again a more verbose with several cond-elses
 (define all-nums 
-    (λ ( lat) 
+    (λ (lat) 
       (cond 
         ((null? lat) '()) 
         (else 
@@ -1033,6 +1034,7 @@
 
 (module+ test
   (check-equal? (occur 'a '()) 0)
+  (check-equal? (occur 'a '(d b g d f)) 0)
   (check-equal? (occur 'a '(a b c d e)) 1)
   (check-equal? (occur 'a '(a b c d a e)) 2)
   (check-equal? (occur 'a '(a b c a d a e a a d a)) 6))
@@ -1049,7 +1051,7 @@
            (else (occur a (cdr lat)))))))) |#
 
 #| Q: Write the function one? where (one? n) is #t if n is 1
-      and #f (i.e. , false) otherwise. |#
+      and #f (i.e., false) otherwise. |#
 #| A: Ok, will do. |#
 
 ;; one? : WN -> Boolean

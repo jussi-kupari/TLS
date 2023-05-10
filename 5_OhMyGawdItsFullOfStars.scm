@@ -1,4 +1,4 @@
-#lang racket/base
+#lang racket
 
 (provide rember*
          insertR*
@@ -54,8 +54,8 @@
           (rember* a (cdr l)))               ; remove atom from list
          (else
           (cons (car l)
-                (rember* a (cdr l))))))      ; but keep unmatching atom in list
-      (else (cons (rember* a (car l))        ; if first element is a list, cons result of (rember* a (car l)) 
+                (rember* a (cdr l))))))      ; but if unmatching keep atom in list
+      (else (cons (rember* a (car l))        ; if first element is a list, run rember* on it and cons the result 
                   (rember* a (cdr l)))))))   ; to the result of (rember* a (cdr l))
 
 (module+ test
@@ -112,7 +112,7 @@
   (λ (new old l)
     (cond
       ((null? l) '())                        ; empty list returns empty of course
-      ((atom? (car l))                       ; if first element in an atom
+      ((atom? (car l))                       ; if first element is an atom
        (cond
          ((eq? (car l) old)                  ; and matches with old
           (cons old                          ; cons old to the cons of new and natural recursion
@@ -297,9 +297,9 @@
           (cons new
                 (subst* new old (cdr l))))        ; cons new to result of recurring with (cdr l)
          (else (cons (car l)
-                     (subst* new old (cdr l)))))) ; else cons first element to result of recurring with (cdr l)) 
+                     (subst* new old (cdr l)))))) ; else cons first element (or old) to result of recurring with (cdr l)) 
       (else                                       ; if first element is a list
-       (cons (subst* new old (car l))             ; subst* in that list and cons resulting list
+       (cons (subst* new old (car l))             ; run subst* on that list and cons result
              (subst* new old (cdr l)))))))        ; to the natural recursion with (cdr l)
 
 (module+ test
@@ -582,12 +582,15 @@
 (define eqlist?.v1
   (λ (l1 l2)
     (cond
-      ((and (null? l1) (null? l2)) #t)
-      ((or (null? l1) (null? l2)) #f)
-      ((and (atom? (car l1)) (atom? (car l2)))
-       (and (eqan? (car l1) (car l2)) (eqlist?.v1 (cdr l1) (cdr l2))))
+      ((and (null? l1) (null? l2)) #t)         
+      ((or (null? l1) (null? l2)) #f)          
+      ((and (atom? (car l1)) (atom? (car l2))) 
+       (and (eqan? (car l1) (car l2))
+            (eqlist?.v1 (cdr l1) (cdr l2))))
       ((or (atom? (car l1)) (atom? (car l2))) #f)
-      (else (and (eqlist?.v1 (car l1) (car l2)) (eqlist?.v1 (cdr l1) (cdr l2)))))))
+      (else
+       (and (eqlist?.v1 (car l1) (car l2))
+                 (eqlist?.v1 (cdr l1) (cdr l2)))))))
 
 (module+ test
   (check-true (eqlist?.v1 '(strawberry ice cream) '(strawberry ice cream)))
@@ -607,17 +610,17 @@
 (define eqlist?.v2 
   (λ (l1 l2) 
     (cond 
-      ((and (null? l1) (null? l2)) #t)         ;both list empty means they are the same
-      ((and (null? l1) (atom? (car l2))) #f)   ;first list empty and second starts with atom means different 
-      ((null? l1) #f)                          ;first still empty means they are different
-      ((and (atom? (car l1)) (null? l2)) #f)   ;first starts with atom and second empty means different
+      ((and (null? l1) (null? l2)) #t)          ;both list empty means they are the same
+      ((and (null? l1) (atom? (car l2))) #f)    ;first list empty and second starts with atom means different 
+      ((null? l1) #f)                           ;first still empty means they are different
+      ((and (atom? (car l1)) (null? l2)) #f)    ;first starts with atom and second empty means different
       ((and (atom? (car l1)) (atom? (car l2))) 
        (and (eqan? (car l1) (car l2)) 
             (eqlist?.v2 (cdr l1) (cdr l2))))    ;lists start with equal atoms. Look further in the lists
-      ((atom? (car l1)) #f)                    ;first still starts with atom so they are different     
-      ((null? l2) #f)                          ;second is empty means they are different   
-      ((atom? (car l2)) #f)                    ;second starts with atom means they are different 
-      (else                                    ;if we get here then 
+      ((atom? (car l1)) #f)                     ;first still starts with atom so they are different     
+      ((null? l2) #f)                           ;second is empty means they are different   
+      ((atom? (car l2)) #f)                     ;second starts with atom means they are different 
+      (else                                     ;if we get here then 
        (and (eqlist?.v2 (car l1) (car l2))      ;check if the first element lists 
             (eqlist?.v2 (cdr l1) (cdr l2))))))) ;and the remaining lists are equal
 
@@ -649,14 +652,14 @@
   (λ (l1 l2) 
     (cond 
       ((and (null? l1) (null? l2)) #t)             ;both are empty so the same
-      ((or (null? l1) (null? l2)) #f)              ;one empty then they are not the same 
+      ((or (null? l1) (null? l2)) #f)              ;one still empty then they are not the same 
       ((and (atom? (car l1)) (atom? (car l2)))     ;both start with atom
        (and (eqan? (car l1) (car l2)) 
             (eqlist?.v3 (cdr l1) (cdr l2))))       ;atoms identical so we look futher in the lists 
       ((or (atom? (car l1 ))                       ;one still starts with atom means they are different
            (atom? (car l2))) #f) 
       (else                              
-       (and (eqlist?.v3 (car l1 ) (car l2))        ;check if first elements (lists) are identical and 
+       (and (eqlist?.v3 (car l1 ) (car l2))        ;check if first elements (lists) are identical and if 
             (eqlist?.v3 (cdr l1 ) (cdr l2)))))))   ;the remaining lists are identical
 
 #| Q: What is an S-expression? |#

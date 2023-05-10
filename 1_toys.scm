@@ -1,4 +1,4 @@
-#lang racket/base
+#lang racket
 
 (require "Atom.scm")
 
@@ -407,14 +407,14 @@
 #| Q: Is (eq? l1 l2) true or false where l1 is () and l2 is (strawberry)? |#
 #| A: No answer, () and (strawberry) are lists.  |#
 
-;Note: In practice, lists m83' be arguments of eq?. Two lists are eq? if they are the same list. 
+;Note: In Racket, lists can be arguments of eq?. Two lists are eq? if they are the same list. 
 (module+ test
   (check-false (eq? '() '(strawberry))))
 
 #| Q: Is (eq? n1 n2) true or false where n1 is 6 and n2 is 7? |#
 #| A: No answer, 6 and 7 are numbers. |#
 
-; Note: In practice, some numbers may be arguments of eq?. 
+; Note: In Racket, some numbers may be arguments of eq?. 
 (module+ test
   (check-false (eq? 6 7)))
 
@@ -437,7 +437,7 @@
 #| A: No answer, because (cdr (soured milk)) returns the list (milk) and
       eq? doesn't work with lists. See The Laws of Eq? and Cdr.  |#
 
-; Note: in #lang racket this returns #f
+; Note: in Racket this returns #f
 (module+ test
   (check-false (eq? (cdr '(soured milk)) 'milk)))
 

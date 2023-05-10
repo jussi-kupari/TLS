@@ -1,4 +1,4 @@
-#lang racket/base
+#lang racket
 
 (provide rember
          firsts
@@ -42,7 +42,7 @@
 #| A: Return (). |#
 
 #| Q: What do we know if (null? lat) is not true? |#
-#| A:We know that there must be at least one atom in the lat. |#
+#| A: We know that there must be at least one atom in the lat. |#
 
 #| Q: Is there any other question we should ask about the lat? |#
 #| A: No. Either a lat is empty or it contains at least one atom. |#
@@ -106,7 +106,7 @@
 #| Q: else |#
 #| A: Yes. |#
 
-#| Q: What next?|#
+#| Q: What next? |#
 #| A: Ask the next question. |#
 
 #| Q: (eq? (car lat) a) |#
@@ -341,13 +341,13 @@
 #| A: Yes. |#
 
 #| Q: Can you put in your own words how we determined the final value (bacon lettuce tomato) |#
-#| A: Rember.v2 checks each atom of a list against the given atom one at a time. If the
+#| A: Rember.v2 begins to check each atom of a list against the given atom one at a time. If the
       list is null, it returns an empty list. If the list is not empty, it checks if the first atom
-      is the same. If it is, it returns the list without the atom. If the atoms are not the same, it
+      is a match. If it is, it returns the cdr of the list. If it is not a match, it
       saves the first atom on the list to be consed with the result of running rember.v2 with the
       given atom and the rest of the list. Each round when the atoms are not the same it saves
-      the first atom to be consed to the result of running rember.v2with the remaining list. When it reaches
-      the end --finds the atom or the end of the list-- it conses the saved atoms to the
+      the first atom to be consed to the result of running rember.v2 with the rest of the list.
+      When it reaches the end --finds the atom or an empty list-- it conses the saved atoms to the
       result.
 
       from the book:
@@ -604,8 +604,8 @@
       What does the last line look like now? |#
 #| A: (else (cons (car (car l)) (firsts (cdr l))))
 
-      build list -> (cons 
-      typical element -> (car (car l)
+      build list -> (else (cons ...)) 
+      typical element -> (car (car l))
       natural recursion -> (firsts (cdr l)) |#
 
 #| Q: What does (firsts l) do
@@ -698,7 +698,7 @@ In any case, what is the value of (firsts l) |#
 
       In our words: 
       "It takes three arguments: the atoms new 
-      and old , and a lat. The function insertR 
+      and old, and a lat. The function insertR 
       builds a lat with new inserted to the right 
       of the first occurrence of old." |#
 

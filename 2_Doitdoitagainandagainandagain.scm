@@ -1,4 +1,4 @@
-#lang racket/base
+#lang racket
 
 (provide lat? member?)
 
@@ -17,14 +17,14 @@
 #| Q: True or false: (lat? l) where l is (Jack Sprat could eat no chicken fat) |#
 #| A: True, because each S-expression in l is an atom. |#
 
-#| Q: True or false: (lat ? l) where l is ((Jack) Sprat could eat no chicken fat) |#
-#| A: False, since ( car l) is a list. |#
+#| Q: True or false: (lat? l) where l is ((Jack) Sprat could eat no chicken fat) |#
+#| A: False, since (car l) is a list. |#
 
 #| Q: True or false: (lat? l) where l is (Jack (Sprat could) eat no chicken fat) |#
 #| A: False, since one of the S-expressions in l is a list. |#
 
-#| Q: True or false: (lat ? l) where l is () |#
-#| A: True, because it does not contain a list. |#
+#| Q: True or false: (lat? l) where l is () |#
+#| A: True, because it does not contain a list. |# 
 
 ; Note: It is not entirely obvious to me why an empty list is considered a list of atoms.
 
@@ -85,7 +85,7 @@
 
 
 
-#|          Are you rested?          |#
+#|          Are you rested?          |#  
 
 
 
@@ -113,11 +113,11 @@
       function lat? and refer to it for the next 
       group of questions. "
 
-      My answer: First we check if the list is null, if yes, then the answer is #t.
+      My answer: First we check if the list is null, if yes, then the answer is true.
       If the list is not null, we look at the first element. If that is
       an atom, then we proceed to repeat this process for the remaining part
       of the list. If we get to the end of the list - that is - to an empty
-      list, we get #t. In any other case we get #f. |#
+      list, the result is true. In any other case the result is false. |#
 
 #| Q: What is the first question asked by (lat? l) |#
 #| A: (null? l) 
@@ -593,7 +593,7 @@
   (check-false (eq? (car '(bagels and lox)) 'liver)))
 
 #| Q: (null? lat) |#
-#| A: (No. Move to the next line. |#
+#| A: No. Move to the next line. |#
 (module+ test
   (check-false (null? '(and lox))))
 
@@ -637,7 +637,7 @@
 (module+ test
   (check-false (member? 'liver '(lox))))
 
-#| Q: What is the value of (or (eq? (car lat) a)  (member? a (cdr lat)))
+#| Q: What is the value of (or (eq? (car lat) a) (member? a (cdr lat)))
       where a is liver and lat is (and lox) |#
 #| A: #f. |#
 (module+ test
