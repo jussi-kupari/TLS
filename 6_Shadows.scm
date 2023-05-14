@@ -48,13 +48,15 @@
 #| Q: What is (quote a) NOTE: this is the same as 'a |#
 #| A: a. |#
 
-#| Q: What is (quote +) |#
+; From now on I will write these as 'a not (quote a)
+
+#| Q: What is '+ |# 
 #| A: The atom +, not the operation + |#
 
-#| Q: What does (quote *) stand for? |#
+#| Q: What does '* stand for? |#
 #| A: The atom *, not the operation *. |#
 
-#| Q: Is (eq? (quote a) y) true or false where y is a? |#
+#| Q: Is (eq? 'a y) true or false where y is a? |#
 #| A: True. |#
 (module+ test
   (define y 'a)
@@ -114,14 +116,14 @@
 #| Q: What is the first question? |#
 #| A: (atom? aexp). |#
 
-#| Q: What is (eq? (car (cdr aexp)) (quote +)) |#
+#| Q: What is (eq? (car (cdr aexp)) '+) |#
 #| A: It is the second question. |#
 
 #| Q: Can you guess the third one? |#
-#| A: (eq? (car (cdr aexp)) (quote * )) is perfect. |#
+#| A: (eq? (car (cdr aexp)) '*) is perfect. |#
 
 #| Q: And you must know the fourth one. |#
-#| A: (eq? (car (cdr aexp)) (quote **)), of course. |#
+#| A: (eq? (car (cdr aexp)) '**), of course. |#
 
 #| Q: Should we ask another question about aexp? |#
 #| A: No! So we could replace the previous question by else. |#
@@ -182,7 +184,7 @@
       ((eq? (car (cdr aexp)) '+)
        (and
         (numbered?.v1 (car aexp))
-        (numbered?.v1 (car (cdr (cdr aexp))))))        ; % See below
+        (numbered?.v1 (car (cdr (cdr aexp))))))        ;%%% See below
       ((eq? (car (cdr aexp)) '*)
        (and
         (numbered?.v1 (car aexp))
@@ -192,7 +194,7 @@
         (numbered?.v1 (car aexp))
         (numbered?.v1 (car (cdr (cdr aexp)))))))))
 
-#| %
+#| %%%
 (car (cdr (cdr aexp))) because
 (cdr (cdr '((5 + 5) + 2)))) ==> '(2) 
 (car (cdr (cdr '((5 + 5) + 2)))) ==> 2
@@ -241,7 +243,7 @@
 #| Q: (value x) where x is (1 + 3) |#
 #| A: 4. |#
 
-#| Q: (value y) where y is (1 + (3 ** 4) |#
+#| Q: (value y) where y is (1 + (3 ** 4)) |#
 #| A: 82. |#
 
 #| Q: (value z) where z is cookie |#
@@ -261,9 +263,9 @@
     (λ (nexp) 
       (cond 
         ((atom? nexp) ...) 
-        ((eq? (car (cdr nexp)) (quote +)) 
+        ((eq? (car (cdr nexp)) '+) 
          ...) 
-        ((eq? (car (cdr nexp)) (quote *)) 
+        ((eq? (car (cdr nexp)) '*) 
          ...) 
         (else ...)))) |#
 
@@ -353,7 +355,7 @@
        (plus (value.v2 (cdr nexp))
              (value.v2 (cdr (cdr nexp)))))
       ((eq? (car nexp) '*)
-       (x (value.v2 (cdr nexp))
+       (* (value.v2 (cdr nexp))
              (value.v2 (cdr (cdr nexp)))))
       ((eq? (car nexp) '**)
        (** (value.v2 (cdr nexp))
