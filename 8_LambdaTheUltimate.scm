@@ -4,7 +4,6 @@
 
 (require
   (only-in "Atom.scm" atom?)
-  (only-in "3_ConsTheMagnificent.scm" insertL insertR)
   (only-in "4_NumbersGames.scm" plus x **)
   (only-in "6_Shadows.scm" operator 1st-sub-exp 2nd-sub-exp))
 
@@ -51,18 +50,16 @@
 #| A: Ok. |#
 
 ;; rember-f : Sexp Predicate List -> List
-;; Removes the sexp from the list using the predicate
+;; Removes sexp from list using predicate
 
 (define rember-f.v1
   (λ (test? a l)
     (cond
       ((null? l) '())
-      ((test? (car l) a)
-       (rember-f.v1 test? a (cdr l)))
+      ((test? (car l) a) (cdr l))
       (else
        (cons (car l)
              (rember-f.v1 test? a (cdr l)))))))
-
 
 (module+ test
   (check-equal?
@@ -74,9 +71,8 @@
   (check-equal?
    (rember-f.v1 equal? '(pop corn) '(lemonade (pop corn) and (cake))) '(lemonade and (cake))))
 
-; The first book solution is verbose with extra conds and
-; returns (cdr l) on first match (does not remove multiple matches).
 
+; The first book solution is fully verbose with extra conds.
 (define rember-f.v2 
   (λ (test? a l) 
     (cond 
@@ -100,27 +96,19 @@
 ; This is good! 
 
 #| Q: What about the short version? |#
-#| A: Note: Looks like my version above but still returns (cdr l) after first match. |#
+#| A: This is exactly like my first version rember-f.v1 above! |#
 
-(define rember-f.v3
+#|
+(define rember-f
   (λ (test? a l)
     (cond
       ((null? l) '())
       ((test? (car l) a) (cdr l))
       (else
        (cons (car l)
-             (rember-f.v3 test? a
-                          (cdr l)))))))
+             (rember-f test? a
+                          (cdr l))))))) |#
 
-(module+ test
-  (check-equal?
-   (rember-f.v3 = 5 '(6 2 5 3)) '(6 2 3))
-  (check-equal?
-   (rember-f.v3 eq? 'jelly '(jelly beans are good)) '(beans are good))
-  (check-equal?
-   (rember-f.v3 eq? 'jelly '(jelly beans are good)) '(beans are good))
-  (check-equal?
-   (rember-f.v3 equal? '(pop corn) '(lemonade (pop corn) and (cake))) '(lemonade and (cake))))
 
 #| Q: How does (rember-f test? a l) act where test? is eq? |#
 #| A: (rember-f test? a l) where test? is eq?, acts like rember. |#
@@ -149,7 +137,7 @@
 #| Q: Can you say what (λ (a l) ...) is? |#
 #| A: (λ (a l) ...) is a function of two arguments, a and l. |#
 
-;(λ (a l) 'value) ==> #<procedure>
+; (λ (a l) 'value) ==> #<procedure>
 
 #| Q: Now what is
  
@@ -183,7 +171,7 @@
 #| Q: So let's give it a name using (define ...) |#
 #| A: Okay. |#
 
-;(define eq?-salad (eq?-c k)), where k is salad
+; (define eq?-salad (eq?-c k)), where k is salad
 
 ;; eq?-salad : Sexp -> Boolean
 ;; Produces true if given sexp is equal to the atom salad
@@ -235,7 +223,7 @@
  
 #| Q: Describe in your own words the result of (rember-f test?) where test? is eq? |#
 #| A: It is a function that takes two arguments, a and l. It compares the elements of the list 
-      with a using eq?, and removes the first that results in #true. |#
+      with a using eq?, and removes the first atom that results in #true. |#
 
 #| Q: Give a name to the function returned by (rember-f test?) where test? is eq? |#
 #| A: (define rember-eq? (rember-f test?)) where test? is eq?. |#
@@ -252,7 +240,7 @@
 #| A: Ok. |#
 
 ;; rember-f : Predicate -> Function
-;; Produces a function that removes an element from a list using the predicate.
+;; Produces a function that removes the first matching element from a list using the predicate.
 
 (define rember-f
   (λ (test?)
@@ -263,9 +251,6 @@
         (else
          (cons (car l)
                ((rember-f test?) a (cdr l))))))))
-
-; It is mind-bending to try and understand how the recursion works here.
-; The fact that the function recurs from the top (rember-f) melts my brain.
 
 (module+ test
   (check-equal?
@@ -334,11 +319,11 @@
 #| Q: Can you write a function insert-g that would insert either at the left or at the right?
       If you can, get yourself some coffee cake and relax! Otherwise, don't give up. You'll see it 
       in a minute. |#
-#| A: Ok. My attempt is below. It seems to work. |#
+#| A: Ok. My attempt is below. It seems to work but also uses an extra argument for the predicate |#
 
-;; insert-G-full : Predicate Atom -> Function
+;; insert-G : Predicate Atom -> Function
 ;; Produces a function to insert atoms in a specific position in a list using predicate and atom ('left or 'right).
-(define insert-G-full
+(define insert-G
   (λ (test? pos)
     (cond
       ((eq? pos 'right)
@@ -349,7 +334,7 @@
             (cons old (cons new (cdr l))))
            (else
             (cons (car l)
-                  ((insert-G-full test? pos) new old (cdr l)))))))
+                  ((insert-G test? pos) new old (cdr l)))))))
       (else
        (λ (new old l)
          (cond
@@ -358,21 +343,21 @@
             (cons new (cons old (cdr l))))
            (else
             (cons (car l)
-                  ((insert-G-full test? pos) new old (cdr l))))))))))
+                  ((insert-G test? pos) new old (cdr l))))))))))
 
 (module+ test
   (check-equal?
-   ((insert-G-full eq? 'right) 'chicken 'tuna '(This is a very good tuna salad!))
+   ((insert-G eq? 'right) 'chicken 'tuna '(This is a very good tuna salad!))
    '(This is a very good tuna chicken salad!))
   
   (check-equal?
-   ((insert-G-full eq? 'left) 'chicken 'tuna '(This is a very good tuna salad!))
+   ((insert-G eq? 'left) 'chicken 'tuna '(This is a very good tuna salad!))
    '(This is a very good chicken tuna salad!)))
 
 ; This can also be written with the predefined insertR-f and insertL-f functions in shorter format.
 ; but this function is dependent on those two predefined functions
 
-(define insert-G
+(define insert-G-short
   (λ (test? pos)
     (cond
       ((eq? pos 'right)
@@ -382,11 +367,11 @@
 
 (module+ test
   (check-equal?
-   ((insert-G eq? 'right) 'chicken 'tuna '(This is a very good tuna salad!))
+   ((insert-G-short eq? 'right) 'chicken 'tuna '(This is a very good tuna salad!))
    '(This is a very good tuna chicken salad!))
   
   (check-equal?
-   ((insert-G eq? 'left) 'chicken 'tuna '(This is a very good tuna salad!))
+   ((insert-G-short eq? 'left) 'chicken 'tuna '(This is a very good tuna salad!))
    '(This is a very good chicken tuna salad!)))
 
 #| Q: Which pieces differ? |#
@@ -413,10 +398,6 @@
          onto the result of consing 
          the second argument onto the third argument. |#
 #| A: Ok. |#
-
-
-; Note: In this case the third argument is a list
-
 
 ;; define seqL : Sexp Sexp List -> List
 ;; Produces a list by consing first sexp to the result of consing second and third.
@@ -452,28 +433,10 @@
         which returns insertR 
             where seq is seqR |#
 
-#| A: Ok. I am using the defined insertR and insertL functions from chapter 3. |#
+#| A: Ok |#
 
-(define insert-g.v1
-  (λ (seq)
-    (cond
-      ((equal? seq seqL)
-       insertL)
-      ((equal? seq seqR)
-       insertR))))
-
-(module+ test
-  (check-equal?
-   ((insert-g.v1 seqR) 'chicken 'tuna '(This is a very good tuna salad!))
-   '(This is a very good tuna chicken salad!))
-
-  (check-equal?
-   ((insert-g.v1 seqL) 'chicken 'tuna '(This is a very good tuna salad!))
-   '(This is a very good chicken tuna salad!)))
-
-
-; The book solution is obviously not using the predefined functions.
-
+;; insert-g : Function -> Function
+;; Produces a function to insert atoms in a specific position in a list.
 (define insert-g 
   (λ (seq) 
     (λ (new old l) 
@@ -497,18 +460,18 @@
 
 #| Q: Now define insertL with insert-g |#
 #| A: Ok. |#
-(define insertl (insert-g seqL)) 
+(define insertL (insert-g seqL)) 
 
 #| Q: And insertR. |#
 #| A: Sure. |#
-(define insertr (insert-g seqR))
+(define insertR (insert-g seqR))
 
 (module+ test
   (check-equal?
-   (insertr 'chicken 'tuna '(This is a very good tuna salad!))
+   (insertR 'chicken 'tuna '(This is a very good tuna salad!))
    '(This is a very good tuna chicken salad!))
   (check-equal?
-   (insertl 'chicken 'tuna '(This is a very good tuna salad!))
+   (insertL 'chicken 'tuna '(This is a very good tuna salad!))
    '(This is a very good chicken tuna salad!)))
 
 #| Q: Is there something unusual about these two definitions? |#
@@ -560,7 +523,7 @@
 
 (define seqS 
   (λ (new old l) 
-    (cons new l))) 
+    (cons new l)))  ; Note that old is not used here
 
 #| Q: And now define subst using insert-g |#
 #| A: Ok. |#
@@ -653,7 +616,6 @@ Surprise! It is our old friend rember
 
 ;; Using #f we can bypass the unused argument.
 
-((insert-g seqrem) #f 'sausage '(pizza with sausage and bacon))
 
 
 
@@ -703,16 +665,15 @@ Surprise! It is our old friend rember
       if (eq? x '*) and 
          returns the function ** 
          otherwise? |#
-#| A: Let me try. I will use functions that we defined in Chapter 4.
-      I will use a as the argument instead of x, bcause I use x as the function *. |#
+#| A: Let me try. I will use functions that we defined in Chapter 4. |#
 
 ;; atom-to-function : Atom -> Function
 ;; Given atom, produces the appropriate function
 (define atom-to-function
-  (λ (a)
+  (λ (x)
     (cond
-      ((eq? a '+) plus) 
-      ((eq? a ' *) x)   
+      ((eq? x '+) plus) 
+      ((eq? x '*) *)   
       (else **))))
 
 
@@ -765,7 +726,7 @@ Here is the original function btw
     (cond
       ((atom? nexp) nexp)
       (else
-       ((atom-to-function (car (cdr nexp))) ; operator
+       ((atom-to-function (operator nexp))     
         (value.v1 (car nexp))                  ; 1st-sub-exp
         (value.v1 (car (cdr (cdr nexp))))))))) ; 2nd-sub-exp
 
@@ -787,7 +748,6 @@ Here is the original function btw
   (check-equal? (value (+ 5 3)) 8)
   (check-equal? (value (* 5 3)) 15)
   (check-equal? (value (** 5 3)) 125))
-
 
 #| Q: Is this quite a bit shorter than the first version? |#
 #| A: Yes, but that's okay. We haven't changed its meaning. |#
@@ -853,11 +813,7 @@ Here is the original function btw
 
 
 #| Q: Do we really need to tell multirember-f about tuna |#
-#| A: As multirember-f visits all the elements in lat, it always looks for tuna.
-
-      Note: This is confusing. What is the point of this? multirember-f takes a
-      predicate as input but the resulting function needs to be given an atom to
-      look for. |#
+#| A: As multirember-f visits all the elements in lat, it always looks for tuna. |#
 
 #| Q: Does test? change as multirember-f goes through lat |#
 #| A: No, test? always stands for eq?, just as a always stands for tuna. |#
@@ -875,6 +831,7 @@ Here is the original function btw
         (eq?-c k))
 
       where k is tuna
+
       Can you think of a different way of writing 
       this function?  |#
 
@@ -889,7 +846,7 @@ Here is the original function btw
   (check-false
    (eq?-tuna 'tunaaa)))
 
-; Note: Isn't this exactly the same as above??
+; Note: But isn't this exactly the same as above??
 
 #| Q: Have you ever seen definitions that contain atoms? |#
 #| A: Yes, 0, 'x, '+, and many more. |#
@@ -1007,6 +964,7 @@ Here is the original function btw
 ; https://stackoverflow.com/questions/2018008/help-understanding-continuations-in-scheme?rq=1
 ; https://davidgorski.ca/posts/collectors-in-scheme/
 ; http://debasishg.blogspot.com/2007/08/collector-idiom-in-scheme-is-this.html
+; https://stackoverflow.com/questions/40641470/building-the-built-in-procedure-build-list-in-racket/40643451#40643451
 
 #| Q: Here is the new collector:
 
@@ -1018,7 +976,8 @@ Here is the original function btw
       where 
        (car lat) is tuna 
       and 
-       col is a-friend 
+       col is a-friend
+
       Can you write this definition differently? |#
 
 #| A: Do you mean the new way where we put tuna into the definition?
@@ -1142,7 +1101,7 @@ Do you also remember multiinsertR? |#
       Hint: multiinsertLR inserts new to the left of oldL and to the right of oldR in lat if 
       oldL are oldR are different. |#
 
-#| A: Ok. This is not difficult but I had to peak the answer because I
+#| A: Ok. This was not complicated but I had to peak the answer because I
       could not figure out what the function was supposed to do. |#
 
 ;; multiinsertLR : Atom Atom Atom LAT -> LAT
@@ -1325,7 +1284,7 @@ Do you also remember multiinsertR? |#
 
 #| A: Now that we have practiced this way of writing functions, evens-only* is just an exercise: |#
 
-;; The book is did not disclose that the list can contain both atoms and lists and not just lists
+;; The book did not disclose that the list can contain both atoms and lists and not just lists
 
 ;; evens-only* : List-of-tuples-and-atoms -> List-of-tuples-and-atoms
 ;; Removes all odd numbers in the list 
@@ -1425,7 +1384,7 @@ passes these values to the old collector:
                   (λ (dl dp ds) 
                     (col (cons al dl) 
                          (x ap dp) 
-                         (+ as ds))))). |#
+                         (+ as ds))))) |#
 
 
 (define evens-only*&co 
@@ -1437,20 +1396,20 @@ passes these values to the old collector:
        (cond 
          ((even? (car l)) 
           (evens-only*&co (cdr l) 
-                                (λ (newl p s) 
-                                  (col (cons (car l) newl) 
-                                       (* (car l) p) s)))) 
+                          (λ (newl p s) 
+                            (col (cons (car l) newl) 
+                                 (* (car l) p) s)))) 
          (else (evens-only*&co (cdr l) 
-                                     (λ (newl p s) 
-                                       (col newl 
-                                            p (+ (car l) s))))))) 
+                               (λ (newl p s) 
+                                 (col newl 
+                                      p (+ (car l) s))))))) 
       (else (evens-only*&co (car l) 
-                                  (λ (al ap as) 
-                                    (evens-only*&co (cdr l) 
-                                                    (λ (dl dp ds) 
-                                                      (col (cons al dl) 
-                                                           (x ap dp) 
-                                                           (+ as ds))))))))))
+                            (λ (al ap as) 
+                              (evens-only*&co (cdr l) 
+                                              (λ (dl dp ds) 
+                                                (col (cons al dl) 
+                                                     (x ap dp) 
+                                                     (+ as ds))))))))))
 
 ; https://stackoverflow.com/questions/10692449/the-little-schemer-evens-onlyco
 

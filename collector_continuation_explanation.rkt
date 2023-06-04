@@ -59,17 +59,21 @@ is to compose k with this function -- so we do the same sum operation,
 then send the result to k:
 |#
 
+#|
 (define (list-sum3 l k)
   (if (null? l)
     (k 0)
     (list-sum3 (cdr l) (λ (s) (k (+ s (car l)))))))
+|#
+
 
 #|
 which is finally working. (BTW, remember that each of these lambda functions has its own "copy" of l.)
 You can try this with:
-|#
 
 (list-sum3 '(1 2 3 4 5) (lambda (x) x))
+
+|#
 
 ;; The final collector function is below 
   ((lambda (s)

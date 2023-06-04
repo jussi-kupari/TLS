@@ -67,7 +67,7 @@
   (check-false (set.v1? '(apple peaches apple plum)))
   (check-true (set.v1? '(apples peaches pears plums))))
 
-#| Q: Simplify  set? |#
+#| Q: Simplify set? |#
 #| A: Ok. Let's remove the redundant cond. I will also use 'and' and 'not' |#
 
 ;; set.v2? : LAT -> Boolean
@@ -110,7 +110,7 @@
 
 #| Q: Were you surprised to see the function member? appear in the definition of set? |#
 #| A: You should not be, because we have written member? already, and now we can use it 
-      whenever we want. Note: Previously I had forgotten we had defined member? before. |#
+      whenever we want. Note: I had forgotten we had defined member? before! |#
 
 #| Q: What is (makeset lat) where lat is (apple peach pear peach plum apple lemon peach) |#
 #| A: (apple peach pear plum lemon)|#
@@ -174,10 +174,6 @@
       Here are our words: 
       "The function makeset remembers to cons the first atom in the lat onto the result of 
        the natural recursion, after removing all occurrences of the first atom from the rest of the lat." |#
-
-#| A: Starting from the first atom in the list, makeset conses the atom to the result of
-      the natural recursion of makeset on the remaining list after all possible occurrences
-      of the atom have been removed. |#
 
 #| Q: Does the second makeset work for the example (apple 3 pear 4 9 apple 3 4) |#
 #| A: Yes, since multirember is now written using equal? instead of eq?. |#
@@ -247,7 +243,6 @@
 
 #| Q: Try to write subset ? with (and ...) |#
 #| A: This is my original version of subset. |#
-
 
 #| Q: What is (eqset? set1 set2) where set1 is (6 large chickens with wings) and 
       set2 is (6 chickens with large wings) |#
@@ -577,9 +572,9 @@
       (else (car (cdr p))))))
 
 (define build.v1 
-  (λ (sl s2) 
+  (λ (s1 s2) 
     (cond 
-      (else (cons sl 
+      (else (cons s1 
                   (cons s2 '()))))))
 
 #| Q: What possible uses do these three functions have? |#
