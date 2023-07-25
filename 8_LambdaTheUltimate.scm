@@ -32,18 +32,18 @@
 #| A: By passing equal? as an argument to rember-f. |#
 
 #| Q: What is (rember-f test? a l) where
-     test? is = 
-     a is 5 and 
-     l is (6 2 5 3) |#
+test? is = 
+a is 5 and 
+l is (6 2 5 3) |#
 
 #| A: (6 2 3). |#
 
 #| Q: What is (rember-f test? a l) where test? is eq?, a is jelly and
-      l is (jelly beans are good) |#
+l is (jelly beans are good) |#
 #| A: (beans are good). |#
 
 #| Q: What is (rember-f test? a l) where test? is equal? a is (pop corn) and
-      l is (lemonade (pop corn) and (cake)) |#
+l is (lemonade (pop corn) and (cake)) |#
 #| A: (lemonade and (cake)). |#
 
 #| Q: Try to write rember-f |#
@@ -118,12 +118,12 @@
 
 #| Q: Now we have four functions that do almost the same thing. |#
 #| A:
-      Yes: 
-       rember with = 
-       rember with equal? 
-       rember with eq? 
-       and 
-       rember-f. |#
+Yes: 
+rember with = 
+rember with equal? 
+rember with eq? 
+and 
+rember-f. |#
 
 #| Q: And rember-f can behave like all the others. |#
 #| A: Let's generate all versions with rember-f. |#
@@ -146,7 +146,7 @@
     (eq? x a))) |#
 
 #| A: It is a function that, when passed an argument a, returns the function 
-     (λ (x) (eq? x a)) where a is just that argument. |#
+(λ (x) (eq? x a)) where a is just that argument. |#
 
 #| Q: Is this called "Curry-ing?" |#
 #| A: Thank you, Moses Schönfinkel (1889-1942). |#
@@ -166,7 +166,7 @@
 
 #| Q: What is (eq?-c k) where k is salad |#
 #| A: Its value is a function that takes x as an argument and
-      tests whether it is eq? to salad. |#
+tests whether it is eq? to salad. |#
 
 #| Q: So let's give it a name using (define ...) |#
 #| A: Okay. |#
@@ -193,18 +193,18 @@
 
 #| Q: Do we need to give a name to eq?-salad |#
 #| A: No, we may just as well ask
-       ((eq?-c x) y)
-      where
-       x is salad
-      and 
-       y is tuna. |#
+((eq?-c x) y)
+where
+x is salad
+and 
+y is tuna. |#
 
 (module+ test
   (check-false
    ((eq?-c 'salad) 'tuna)))
 
 #| Q: Now rewrite rember-f as a function of one argument test?
-      that returns an argument like rember with eq? replaced by test? |#
+that returns an argument like rember with eq? replaced by test? |#
 #| A: Ok.
 
 ;; rember-f : Predicate -> Function
@@ -219,11 +219,11 @@
         (else
          (cons (car l) ...)))))) 
 
-         is a good start |#
+is a good start |#
  
 #| Q: Describe in your own words the result of (rember-f test?) where test? is eq? |#
 #| A: It is a function that takes two arguments, a and l. It compares the elements of the list 
-      with a using eq?, and removes the first atom that results in #true. |#
+with a using eq?, and removes the first atom that results in #true. |#
 
 #| Q: Give a name to the function returned by (rember-f test?) where test? is eq? |#
 #| A: (define rember-eq? (rember-f test?)) where test? is eq?. |#
@@ -258,7 +258,7 @@
    '(salad is good)))
 
 #| Q: What is ((rember-f eq?) a l) where a is tuna and 
-      l is (shrimp salad and tuna salad) |#
+l is (shrimp salad and tuna salad) |#
 #| A: (shrimp salad and salad). |#
 
 (module+ test
@@ -317,8 +317,8 @@
 #| A: Only the middle piece is a bit different. |#
 
 #| Q: Can you write a function insert-g that would insert either at the left or at the right?
-      If you can, get yourself some coffee cake and relax! Otherwise, don't give up. You'll see it 
-      in a minute. |#
+If you can, get yourself some coffee cake and relax! Otherwise, don't give up. You'll see it 
+in a minute. |#
 #| A: Ok. My attempt is below. It seems to work but also uses an extra argument for the predicate |#
 
 ;; insert-G : Predicate Atom -> Function
@@ -376,27 +376,27 @@
 
 #| Q: Which pieces differ? |#
 #| A: The second lines differ from each other. In insertL it is: 
-      ((eq? (car l) old) 
-      (cons new (cons old (cdr l)))), 
+((eq? (car l) old) 
+ (cons new (cons old (cdr l)))), 
 
-      but in insertR it is: 
-      ((eq? (car l) old) 
-      (cons old (cons new (cdr l)))). |#
+but in insertR it is: 
+((eq? (car l) old) 
+ (cons old (cons new (cdr l)))). |#
 
 #| Q: Put the difference in words! |#
 #| A: We say: 
-      "The two functions cons old and new in a 
+"The two functions cons old and new in a 
        different order onto the cdr of the list l." |#
 
 #| Q: So how can we get rid of the difference? |#
 #| A: You probably guessed it: by passing in a function that expresses
-      the appropriate consing. |#
+the appropriate consing. |#
 
 #| Q: Define a function seqL that 
-      1. takes three arguments, and 
-      2. conses the first argument 
-         onto the result of consing 
-         the second argument onto the third argument. |#
+1. takes three arguments, and 
+2. conses the first argument 
+onto the result of consing 
+the second argument onto the third argument. |#
 #| A: Ok. |#
 
 ;; define seqL : Sexp Sexp List -> List
@@ -416,22 +416,22 @@
     (cons old (cons new l))))
 
 #| A: A function that 
-      1. takes three arguments, and 
-      2. conses the second argument 
-         onto the result of consing 
-         the first argument onto 
-         the third argument. |#
+1. takes three arguments, and 
+2. conses the second argument 
+onto the result of consing 
+the first argument onto 
+the third argument. |#
 
 #| Q: Do you know why we wrote these functions? |#
 #| A: Because they express what the two differing lines in insertL and insertR express. |#
 
 #| Q: Try to write the function insert-g of one
-      argument seq 
-        which returns insertL 
-            where seq is seqL 
-      and 
-        which returns insertR 
-            where seq is seqR |#
+argument seq 
+which returns insertL 
+where seq is seqL 
+and 
+which returns insertR 
+where seq is seqR |#
 
 #| A: Ok |#
 
@@ -476,21 +476,21 @@
 
 #| Q: Is there something unusual about these two definitions? |#
 #| A: Yes. Earlier we would probably have written 
-        (define insertL (insert-g seq)) 
-      where 
-        seq is seqL 
-      and 
-        (define insertR (insert-g seq)) 
-      where 
-        seq is seqR. 
-      But, using "where" is unnecessary when you 
-      pass functions as arguments. |#
+(define insertL (insert-g seq)) 
+where 
+seq is seqL 
+and 
+(define insertR (insert-g seq)) 
+where 
+seq is seqR. 
+But, using "where" is unnecessary when you 
+pass functions as arguments. |#
 
 #| Q: Is it necessary to give names to seqL and seqR |#
 #| A: Not really. We could have passed their definitions instead. |#
 
 #| Q: Define insertL again with insert-g 
-      Do not pass in seqL this time. |#
+Do not pass in seqL this time. |#
 #| A: Ok. |#
 
 (define insert-L
@@ -500,7 +500,7 @@
 
 #| Q: Is this better? |#
 #| A: Yes, because you do not need to remember as many names. You can
-      (rember func-name "your-mind") where func-name is seqL. |#
+(rember func-name "your-mind") where func-name is seqL. |#
 
 #| Q: Do you remember the definition of subst |#
 #| A: Here is one.
@@ -516,7 +516,7 @@
 
 #| Q: Does this look familiar? |#
 #| A: Yes, it looks like insertL or insertR. Just the 
-      answer of the second cond-line is different. |#
+answer of the second cond-line is different. |#
 
 #| Q: Define a function like seqL or seqR for subst |#
 #| A: What do you think about this? |#
@@ -550,7 +550,7 @@
 Step-by-step:
 
 1. seqrem is a function that takes three arguments: new old and l and
-   always returns l ignoring the others.
+always returns l ignoring the others.
 
 2. Here is insert-g again:
 
@@ -566,33 +566,33 @@ Step-by-step:
                                     (cdr l))))))))
 
 3. If we use seqrem with insert-g, we get a function that takes
-   three arguments: new old and l, that returns (cdr l) when it encounters
-   old in the list. The argument new is not used. 
+three arguments: new old and l, that returns (cdr l) when it encounters
+old in the list. The argument new is not used. 
 
 4. When we define yyy we create function that takes two arguments: a and l
-   that removes the first encounter of a in l. 
+that removes the first encounter of a in l. 
 
 5. yyy is just rember.
 
 6. It appears that #f [false] in the inner function allows us to bypass the unused argument
-   See further down.
+See further down.
 
 
 This is from the book:
 
 Surprise! It is our old friend rember
 
- Hint: Step through the evaluation of
-   (yyy a l) 
- where 
-   a is sausage 
- and 
-   l is (pizza with sausage and bacon). |#
+Hint: Step through the evaluation of
+(yyy a l) 
+where 
+a is sausage 
+and 
+l is (pizza with sausage and bacon). |#
 
 
 ;; What role does #f play?!
 
-;; Let's try something ==>
+;; Let's try something
 
 ;; inner : Number Number Number -> Number
 ;; Produces the sum of the first two numbers and ignores the third
@@ -657,14 +657,14 @@ Surprise! It is our old friend rember
 #| A: The last three answers are the same except for the plus, *, and **. |#
 
 #| Q: Can you write the function atom-to-function 
-      which: 
-         1. Takes one argument x and 
-         2. returns the function + 
-      if (eq? x '+) 
-         returns the function * 
-      if (eq? x '*) and 
-         returns the function ** 
-         otherwise? |#
+which: 
+1. Takes one argument x and 
+2. returns the function + 
+if (eq? x '+) 
+   returns the function * 
+   if (eq? x '*) and 
+   returns the function ** 
+   otherwise? |#
 #| A: Let me try. I will use functions that we defined in Chapter 4. |#
 
 ;; atom-to-function : Atom -> Function
@@ -767,7 +767,7 @@ Here is the original function btw
                   (multirember a 
                                (cdr lat)))))))
 
-      Write multirember-f |#
+Write multirember-f |#
 
 #| A: No problem. |#
 
@@ -778,7 +778,7 @@ Here is the original function btw
     (λ (a lat) 
       (cond 
         ((null? lat) '()) 
-        ((eq? (car lat) a) 
+        ((test? (car lat) a) 
          ((multirember-f test?) a (cdr lat))) 
         (else
          (cons (car lat) 
@@ -820,20 +820,20 @@ Here is the original function btw
 
 #| Q: Can we combine a and test? |#
 #| A: Well, test? could be a function of just one argument and could compare
-      that argument to tuna. |#
+that argument to tuna. |#
 
 #| Q: How would it do that? |#
 #| A: The new test? takes one argument and compares it to tuna. |#
 
 #| Q: Here is one way to write this function.
 
-      (define eq?-tuna  
-        (eq?-c k))
+(define eq?-tuna  
+  (eq?-c k))
 
-      where k is tuna
+where k is tuna
 
-      Can you think of a different way of writing 
-      this function?  |#
+Can you think of a different way of writing 
+this function?  |#
 
 #| A: Yes, and here is a different way: |#
 
@@ -852,12 +852,12 @@ Here is the original function btw
 #| A: Yes, 0, 'x, '+, and many more. |#
 
 #| Q: Perhaps we should now write multiremberT which is similar to multirember-f 
-      Instead of taking test? and returning a function, multiremberT takes a function like 
-      eq?-tuna and a lat and then does its work. |#
+Instead of taking test? and returning a function, multiremberT takes a function like 
+eq?-tuna and a lat and then does its work. |#
 #| A: This is not really difficult. |#
 
 ;; multiremberT : Predicate LAT -> LAT
-;; Removes all wanted atoms from lat using predicate
+;; Removes all matching atoms from lat using predicate
 
 (define multiremberT
   (λ (test? lat) 
@@ -914,15 +914,15 @@ Here is the original function btw
     (null? y)))
 
 #| A: Yes, it is simpler. It is a function that takes two arguments and asks
-      whether the second one is the empty list. It ignores its first argument. |#
+whether the second one is the empty list. It ignores its first argument. |#
 
 #| Q: What is the value of
-        (multirember&co a lat col) 
-      where 
-        a is tuna 
-        lat is (strawberries tuna and swordfish) 
+(multirember&co a lat col) 
+where 
+a is tuna 
+lat is (strawberries tuna and swordfish) 
       and 
-        col is a-friend |#
+       col is a-friend |#
 
 #| A: This is not simple. |#
 
@@ -959,12 +959,16 @@ Here is the original function btw
 #| A: The name col is short for "collector."
       A collector is sometimes called a "continuation." |#
 
-; http://www.michaelharrison.ws/weblog/2007/08/unpacking-multiremberco-from-tls/
+; http://www.michaelharrison.ws/weblog/2007/08/unpacking-multiremberco-from-tls/  # This link is broken
+; https://web.archive.org/web/20201109005927/http://www.michaelharrison.ws/weblog/2007/08/unpacking-multiremberco-from-tls/
 ; https://stackoverflow.com/questions/7004636/explain-the-continuation-example-on-p-137-of-the-little-schemer/7005024#7005024
 ; https://stackoverflow.com/questions/2018008/help-understanding-continuations-in-scheme?rq=1
 ; https://davidgorski.ca/posts/collectors-in-scheme/
 ; http://debasishg.blogspot.com/2007/08/collector-idiom-in-scheme-is-this.html
 ; https://stackoverflow.com/questions/40641470/building-the-built-in-procedure-build-list-in-racket/40643451#40643451
+
+; https://dreamsongs.com/Files/WhyOfY.pdf # this is for later
+
 
 #| Q: Here is the new collector:
 
@@ -973,12 +977,12 @@ Here is the original function btw
     (col newlat 
          (cons (car lat) seen))))
 
-      where 
-       (car lat) is tuna 
-      and 
-       col is a-friend
+where 
+(car lat) is tuna 
+and 
+col is a-friend
 
-      Can you write this definition differently? |#
+Can you write this definition differently? |#
 
 #| A: Do you mean the new way where we put tuna into the definition?
 
@@ -987,12 +991,12 @@ Here is the original function btw
     (col newlat 
          (cons 'tuna seen))))
 
-      where
-       col is a-friend.
+where
+col is a-friend.
 |#
 
 #| Q: Can we also replace col with a-friend in such definitions
-      because col is to a-friend what (car lat) is to tuna |#
+because col is to a-friend what (car lat) is to tuna |#
 
 #| A: Yes, we can:
 
@@ -1003,14 +1007,14 @@ Here is the original function btw
 
 #| Q: And now? |#
 #| A: multirember&co finds out that (null? lat) is true, which means
-      that it uses the collector on two empty lists. |#
+that it uses the collector on two empty lists. |#
 
 #| Q: Which collector is this? |#
 #| A: It is new-friend. |#
 
 #| Q: How does a-friend differ from new-friend |#
 #| A: new-friend uses a-friend on the empty list and the value of 
-      (cons 'tuna '()). |#
+(cons 'tuna '()). |#
 
 #| Q: And what does the old collector do with such arguments? |#
 #| A: It answers #f, because its second argument is (tuna), which is not the empty list. |#
@@ -1098,11 +1102,11 @@ Do you also remember multiinsertR? |#
 
 #| Q: Now try multiinsertLR
 
-      Hint: multiinsertLR inserts new to the left of oldL and to the right of oldR in lat if 
-      oldL are oldR are different. |#
+Hint: multiinsertLR inserts new to the left of oldL and to the right of oldR in lat if 
+oldL are oldR are different. |#
 
 #| A: Ok. This was not complicated but I had to peak the answer because I
-      could not figure out what the function was supposed to do. |#
+could not figure out what the function was supposed to do. |#
 
 ;; multiinsertLR : Atom Atom Atom LAT -> LAT
 ;; inserts atom to both sides of matched atom in list
@@ -1131,8 +1135,7 @@ Do you also remember multiinsertR? |#
 #| A: It is a collector function. |#
 
 #| Q: When multiinsertLR&co is done, it will use col on the new lat, on the number of left 
-      insertions, and the number of right insertions. Can you write an outline of 
-      multiinsertLR&co |#
+      insertions, and the number of right insertions. Can you write an outline of multiinsertLR&co |#
 #| A: Sure, it is just like multiinsertLR. |#
 
 (define multiinsertLR&co-proto 
@@ -1161,9 +1164,11 @@ Do you also remember multiinsertR? |#
 #| A: The empty lat contains neither oldL nor oldR. And this means that 0 occurrences of oldL
       and 0 occurrences of oldR are found and that multiinsertLR will return () when lat is empty. |#
 
-#| Q: So what is the value of 
-      (multiinsertLR&co 
-       'cranberries 'fish 'chips '() col) |#
+#| Q: So what is the value of
+ 
+(multiinsertLR&co 
+ 'cranberries 'fish 'chips '() col) |#
+
 #| A: It is the value of (col '() 0 0), which we cannot determine because we don't know what col is. |#
 
 #| Q: Is it true that multiinsertLR&co will use the new collector on three arguments when 
@@ -1174,13 +1179,14 @@ Do you also remember multiinsertR? |#
 
 #| Q: Is it true that multiinsertLR&co then uses the function col on (cons (car lat) newlat) 
       because it copies the list unless an oldL or an oldR appears? |#
-#| A: Yes, it is true, so we know what the new collector for the last case is: 
+#| A: Yes, it is true, so we know what the new collector for the last case is:
+
       (λ (newlat L R) 
-      (col (cons (car lat) newlat) L R)).|#
+       (col (cons (car lat) newlat) L R)).|#
 
 #| Q: Why are col's second and third arguments just L and R |#
-#| A: If (car lat) is neither oldL nor oldR, we do not need to insert any new elements. So, L 
-      and R are the correct results for both (cdr lat) and all of lat. |#
+#| A: If (car lat) is neither oldL nor oldR, we do not need to insert any new elements.
+      So, L and R are the correct results for both (cdr lat) and all of lat. |#
 
 #| Q: Here is what we have so far. And we have even thrown in an extra collector: |#
 
@@ -1200,7 +1206,7 @@ Do you also remember multiinsertR? |#
        (multiinsertLR&co-proto2 new oldL oldR 
                                 (cdr lat) 
                                 (λ (newlat L R) 
-                                  '... ))) 
+                                  '...))) 
       (else 
        (multiinsertLR&co-proto2 new oldL oldR 
                                 (cdr lat) 
@@ -1212,8 +1218,6 @@ Do you also remember multiinsertR? |#
 #| A: The incomplete collector is similar to the extra collector. Instead of adding one to L, it 
       adds one to R, and instead of consing new onto consing oldL onto newlat, it conses oldR 
       onto the result of consing new onto newlat. |#
-
-
 
 #| Q: Can you fill in the dots? |#
 
@@ -1245,46 +1249,53 @@ Do you also remember multiinsertR? |#
 
 #| A: Yes, the final collector is
 
-      (λ (newlat L R) 
-        (col (cons oldR (cons new newlat))
-              L (add1 R))) |#
+(λ (newlat L R) 
+  (col (cons oldR (cons new newlat))
+       L (add1 R))) |#
 
 #| Q: What is the value of
-       (multiinsertLR&co new oldL oldR lat col) 
-      where 
-       new is salty 
-       oldL is fish 
-       oldR is chips 
-      and 
-       lat is (chips and fish or fish and chips) |#
+
+(multiinsertLR&co new oldL oldR lat col) 
+where 
+ new is salty 
+ oldL is fish 
+ oldR is chips 
+and 
+ lat is (chips and fish or fish and chips) |#
+
 #| A: It is the value of (col newlat 2 2) 
       where 
        newlat is (chips salty and salty fish or salty fish and chips salty). |#
+
+(module+ test
+  (check-equal?
+   (multiinsertLR&co 'salty 'fish 'chips '(chips and fish or fish and chips) list)
+   '((chips salty and salty fish or salty fish and chips salty) 2 2)))
 
 #| Q: Is this healthy? |#
 #| A: Looks like lots of salt. Perhaps dessert is sweeter. |#
 
 #| Q: Do you remember what *-functions are? |#
 #| A: Yes, all *-functions work on lists that are either 
-      - empty, 
-      - an atom consed onto a list, or 
-      - a list consed onto a list. |#
+- empty, 
+- an atom consed onto a list, or 
+- a list consed onto a list. |#
 
 #| Q: Now write the function evens-only* which removes all odd numbers from a list of nested 
-      lists. Here is even?
+lists. Here is even?
 
-      (define even? 
-        (lambda (n) 
-          (= (* (/ n 2) 2) n)))      
-
-      NOTE! I can't understand how that function should work?? It always return true. The number after
-      the first division must be an integer for this to work.
-      Luckily racket has the function even?
+;; even? : Natural -> Boolean
+;; Produces #true, if the given number is even, else #false
+(define even? 
+  (lambda (n) 
+    (= (* (quotient n 2) 2) n)))      
 |#
 
-#| A: Now that we have practiced this way of writing functions, evens-only* is just an exercise: |#
+; NOTE! I used 'quotient' in the above definition to mimic the custom function 'divide' from before  
+; Racket has the function even?
 
-;; The book did not disclose that the list can contain both atoms and lists and not just lists
+
+#| A: Now that we have practiced this way of writing functions, evens-only* is just an exercise: |#
 
 ;; evens-only* : List-of-tuples-and-atoms -> List-of-tuples-and-atoms
 ;; Removes all odd numbers in the list 
@@ -1296,16 +1307,18 @@ Do you also remember multiinsertR? |#
        (cond
          ((even? (car l))
           (cons (car l) (evens-only* (cdr l))))
-         (else (evens-only* (cdr l)))))
-      (else (cons (evens-only* (car l))
+         (else (evens-only* (cdr l))))) 
+      (else (cons (evens-only* (car l)) ; means that (car l) is a list
                   (evens-only* (cdr l)))))))
 
 ; This solution is identical to the one in the book.
 
 #| Q: What is the value of
-       (evens-only* l) 
-      where 
-       l is ((9 1 2 8) 3 10 ((9 9) 7 6) 2) |#
+
+(evens-only* l) 
+where 
+l is ((9 1 2 8) 3 10 ((9 9) 7 6) 2) |#
+
 #| A: '((2 8) 10 (() 6) 2) |#
 
 (module+ test
@@ -1314,13 +1327,13 @@ Do you also remember multiinsertR? |#
    '((2 8) 10 (() 6) 2)))
 
 #| Q: What is the sum of the odd numbers in l 
-      where 
-       l is ((9 1 2 8) 3 10 ((9 9) 7 6) 2) |#
+where
+l is ((9 1 2 8) 3 10 ((9 9) 7 6) 2) |#
 #| A: 9 + 1 + 3 + 9 + 9 + 7 = 38. |#
 
 #| Q: What is the product of the even numbers in l 
-      where 
-       l is ((9 1 2 8) 3 10 ((9 9) 7 6) 2) |#
+where 
+l is ((9 1 2 8) 3 10 ((9 9) 7 6) 2) |#
 #| A: 2 x 8 x 10 x 6 x 2 = 1920. |#
 
 #| Q: Can you write the function evens-only*&co
@@ -1330,8 +1343,7 @@ Do you also remember multiinsertR? |#
 #| A: This is full of stars! |#
 
 #| Q: Here is an outline. Can you explain what 
-      (evens-only*&co (car l) ... ) accomplishes? |#
-
+(evens-only*&co (car l) ... ) accomplishes? |#
 
 (define evens-only*&co-proto 
   (λ (l col) 
@@ -1366,9 +1378,9 @@ Do you also remember multiinsertR? |#
       sum of the odd numbers. |#
 
 #| Q: Does this mean the unknown collector looks roughly like this: 
-      (λ (al ap as) 
-        (evens-only*&co (cdr l) 
-                        ...)) |#
+(λ (al ap as) 
+  (evens-only*&co (cdr l) 
+                  ...)) |#
 #| A: Yes. |#
 
 #| Q: And when (evens-only*&co (cdr l) ... ) is done with its job, what happens then? |#
@@ -1376,16 +1388,15 @@ Do you also remember multiinsertR? |#
 
 #| Q: What does the collector for (evens-only*&co (cdr l) ...) do? |#
 #| A: It conses together the results for the lists in 
-the car and the cdr and multiplies and adds 
-the respective products and sums. Then it 
-passes these values to the old collector:
+      the car and the cdr and multiplies and adds 
+      the respective products and sums. Then it 
+      passes these values to the old collector:
 (λ (al ap as) 
   (evens-only*&co (cdr l) 
                   (λ (dl dp ds) 
                     (col (cons al dl) 
-                         (x ap dp) 
+                         (* ap dp) 
                          (+ as ds))))) |#
-
 
 (define evens-only*&co 
   (λ (l col) 
@@ -1408,7 +1419,7 @@ passes these values to the old collector:
                               (evens-only*&co (cdr l) 
                                               (λ (dl dp ds) 
                                                 (col (cons al dl) 
-                                                     (x ap dp) 
+                                                     (* ap dp) 
                                                      (+ as ds))))))))))
 
 ; https://stackoverflow.com/questions/10692449/the-little-schemer-evens-onlyco
