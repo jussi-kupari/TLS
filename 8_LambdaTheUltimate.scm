@@ -1364,8 +1364,6 @@ l is ((9 1 2 8) 3 10 ((9 9) 7 6) 2) |#
       (else (evens-only*&co-proto (car l) 
                                   '...)))))
 
-
-
 #| A: It visits every number in the car of l and collects the list without odd numbers, the 
       product of the even numbers, and the sum of the odd numbers. |#
 
